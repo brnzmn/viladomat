@@ -18,7 +18,10 @@ import { hmacIban, lookupEsBank, validateIban } from '@viladomat/core';
 import { envOptional } from '../../lib/env.ts';
 import type { CheckContext, CheckResult, CheckSubject, VendorCheck } from '../types.ts';
 
-function absorptionNote(code: string | null, bank: ReturnType<typeof lookupEsBank> | null): string | undefined {
+function absorptionNote(
+  code: string | null,
+  bank: ReturnType<typeof lookupEsBank> | null,
+): string | undefined {
   if (!bank?.absorbedInto) return undefined;
   return (
     `Bank code ${code} was absorbed into ${bank.currentCode}` +
@@ -77,7 +80,10 @@ export const ibanValidate: VendorCheck = {
       return Promise.resolve({
         type: 'iban_validate',
         status: 'not_found',
-        normalised: { present: false, note: 'No account number or stored pseudonym for this party.' },
+        normalised: {
+          present: false,
+          note: 'No account number or stored pseudonym for this party.',
+        },
         raw: { input: null },
         source_url: null,
         cost_cents: 0,
@@ -127,7 +133,9 @@ export const ibanValidate: VendorCheck = {
       source_url: null,
       cost_cents: 0,
       request: { last4: v.last4 },
-      ...(absorptionNote(v.bankCode ?? null, bank) ? { note: absorptionNote(v.bankCode ?? null, bank) as string } : {}),
+      ...(absorptionNote(v.bankCode ?? null, bank)
+        ? { note: absorptionNote(v.bankCode ?? null, bank) as string }
+        : {}),
     });
   },
 };

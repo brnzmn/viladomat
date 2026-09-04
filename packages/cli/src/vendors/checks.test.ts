@@ -376,3 +376,33 @@ describe('manual checks', () => {
     expect(r.cost_cents).toBeGreaterThan(0);
   });
 });
+
+describe('iban_validate from the stored pseudonym', () => {
+  it('resolves the entity from the bank code when the account number is not held in clear', async () => {
+    const r = await ibanValidate.run(
+      {
+        ...VENDOR,
+        iban: null,
+        extra: {
+          bank_code: '0075',
+          last4: '0001',
+          iban_valid: true,
+          ccc_dc_valid: true,
+          country: 'ES',
+        },
+      },
+      ctxWith([]),
+    );
+    expect(r.status).toBe('ok');
+    expect(r.normalised.basis).toBe('stored_pseudonym');
+    expect(r.normalised.current_bank_code).toBe('0049');
+    expect(r.normalised.valid).toBe(true);
+    expect(String(r.note)).toMatch(/absorbed/);
+    expect(JSON.stringify(r)).not.toMatch(/ES\d{22}/);
+  });
+
+  it('still reports not_found when there is neither a number nor a pseudonym', async () => {
+    const r = await ibanValidate.run({ ...VENDOR, iban: null }, ctxWith([]));
+    expect(r.status).toBe('not_found');
+  });
+});

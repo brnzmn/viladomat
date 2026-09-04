@@ -43,7 +43,7 @@ and the row keeps the storage path.
 | Check | Source | What it returns | Rate | Cost |
 |---|---|---|---|---|
 | `nif_validate` | local (`@viladomat/core`) | check digit, kind (DNI/NIE/CIF), entity letter and the legal form it implies | – | free |
-| `iban_validate` | local (`@viladomat/core`) | mod-97, Spanish CCC control digits, bank code, bank name, absorbed-into code and the current entity, last four characters. The account number itself is never written to the row | – | free |
+| `iban_validate` | local (`@viladomat/core`) | mod-97, Spanish CCC control digits, bank code, bank name, absorbed-into code and the current entity, last four characters. The account number itself is never written to the row. Given a transcribed number it computes; given only what `party_ibans` stores (bank code, last four, the verdicts recorded when the number was read) it replays the entity resolution and marks the result `basis: 'stored_pseudonym'` | – | free |
 | `company_profile` | OpenMercantil `/api/v1` (BORME aggregator) | officers, registered address, incorporation date, share capital, CNAE, gazette event timeline; searched by identifier, then by name at ≥ 0.85 token-set similarity | 60/min | free |
 | `bdns_grants` | BDNS `concesiones/busqueda` | grants published for a beneficiary, with amounts granted and paid | 30/min | free |
 | `raisc_grants` | Catalan open data (Socrata `s9xt-n979`) | the same, for the Catalan register | 60/min | free |
