@@ -231,6 +231,27 @@ suite('matcher and M3 rules on a seeded scenario', () => {
     expect(hits.filter((h) => h.entityId === s.invoiceA)).toHaveLength(1);
   });
 
+  it('moves a pending contract milestone to paid from the linked invoice and payment', async () => {
+    await client.query('savepoint milestones');
+    try {
+      const ms = await client.query<{ id: string }>(
+        `insert into public.contract_milestones (community_id, contract_id, seq, hito, importe, is_advance)
+         values ($1, $2, 1, 'Bestreta a la comanda', 1210.00, true) returning id`,
+        [s.cid, s.contractId],
+      );
+      await runMatch(client, s.cid);
+      const row = await client.query<{ status: string; matched_invoice_id: string | null; matched_tx_id: string | null }>(
+        `select status::text as status, matched_invoice_id, matched_tx_id from public.contract_milestones where id = $1`,
+        [ms.rows[0]!.id],
+      );
+      expect(row.rows[0]!.status).toBe('paid');
+      expect(row.rows[0]!.matched_invoice_id).toBe(s.invoiceA);
+      expect(row.rows[0]!.matched_tx_id).toBe(s.txA);
+    } finally {
+      await client.query('rollback to savepoint milestones');
+    }
+  });
+
   it('does not multiply the invoiced total when a package carries several resolutions', async () => {
     await client.query('savepoint e1_check');
     try {

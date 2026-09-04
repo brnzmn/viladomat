@@ -200,16 +200,18 @@ function nifCheck(code: string, raw: string | null | undefined, expectEntity?: '
   };
   if (v.entityLetter) details['entityLetter'] = v.entityLetter;
   let passed = v.valid;
-  if (passed && expectEntity && v.entityLetter !== expectEntity) {
+  if (expectEntity) {
     details['expectedEntityLetter'] = expectEntity;
-    passed = false;
+    const letter = v.entityLetter ?? v.normalised.charAt(0);
+    if (letter !== expectEntity) passed = false;
   }
   return result(code, passed, details);
 }
 
+/** Full IBAN shape, not a masked print-out (`ES12 **** **** 1234`, `ES12 XXXX …`). */
 function looksLikeFullIban(raw: string): boolean {
   const s = raw.replace(/[\s.\-]/g, '').toUpperCase();
-  return /^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(s) && !/[*X#•]/.test(s.slice(4));
+  return /^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(s) && !/[*#•]|XX/.test(s.slice(4));
 }
 
 function ibanCheck(code: string, raw: string | null | undefined): ValidatorResult {
@@ -798,18 +800,24 @@ export function validateDerrama(doc: Derrama, opts: ValidatorOptions = {}): Vali
   }
 
   {
+    // Only rows whose printed instalment list is complete (notices often print the first few).
     const code = 'derrama.plazos_suman_cuota';
     const problems: Record<string, unknown>[] = [];
     let checked = 0;
+    let incomplete = 0;
     cuotas.forEach((c, i) => {
       if (!isNum(c.importe) || c.plazos.length === 0) return;
+      if (isNum(doc.numero_plazos) && c.plazos.length !== doc.numero_plazos) {
+        incomplete += 1;
+        return;
+      }
       const s = sum(c.plazos.map((pl) => pl.importe));
       if (s.count === 0) return;
       checked += 1;
       if (!within(s.total, c.importe, TOLERANCES.perLine * s.count)) problems.push({ index: i, entidad_label: c.entidad_label, sumPlazos: s.total, importe: r2(c.importe) });
     });
-    if (checked === 0) out.push(skipped(code, 'no instalments'));
-    else out.push(result(code, problems.length === 0, { checked: true, problems }));
+    if (checked === 0) out.push(skipped(code, incomplete ? 'instalment lists incomplete' : 'no instalments'));
+    else out.push(result(code, problems.length === 0, { checked: true, problems, rowsSkippedIncomplete: incomplete }));
   }
 
   {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CIF_VENDOR,
+  IBAN_VENDOR,
   actaFixture,
   certificacionFixture,
   clone,
@@ -142,7 +144,7 @@ describe('validators: factura', () => {
   it('catches an invalid NIF and an invalid IBAN', () => {
     const doc = clone(facturaFixture);
     doc.emisor.nif = 'B65432100';
-    doc.iban_mostrado = 'ES0021000418020005133X';
+    doc.iban_mostrado = `ES00${IBAN_VENDOR.slice(4)}`;
     const r = validateFactura(doc, opts);
     expect(failing(r)).toContain('factura.nif_emisor_valido');
     expect(failing(r)).toContain('factura.iban_valido');
@@ -195,8 +197,10 @@ describe('validators: extracto', () => {
     const doc = clone(extractoFixture);
     doc.iban_o_cuenta_mostrada = 'ES21 **** **** **** **** 1332';
     expect(byCode(validateExtracto(doc, opts), 'extracto.iban_valido').details['checked']).toBe(false);
-    (doc.movimientos[1] as { contraparte_iban: string }).contraparte_iban = 'ES0000810057000123456X';
+    (doc.movimientos[1] as { contraparte_iban: string }).contraparte_iban = `ES00${IBAN_VENDOR.slice(4)}`;
     expect(failing(validateExtracto(doc, opts))).toContain('extracto.contraparte_iban_valido');
+    (doc.movimientos[1] as { contraparte_iban: string }).contraparte_iban = 'ES12 XXXX XXXX XX12 3456';
+    expect(byCode(validateExtracto(doc, opts), 'extracto.contraparte_iban_valido').details['checked']).toBe(false);
   });
 });
 
@@ -287,10 +291,13 @@ describe('validators: presupuesto, liquidacion, contrato, derrama', () => {
     expect(codes).toContain('liquidacion.fondo_reserva');
     expect(codes).toContain('liquidacion.coeficientes_le_100');
     expect(codes).not.toContain('liquidacion.saldo_final');
+    // a valid CIF with the wrong entity letter for a community (H expected)
     const nif = clone(liquidacionFixture);
-    nif.comunidad.nif = 'B65432109';
+    nif.comunidad.nif = CIF_VENDOR;
     const r = byCode(validateLiquidacion(nif, opts), 'liquidacion.nif_comunidad_valido');
     expect(r.passed).toBe(false);
+    expect(r.details['reason']).toBeNull();
+    expect(r.details['entityLetter']).toBe('B');
     expect(r.details['expectedEntityLetter']).toBe('H');
   });
 
@@ -307,9 +314,15 @@ describe('validators: presupuesto, liquidacion, contrato, derrama', () => {
   });
 
   it('derrama: catches unit sums, instalments and coefficients', () => {
+    // clean fixture: Pral 1a prints only 2 of 12 instalments → the instalment check is skipped
+    expect(byCode(validateDerrama(derramaFixture, opts), 'derrama.plazos_suman_cuota').details['checked']).toBe(false);
     const doc = clone(derramaFixture);
     doc.importe_total = 2200;
-    (doc.cuotas[0] as { plazos: { fecha: string; importe: number }[] }).plazos = [{ fecha: '2023-04-01', importe: 60 }, { fecha: '2023-05-01', importe: 60 }, ...Array.from({ length: 10 }, (_, i) => ({ fecha: `2023-${String(6 + i).padStart(2, '0')}-01`.replace('2023-13', '2024-01').replace('2023-14', '2024-02').replace('2023-15', '2024-03'), importe: 61 }))];
+    const months = Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(Date.UTC(2023, 3 + i, 1));
+      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-01`;
+    });
+    (doc.cuotas[0] as { plazos: { fecha: string; importe: number }[] }).plazos = months.map((fecha, i) => ({ fecha, importe: i < 2 ? 60 : 61 }));
     const codes = failing(validateDerrama(doc, opts));
     expect(codes).toContain('derrama.cuotas_suman_total');
     expect(codes).toContain('derrama.plazos_suman_cuota');

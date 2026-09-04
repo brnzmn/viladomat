@@ -97,7 +97,7 @@ export const ACTA_ORDINARIA: ActaSpec = {
       kind: 'derrama',
       importeAprobado: 60.0,
       textoLiteral:
-        "Es manté la quota extraordinària de 60,00 €/mes per unitat per finançar les obres en curs (ascensor, façana posterior, escala, porta d'entrada, videoporter i pintura interior), sense modificacions.",
+        "Es manté la quota extraordinària de 60,00 €/mes per unitat per finançar les obres en curs (ascensor, façana posterior, escala, finestres, porta d'entrada, videoporter i pintura interior), sense modificacions.",
       pageNo: 2,
       votes: { favorUnits: 11, favorQuotaPct: 81.5, contraUnits: 1, contraQuotaPct: 8.5, abstencioUnits: 1, abstencioQuotaPct: 9.25 },
     },

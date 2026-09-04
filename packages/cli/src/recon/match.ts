@@ -31,7 +31,7 @@ import { RECON_ENGINE_VERSION } from './version.ts';
 const MUNICIPAL_PAYEE_RE = '(ajuntament|ayuntamiento|institut municipal d.?hisenda|hisenda municipal|icio)';
 
 export interface MatchOptions {
-  /** Report date (ISO); defaults to today. */
+  /** Date the pass is run on (ISO); recorded with the result. Defaults to today. */
   today?: string;
 }
 
@@ -51,6 +51,7 @@ export interface MatchResult {
   municipalFlagged: number;
   worksEvents: WorksEventsResult;
   engineVersion: string;
+  runOn: string;
 }
 
 function num(v: unknown): number {
@@ -91,7 +92,7 @@ interface CreditRow {
 
 /** Run the whole matching pass for one community inside the caller's transaction. */
 export async function runMatch(client: pg.PoolClient, cid: string, opts: MatchOptions = {}): Promise<MatchResult> {
-  void opts;
+  const runOn = opts.today ?? new Date().toISOString().slice(0, 10);
   const counts = new Map<string, LinkCounts>();
   const record = async (link: LinkInput): Promise<void> => {
     const outcome = await upsertLink(client, cid, RECON_ENGINE_VERSION, link);
@@ -129,6 +130,7 @@ export async function runMatch(client: pg.PoolClient, cid: string, opts: MatchOp
     municipalFlagged,
     worksEvents,
     engineVersion: RECON_ENGINE_VERSION,
+    runOn,
   };
 }
 
@@ -773,7 +775,7 @@ async function classifyRecurringDirectDebits(client: pg.PoolClient, cid: string)
 /** Printable summary of a matching run. */
 export function formatMatchResult(result: MatchResult): string[] {
   const lines: string[] = [];
-  lines.push(`links written (engine ${result.engineVersion}) — proposals to verify, decisions preserved:`);
+  lines.push(`links written on ${result.runOn} (engine ${result.engineVersion}) — proposals to verify, decisions preserved:`);
   const types = [...result.linkCounts.keys()].sort();
   if (types.length === 0) lines.push('  (no links)');
   for (const t of types) {
