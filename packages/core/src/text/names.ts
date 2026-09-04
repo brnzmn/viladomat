@@ -212,7 +212,10 @@ function detectOrder(tokens: readonly string[]): 'surnames_first' | 'given_first
  *   (`JOSEP MARIA …`); when no token is known, one token is used (two when there are
  *   four or more tokens).
  */
-export function splitSpanishName(s: string | null | undefined, order: NameOrder = 'auto'): SplitName {
+export function splitSpanishName(
+  s: string | null | undefined,
+  order: NameOrder = 'auto',
+): SplitName {
   const raw = s == null ? '' : String(s);
   const empty: SplitName = { given: '', surname1: '', surname2: '', order: 'given_first' };
   const commaIdx = raw.indexOf(',');
@@ -465,7 +468,10 @@ function uniqueTokens(s: string): string[] {
  * are matched fuzzily (JW ≥ 0.9), then the intersection is compared with each side's full
  * token string, and the best score is returned.
  */
-export function tokenSetSimilarity(a: string | null | undefined, b: string | null | undefined): number {
+export function tokenSetSimilarity(
+  a: string | null | undefined,
+  b: string | null | undefined,
+): number {
   const ta = uniqueTokens(a ?? '');
   const tb = uniqueTokens(b ?? '');
   if (ta.length === 0 && tb.length === 0) return 1;

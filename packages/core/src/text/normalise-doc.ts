@@ -63,7 +63,8 @@ export function dedupeKey(input: DedupeKeyInput): string {
   const serie = normaliseInvoiceNumber(input.serie).canonical.replace(/-/g, '');
   const numero = normaliseInvoiceNumber(input.numero);
   const series = `${serie}${numero.series}`;
-  const number = numero.numberInt === null ? numero.canonical : `${numero.numberInt}${numero.suffix}`;
+  const number =
+    numero.numberInt === null ? numero.canonical : `${numero.numberInt}${numero.suffix}`;
   const totalNum = parseAmountEs(input.total);
   const total = totalNum === null ? String(input.total ?? '').trim() : totalNum.toFixed(2);
   const fecha = parseDateEs(input.fecha) ?? String(input.fecha ?? '').trim();

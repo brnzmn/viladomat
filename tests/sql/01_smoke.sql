@@ -19,6 +19,9 @@ begin
   end;
   raise exception 'EXPECTED ERROR DID NOT HAPPEN: %', msg;
 end $$;
+-- 0014 locks down default execute for PUBLIC; the test helpers run as authenticated too.
+grant execute on function pg_temp.assert(boolean, text) to public;
+grant execute on function pg_temp.expect_error(text, text) to public;
 
 -- ---------------------------------------------------------------------------
 -- bootstrap

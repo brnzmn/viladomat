@@ -17,10 +17,14 @@
     "db:local:down": "bash scripts/db-local.sh down",
     "db:local:migrate": "bash scripts/db-local.sh migrate",
     "db:local:test": "bash scripts/db-local.sh test",
-    "vx": "pnpm --filter @viladomat/cli vx"
+    "vx": "pnpm --filter @viladomat/cli vx",
+    "synth": "tsx tests/synthetic/generate.ts"
   },
   "devDependencies": {
+    "pdf-lib": "^1.17.1",
     "prettier": "^3.6.2",
+    "sharp": "^0.35.0",
+    "tsx": "^4.23.13",
     "typescript": "^5.9.3"
   }
 }

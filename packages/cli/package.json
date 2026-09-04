@@ -13,14 +13,22 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@hyzyla/pdfium": "^2.1.5",
     "@supabase/supabase-js": "^2.115.0",
     "@viladomat/core": "workspace:*",
     "commander": "^15.0.0",
+    "exifr": "^7.1.3",
+    "heic-convert": "^2.1.0",
+    "node-tesseract-ocr": "^2.2.1",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.16.3",
+    "sharp": "^0.35.0",
+    "sharp-phash": "^2.2.0",
     "yaml": "^2.9.0",
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@types/heic-convert": "^2.1.0",
     "@types/node": "^22.19.0",
     "@types/pg": "^8.15.5",
     "tsx": "^4.23.13",

@@ -1,0 +1,34 @@
+{
+  "_fixture_note": "Synthetic. Shape of an OVC callejero Consulta_DNPLOC response for a whole building; method names and the envelope are to verify. Cadastral references are invented and belong to no real property.",
+  "consulta_dnp": {
+    "control": { "cudnp": 3 },
+    "lrcdnp": {
+      "rcdnp": [
+        {
+          "rc": { "pc1": "9999XX", "pc2": "9999XX", "car": "0001", "cc1": "A", "cc2": "B" },
+          "dt": {
+            "locs": { "lous": { "lourb": { "loint": { "es": "1", "pt": "01", "pu": "01" } } } }
+          },
+          "ldt": "CL MOSTRA 25 Pl:01 Pt:01 08015 BARCELONA (BARCELONA)",
+          "debi": { "luso": "Residencial", "sfc": "88", "cpt": "9.100000", "ant": "1928" }
+        },
+        {
+          "rc": { "pc1": "9999XX", "pc2": "9999XX", "car": "0002", "cc1": "C", "cc2": "D" },
+          "dt": {
+            "locs": { "lous": { "lourb": { "loint": { "es": "1", "pt": "01", "pu": "02" } } } }
+          },
+          "ldt": "CL MOSTRA 25 Pl:01 Pt:02 08015 BARCELONA (BARCELONA)",
+          "debi": { "luso": "Residencial", "sfc": "76", "cpt": "7.850000", "ant": "1928" }
+        },
+        {
+          "rc": { "pc1": "9999XX", "pc2": "9999XX", "car": "0003", "cc1": "E", "cc2": "F" },
+          "dt": {
+            "locs": { "lous": { "lourb": { "loint": { "es": "1", "pt": "BJ", "pu": "01" } } } }
+          },
+          "ldt": "CL MOSTRA 25 Pl:BJ Pt:01 08015 BARCELONA (BARCELONA)",
+          "debi": { "luso": "Comercial", "sfc": "120", "cpt": "12.400000", "ant": "1928" }
+        }
+      ]
+    }
+  }
+}

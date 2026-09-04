@@ -1,0 +1,3784 @@
+{
+  "generator": {
+    "seed": 1447119921,
+    "generated_by": "tests/synthetic/generate.ts",
+    "note": "All content is fixed/literal; the seed only drives cosmetic photo/handwriting rendering. See README.md."
+  },
+  "community": {
+    "name": "Comunitat de Propietaris Carrer Exemple 1",
+    "nif": "H00000000",
+    "address": "Carrer Exemple 1, 08015 Barcelona",
+    "bankName": "Banc Exemple",
+    "iban": "ES1590100001850000000001"
+  },
+  "units": [
+    {
+      "label": "Sot 1",
+      "quotaPct": 3.5,
+      "use": "storage"
+    },
+    {
+      "label": "Sot 2",
+      "quotaPct": 3.5,
+      "use": "storage"
+    },
+    {
+      "label": "Bxs 1a",
+      "quotaPct": 6.5,
+      "use": "commercial"
+    },
+    {
+      "label": "Bxs 2a",
+      "quotaPct": 6.5,
+      "use": "commercial"
+    },
+    {
+      "label": "Entl 1a",
+      "quotaPct": 8
+    },
+    {
+      "label": "Entl 2a",
+      "quotaPct": 8
+    },
+    {
+      "label": "Pral 1a",
+      "quotaPct": 8.5
+    },
+    {
+      "label": "Pral 2a",
+      "quotaPct": 8.5
+    },
+    {
+      "label": "1r 1a",
+      "quotaPct": 9.25
+    },
+    {
+      "label": "1r 2a",
+      "quotaPct": 9.25
+    },
+    {
+      "label": "2n 1a",
+      "quotaPct": 9.25
+    },
+    {
+      "label": "2n 2a",
+      "quotaPct": 9.25
+    },
+    {
+      "label": "3r 1a",
+      "quotaPct": 10
+    }
+  ],
+  "president_unit": "Entl 1a",
+  "vendors": [
+    {
+      "key": "ascensors",
+      "name": "Ascensors Exemple S.A.",
+      "nif": "A11122231",
+      "address": "Polígon Industrial Exemple, Carrer B 12, 08210 Barberà del Vallès",
+      "iban": "ES1190110001990000000101",
+      "bank_label": "Caixa Model",
+      "is_natural_person": false
+    },
+    {
+      "key": "installacions",
+      "name": "Instal·lacions Exemple S.L.",
+      "nif": "B22233340",
+      "address": "Carrer del Taller 8, 08014 Barcelona",
+      "iban": "ES5390120001130000000102",
+      "bank_label": "Banc de Mostra",
+      "is_natural_person": false
+    },
+    {
+      "key": "construccions",
+      "name": "Construccions Model S.L.",
+      "nif": "B33344458",
+      "address": "Carrer de la Construcció 22, 08020 Barcelona",
+      "iban": "ES2090130001080000000103",
+      "bank_label": "Caixa Referència",
+      "is_natural_person": false
+    },
+    {
+      "key": "pintures",
+      "name": "Pintures Mostra S.L.",
+      "nif": "B44455566",
+      "address": "Carrer de la Pintura 5, 08016 Barcelona",
+      "iban": "ES1190140001120000000104",
+      "bank_label": "Banc Model",
+      "is_natural_person": false
+    },
+    {
+      "key": "fusteria",
+      "name": "Fusteria Referència S.L.",
+      "nif": "B55566673",
+      "address": "Carrer de la Fusteria 3, 08030 Barcelona",
+      "iban": "ES9690150001270000000105",
+      "bank_label": "Banc de Mostra",
+      "is_natural_person": false
+    },
+    {
+      "key": "arquitecte",
+      "name": "Arquitecte Tècnic Exemple",
+      "nif": "12345678Z",
+      "address": "Carrer de l'Arquitectura 2, 08015 Barcelona",
+      "iban": "ES7590170001460000000107",
+      "bank_label": "Caixa Model",
+      "is_natural_person": true
+    },
+    {
+      "key": "neteges",
+      "name": "Neteges Exemple S.L.",
+      "nif": "B66677782",
+      "address": "Carrer de la Neteja 9, 08018 Barcelona",
+      "iban": "ES6690180001500000000108",
+      "bank_label": "Banc Model",
+      "is_natural_person": false
+    },
+    {
+      "key": "administracio",
+      "name": "Administracions Exemple S.L.",
+      "nif": "B77788891",
+      "address": "Carrer de l'Administració 14, 08013 Barcelona",
+      "iban": "ES5490190001650000000109",
+      "bank_label": "Banc Exemple",
+      "is_natural_person": false
+    }
+  ],
+  "documents": [
+    {
+      "file": "out/invoices/inv-elev-maint.pdf",
+      "doc_type": "factura",
+      "language": "ca",
+      "category_code": "ELEV_MAINT",
+      "issuer_name": "Ascensors Exemple S.A.",
+      "issuer_nif": "A11122231",
+      "issuer_iban": "ES1190110001990000000101",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "AM-2026-0512",
+      "date": "2026-05-01",
+      "payment_method": "direct_debit",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Manteniment mensual ascensor — maig 2026",
+          "qty": 1,
+          "unit": "mes",
+          "unit_price": 120,
+          "amount": 120,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 120,
+      "base": 120,
+      "iva_pct": 21,
+      "iva": 25.2,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 145.2,
+      "handwritten": true,
+      "photo_file": "out/invoices/inv-elev-maint-photo.jpg",
+      "plant_tags": [],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-elev-install-a.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "ELEV_INSTALL",
+      "issuer_name": "Ascensors Exemple S.A.",
+      "issuer_nif": "A11122231",
+      "issuer_iban": "ES1190110001990000000101",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "AI-2026-0301",
+      "date": "2026-05-05",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Certificación de obra civil ascensor — fase 1 (hueco y foso)",
+          "qty": 1,
+          "unit": "ud",
+          "unit_price": 3800,
+          "amount": 3800,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 3800,
+      "base": 3800,
+      "iva_pct": 21,
+      "iva": 798,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 4598,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [
+        "C3-duplicate-a"
+      ],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-elev-install-b.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "ELEV_INSTALL",
+      "issuer_name": "Ascensors Exemple S.A.",
+      "issuer_nif": "A11122231",
+      "issuer_iban": "ES1190110001990000000101",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "AI-2026-0344",
+      "date": "2026-05-25",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Certificación de obra civil ascensor — fase 1 (hueco y foso)",
+          "qty": 1,
+          "unit": "ud",
+          "unit_price": 3800,
+          "amount": 3800,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 3800,
+      "base": 3800,
+      "iva_pct": 21,
+      "iva": 798,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 4598,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [
+        "C3-duplicate-b"
+      ],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-elev-inspect.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "ELEV_INSPECT",
+      "issuer_name": "Ascensors Exemple S.A.",
+      "issuer_nif": "A11122231",
+      "issuer_iban": "ES1190110001990000000101",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "AI-2026-0290",
+      "date": "2026-05-13",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Inspección periódica OCA ascensor (organismo de control autorizado)",
+          "qty": 1,
+          "unit": "ud",
+          "unit_price": 460,
+          "amount": 460,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 460,
+      "base": 450,
+      "iva_pct": 21,
+      "iva": 94.5,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 544.5,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [
+        "C2-arithmetic"
+      ],
+      "notes": "Base imponible impresa (450,00) no coincide con la suma de líneas (460,00): -10,00 €."
+    },
+    {
+      "file": "out/invoices/inv-windows-1.pdf",
+      "doc_type": "factura",
+      "language": "ca",
+      "category_code": "WINDOWS",
+      "issuer_name": "Instal·lacions Exemple S.L.",
+      "issuer_nif": "B22233340",
+      "issuer_iban": "ES5390120001130000000102",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "F-2026-0110",
+      "date": "2026-05-02",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Substitució de 2 finestres alumini RPT al replà de l'escala (element comú)",
+          "qty": 1,
+          "unit": "pa",
+          "unit_price": 500,
+          "amount": 500,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 500,
+      "base": 500,
+      "iva_pct": 10,
+      "iva": 50,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 550,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [
+        "C4-split-a"
+      ],
+      "notes": "El cost dels materials no supera el 40% del total (tipus reduït 10%)."
+    },
+    {
+      "file": "out/invoices/inv-windows-2.pdf",
+      "doc_type": "factura",
+      "language": "ca",
+      "category_code": "WINDOWS",
+      "issuer_name": "Instal·lacions Exemple S.L.",
+      "issuer_nif": "B22233340",
+      "issuer_iban": "ES5390120001130000000102",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "F-2026-0115",
+      "date": "2026-05-06",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Substitució de 2 finestres alumini RPT al replà de l'escala — 2a fase (element comú)",
+          "qty": 1,
+          "unit": "pa",
+          "unit_price": 545.45,
+          "amount": 545.45,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 545.45,
+      "base": 545.45,
+      "iva_pct": 10,
+      "iva": 54.55,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 600,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [
+        "C4-split-b"
+      ],
+      "notes": "El cost dels materials no supera el 40% del total (tipus reduït 10%)."
+    },
+    {
+      "file": "out/invoices/inv-windows-3.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "WINDOWS",
+      "issuer_name": "Instal·lacions Exemple S.L.",
+      "issuer_nif": "B22233340",
+      "issuer_iban": "ES5390120001130000000102",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "F-2026-0130",
+      "date": "2026-05-10",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Sustitución ventana escalera — rellano 2º piso (elemento común)",
+          "qty": 1,
+          "unit": "ud",
+          "unit_price": 410,
+          "amount": 410,
+          "element_scope": "common"
+        },
+        {
+          "index": 1,
+          "desc": "Sustitución ventana dormitorio Pral 1a",
+          "qty": 1,
+          "unit": "ud",
+          "unit_price": 385,
+          "amount": 385,
+          "element_scope": "private_unit"
+        }
+      ],
+      "line_sum": 795,
+      "base": 795,
+      "iva_pct": 10,
+      "iva": 79.5,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 874.5,
+      "handwritten": false,
+      "photo_file": "out/invoices/inv-windows-3-photo.jpg",
+      "plant_tags": [
+        "C11-private-element"
+      ],
+      "notes": "La segona línia identifica un element privatiu (dormitori Pral 1a)."
+    },
+    {
+      "file": "out/invoices/inv-intercom.pdf",
+      "doc_type": "factura",
+      "language": "ca",
+      "category_code": "INTERCOM",
+      "issuer_name": "Instal·lacions Exemple S.L.",
+      "issuer_nif": "B22233340",
+      "issuer_iban": "ES5390120001130000000102",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "F-2026-0142",
+      "date": "2026-06-08",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Renovació del quadre de trucada i telefonillos (12 unitats)",
+          "qty": 1,
+          "unit": "pa",
+          "unit_price": 1300,
+          "amount": 1300,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 1300,
+      "base": 1300,
+      "iva_pct": 21,
+      "iva": 273,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 1573,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-facade-progress.pdf",
+      "doc_type": "factura",
+      "language": "ca",
+      "category_code": "FACADE_REHAB",
+      "issuer_name": "Construccions Model S.L.",
+      "issuer_nif": "B33344458",
+      "issuer_iban": "ES2090130001080000000103",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "CM-2026-0210",
+      "date": "2026-06-25",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Certificació núm. 2 — rehabilitació de la façana posterior i balcons (amidament segons direcció facultativa)",
+          "qty": 1,
+          "unit": "pa",
+          "unit_price": 18000,
+          "amount": 18000,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 18000,
+      "base": 18000,
+      "iva_pct": 21,
+      "iva": 3780,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 21780,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [],
+      "notes": "Certificació emesa sota el contracte d'obres de la façana posterior i balcons."
+    },
+    {
+      "file": "out/invoices/inv-entrance-door.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "ENTRANCE_DOOR",
+      "issuer_name": "Fusteria Referència S.L.",
+      "issuer_nif": "B55566673",
+      "issuer_iban": "ES9690150001270000000105",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "FR-2026-0045",
+      "date": "2026-06-05",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Suministro e instalación de puerta de entrada al portal, cierrapuertas y cerradura de seguridad",
+          "qty": 1,
+          "unit": "ud",
+          "unit_price": 4200,
+          "amount": 4200,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 4200,
+      "base": 4200,
+      "iva_pct": 21,
+      "iva": 882,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 5082,
+      "handwritten": false,
+      "photo_file": "out/invoices/inv-entrance-door-photo.jpg",
+      "plant_tags": [
+        "B4B5-iban-mismatch"
+      ],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-architect.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "ARCH_DO",
+      "issuer_name": "Arquitecte Tècnic Exemple",
+      "issuer_nif": "12345678Z",
+      "issuer_iban": "ES7590170001460000000107",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "AR-2026-0012",
+      "date": "2026-06-01",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Dirección de obra y certificaciones — rehabilitación fachada posterior (mayo-junio 2026)",
+          "qty": 1,
+          "unit": "pa",
+          "unit_price": 3000,
+          "amount": 3000,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 3000,
+      "base": 3000,
+      "iva_pct": 21,
+      "iva": 630,
+      "irpf_pct": 15,
+      "irpf": 450,
+      "total": 3180,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-paint.pdf",
+      "doc_type": "factura",
+      "language": "ca",
+      "category_code": "PAINT_INT",
+      "issuer_name": "Pintures Mostra S.L.",
+      "issuer_nif": "B44455566",
+      "issuer_iban": "ES1190140001120000000104",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "PM-2026-0077",
+      "date": "2026-06-10",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Pintat de vestíbul, replans i sostres de l'escala (2 mans de pintura plàstica)",
+          "qty": 175,
+          "unit": "m2",
+          "unit_price": 12,
+          "amount": 2100,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 2100,
+      "base": 2100,
+      "iva_pct": 21,
+      "iva": 441,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 2541,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-cleaning.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "CLEANING",
+      "issuer_name": "Neteges Exemple S.L.",
+      "issuer_nif": "B66677782",
+      "issuer_iban": "ES6690180001500000000108",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "NX-2026-0033",
+      "date": "2026-06-01",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Limpieza de escalera y portal — junio 2026",
+          "qty": 1,
+          "unit": "mes",
+          "unit_price": 180,
+          "amount": 180,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 180,
+      "base": 180,
+      "iva_pct": 21,
+      "iva": 37.8,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 217.8,
+      "handwritten": false,
+      "photo_file": null,
+      "plant_tags": [],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-admin.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "ADMIN_FEE",
+      "issuer_name": "Administracions Exemple S.L.",
+      "issuer_nif": "B77788891",
+      "issuer_iban": "ES5490190001650000000109",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "AE-2026-0089",
+      "date": "2026-06-01",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Honorarios de administración de fincas — 2º trimestre 2026",
+          "qty": 1,
+          "unit": "pa",
+          "unit_price": 900,
+          "amount": 900,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 900,
+      "base": 900,
+      "iva_pct": 21,
+      "iva": 189,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 1089,
+      "handwritten": true,
+      "photo_file": null,
+      "plant_tags": [],
+      "notes": null
+    },
+    {
+      "file": "out/invoices/inv-masonry.pdf",
+      "doc_type": "factura",
+      "language": "es",
+      "category_code": "MASONRY",
+      "issuer_name": "Construccions Model S.L.",
+      "issuer_nif": "B33344458",
+      "issuer_iban": "ES2090130001080000000103",
+      "recipient_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "recipient_nif": "H00000000",
+      "series_number": "CM-2026-0088",
+      "date": "2026-05-08",
+      "payment_method": "transfer",
+      "lines": [
+        {
+          "index": 0,
+          "desc": "Reparación de humedades y repicado puntual en zona común de escalera",
+          "qty": 8,
+          "unit": "h",
+          "unit_price": 35,
+          "amount": 280,
+          "element_scope": "common"
+        },
+        {
+          "index": 1,
+          "desc": "Material de albañilería (yeso, mortero)",
+          "qty": 1,
+          "unit": "pa",
+          "unit_price": 70,
+          "amount": 70,
+          "element_scope": "common"
+        }
+      ],
+      "line_sum": 350,
+      "base": 350,
+      "iva_pct": 21,
+      "iva": 73.5,
+      "irpf_pct": null,
+      "irpf": null,
+      "total": 423.5,
+      "handwritten": true,
+      "photo_file": null,
+      "plant_tags": [],
+      "notes": null
+    },
+    {
+      "file": "out/statements/statement-2026-05.pdf",
+      "doc_type": "extracto_bancario",
+      "format": "pdf",
+      "holder_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "holder_nif": "H00000000",
+      "iban": "ES1590100001850000000001",
+      "period_from": "2026-05-01",
+      "period_to": "2026-05-31",
+      "opening_balance": 78500,
+      "closing_balance": 44492.9,
+      "movement_count": 27,
+      "movements": [
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Sot 1",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78560,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 1",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Sot 2",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78620,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 2",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78680,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78740,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Entl 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78800,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Entl 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78860,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Pral 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78920,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Pral 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78980,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 1r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79040,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 1r 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79100,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 2n 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79160,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 2n 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79220,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 3r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79280,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "3r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat manteniment ascensor",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -145.2,
+          "balance_after": 79134.8,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": "inv-elev-maint",
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-04",
+          "value_date": "2026-05-04",
+          "concept": "Transferència — avançament contracte façana posterior",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -20328,
+          "balance_after": 58806.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D4E2-advance-before-acta"
+          ]
+        },
+        {
+          "date": "2026-05-04",
+          "value_date": "2026-05-04",
+          "concept": "Transferència factura F-2026-0110",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -550,
+          "balance_after": 58256.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-1",
+          "recurring": false,
+          "plant_tags": [
+            "C4-split-a-payment"
+          ]
+        },
+        {
+          "date": "2026-05-07",
+          "value_date": "2026-05-07",
+          "concept": "Transferència factura AI-2026-0301",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -4598,
+          "balance_after": 53658.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-install-a",
+          "recurring": false,
+          "plant_tags": [
+            "C3-duplicate-a-payment"
+          ]
+        },
+        {
+          "date": "2026-05-08",
+          "value_date": "2026-05-08",
+          "concept": "Transferència factura F-2026-0115",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -600,
+          "balance_after": 53058.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-2",
+          "recurring": false,
+          "plant_tags": [
+            "C4-split-b-payment"
+          ]
+        },
+        {
+          "date": "2026-05-10",
+          "value_date": "2026-05-10",
+          "concept": "Transferència factura CM-2026-0088",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -423.5,
+          "balance_after": 52635.3,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": "inv-masonry",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-12",
+          "value_date": "2026-05-12",
+          "concept": "Transferència factura F-2026-0130",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -874.5,
+          "balance_after": 51760.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-3",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-12",
+          "value_date": "2026-05-12",
+          "concept": "Pagament targeta — Ferreteria Exemple",
+          "concept_detail": null,
+          "amount": -85.4,
+          "balance_after": 51675.4,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-15",
+          "value_date": "2026-05-15",
+          "concept": "Transferència factura AI-2026-0290",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -544.5,
+          "balance_after": 51130.9,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-inspect",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-18",
+          "value_date": "2026-05-18",
+          "concept": "Transferència manteniment jardí",
+          "concept_detail": "Jardineria Exemple",
+          "amount": -480,
+          "balance_after": 50650.9,
+          "conceptoComun": "04",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D1R2-unmatched-debit"
+          ]
+        },
+        {
+          "date": "2026-05-20",
+          "value_date": "2026-05-20",
+          "concept": "Reintegre caixer",
+          "concept_detail": null,
+          "amount": -1200,
+          "balance_after": 49450.9,
+          "conceptoComun": "01",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D2-cash-withdrawal"
+          ]
+        },
+        {
+          "date": "2026-05-22",
+          "value_date": "2026-05-22",
+          "concept": "Bizum — subministrament material neteja",
+          "concept_detail": null,
+          "amount": -150,
+          "balance_after": 49300.9,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-27",
+          "value_date": "2026-05-27",
+          "concept": "Transferència factura AI-2026-0344",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -4598,
+          "balance_after": 44702.9,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-install-b",
+          "recurring": false,
+          "plant_tags": [
+            "C3-duplicate-b-payment"
+          ]
+        },
+        {
+          "date": "2026-05-29",
+          "value_date": "2026-05-29",
+          "concept": "Rebut domiciliat assegurança comunitat",
+          "concept_detail": "Asseguradora Exemple",
+          "amount": -210,
+          "balance_after": 44492.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        }
+      ]
+    },
+    {
+      "file": "out/statements/statement-2026-05.n43",
+      "doc_type": "extracto_bancario",
+      "format": "norma43",
+      "holder_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "holder_nif": "H00000000",
+      "iban": "ES1590100001850000000001",
+      "period_from": "2026-05-01",
+      "period_to": "2026-05-31",
+      "opening_balance": 78500,
+      "closing_balance": 44492.9,
+      "movement_count": 27,
+      "movements": [
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Sot 1",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78560,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 1",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Sot 2",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78620,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 2",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78680,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78740,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Entl 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78800,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Entl 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78860,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Pral 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78920,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Pral 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78980,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 1r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79040,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 1r 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79100,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 2n 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79160,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 2n 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79220,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 3r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79280,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "3r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat manteniment ascensor",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -145.2,
+          "balance_after": 79134.8,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": "inv-elev-maint",
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-04",
+          "value_date": "2026-05-04",
+          "concept": "Transferència — avançament contracte façana posterior",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -20328,
+          "balance_after": 58806.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D4E2-advance-before-acta"
+          ]
+        },
+        {
+          "date": "2026-05-04",
+          "value_date": "2026-05-04",
+          "concept": "Transferència factura F-2026-0110",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -550,
+          "balance_after": 58256.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-1",
+          "recurring": false,
+          "plant_tags": [
+            "C4-split-a-payment"
+          ]
+        },
+        {
+          "date": "2026-05-07",
+          "value_date": "2026-05-07",
+          "concept": "Transferència factura AI-2026-0301",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -4598,
+          "balance_after": 53658.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-install-a",
+          "recurring": false,
+          "plant_tags": [
+            "C3-duplicate-a-payment"
+          ]
+        },
+        {
+          "date": "2026-05-08",
+          "value_date": "2026-05-08",
+          "concept": "Transferència factura F-2026-0115",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -600,
+          "balance_after": 53058.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-2",
+          "recurring": false,
+          "plant_tags": [
+            "C4-split-b-payment"
+          ]
+        },
+        {
+          "date": "2026-05-10",
+          "value_date": "2026-05-10",
+          "concept": "Transferència factura CM-2026-0088",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -423.5,
+          "balance_after": 52635.3,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": "inv-masonry",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-12",
+          "value_date": "2026-05-12",
+          "concept": "Transferència factura F-2026-0130",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -874.5,
+          "balance_after": 51760.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-3",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-12",
+          "value_date": "2026-05-12",
+          "concept": "Pagament targeta — Ferreteria Exemple",
+          "concept_detail": null,
+          "amount": -85.4,
+          "balance_after": 51675.4,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-15",
+          "value_date": "2026-05-15",
+          "concept": "Transferència factura AI-2026-0290",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -544.5,
+          "balance_after": 51130.9,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-inspect",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-18",
+          "value_date": "2026-05-18",
+          "concept": "Transferència manteniment jardí",
+          "concept_detail": "Jardineria Exemple",
+          "amount": -480,
+          "balance_after": 50650.9,
+          "conceptoComun": "04",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D1R2-unmatched-debit"
+          ]
+        },
+        {
+          "date": "2026-05-20",
+          "value_date": "2026-05-20",
+          "concept": "Reintegre caixer",
+          "concept_detail": null,
+          "amount": -1200,
+          "balance_after": 49450.9,
+          "conceptoComun": "01",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D2-cash-withdrawal"
+          ]
+        },
+        {
+          "date": "2026-05-22",
+          "value_date": "2026-05-22",
+          "concept": "Bizum — subministrament material neteja",
+          "concept_detail": null,
+          "amount": -150,
+          "balance_after": 49300.9,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-27",
+          "value_date": "2026-05-27",
+          "concept": "Transferència factura AI-2026-0344",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -4598,
+          "balance_after": 44702.9,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-install-b",
+          "recurring": false,
+          "plant_tags": [
+            "C3-duplicate-b-payment"
+          ]
+        },
+        {
+          "date": "2026-05-29",
+          "value_date": "2026-05-29",
+          "concept": "Rebut domiciliat assegurança comunitat",
+          "concept_detail": "Asseguradora Exemple",
+          "amount": -210,
+          "balance_after": 44492.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        }
+      ]
+    },
+    {
+      "file": "out/statements/statement-2026-05.csv",
+      "doc_type": "extracto_bancario",
+      "format": "csv",
+      "holder_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "holder_nif": "H00000000",
+      "iban": "ES1590100001850000000001",
+      "period_from": "2026-05-01",
+      "period_to": "2026-05-31",
+      "opening_balance": 78500,
+      "closing_balance": 44492.9,
+      "movement_count": 27,
+      "movements": [
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Sot 1",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78560,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 1",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Sot 2",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78620,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 2",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78680,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78740,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Entl 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78800,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Entl 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78860,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Pral 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78920,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama Pral 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 78980,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 1r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79040,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 1r 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79100,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 2n 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79160,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 2n 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79220,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat quota derrama 3r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 79280,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "3r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-02",
+          "value_date": "2026-05-02",
+          "concept": "Rebut domiciliat manteniment ascensor",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -145.2,
+          "balance_after": 79134.8,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": "inv-elev-maint",
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-04",
+          "value_date": "2026-05-04",
+          "concept": "Transferència — avançament contracte façana posterior",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -20328,
+          "balance_after": 58806.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D4E2-advance-before-acta"
+          ]
+        },
+        {
+          "date": "2026-05-04",
+          "value_date": "2026-05-04",
+          "concept": "Transferència factura F-2026-0110",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -550,
+          "balance_after": 58256.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-1",
+          "recurring": false,
+          "plant_tags": [
+            "C4-split-a-payment"
+          ]
+        },
+        {
+          "date": "2026-05-07",
+          "value_date": "2026-05-07",
+          "concept": "Transferència factura AI-2026-0301",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -4598,
+          "balance_after": 53658.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-install-a",
+          "recurring": false,
+          "plant_tags": [
+            "C3-duplicate-a-payment"
+          ]
+        },
+        {
+          "date": "2026-05-08",
+          "value_date": "2026-05-08",
+          "concept": "Transferència factura F-2026-0115",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -600,
+          "balance_after": 53058.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-2",
+          "recurring": false,
+          "plant_tags": [
+            "C4-split-b-payment"
+          ]
+        },
+        {
+          "date": "2026-05-10",
+          "value_date": "2026-05-10",
+          "concept": "Transferència factura CM-2026-0088",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -423.5,
+          "balance_after": 52635.3,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": "inv-masonry",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-12",
+          "value_date": "2026-05-12",
+          "concept": "Transferència factura F-2026-0130",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -874.5,
+          "balance_after": 51760.8,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-windows-3",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-12",
+          "value_date": "2026-05-12",
+          "concept": "Pagament targeta — Ferreteria Exemple",
+          "concept_detail": null,
+          "amount": -85.4,
+          "balance_after": 51675.4,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-15",
+          "value_date": "2026-05-15",
+          "concept": "Transferència factura AI-2026-0290",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -544.5,
+          "balance_after": 51130.9,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-inspect",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-18",
+          "value_date": "2026-05-18",
+          "concept": "Transferència manteniment jardí",
+          "concept_detail": "Jardineria Exemple",
+          "amount": -480,
+          "balance_after": 50650.9,
+          "conceptoComun": "04",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D1R2-unmatched-debit"
+          ]
+        },
+        {
+          "date": "2026-05-20",
+          "value_date": "2026-05-20",
+          "concept": "Reintegre caixer",
+          "concept_detail": null,
+          "amount": -1200,
+          "balance_after": 49450.9,
+          "conceptoComun": "01",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": [
+            "D2-cash-withdrawal"
+          ]
+        },
+        {
+          "date": "2026-05-22",
+          "value_date": "2026-05-22",
+          "concept": "Bizum — subministrament material neteja",
+          "concept_detail": null,
+          "amount": -150,
+          "balance_after": 49300.9,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-05-27",
+          "value_date": "2026-05-27",
+          "concept": "Transferència factura AI-2026-0344",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -4598,
+          "balance_after": 44702.9,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190110001990000000101",
+          "unit": null,
+          "linked_invoice": "inv-elev-install-b",
+          "recurring": false,
+          "plant_tags": [
+            "C3-duplicate-b-payment"
+          ]
+        },
+        {
+          "date": "2026-05-29",
+          "value_date": "2026-05-29",
+          "concept": "Rebut domiciliat assegurança comunitat",
+          "concept_detail": "Asseguradora Exemple",
+          "amount": -210,
+          "balance_after": 44492.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        }
+      ]
+    },
+    {
+      "file": "out/statements/statement-2026-06.pdf",
+      "doc_type": "extracto_bancario",
+      "format": "pdf",
+      "holder_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "holder_nif": "H00000000",
+      "iban": "ES1590100001850000000001",
+      "period_from": "2026-06-01",
+      "period_to": "2026-06-30",
+      "opening_balance": 44492.9,
+      "closing_balance": 8934.7,
+      "movement_count": 26,
+      "movements": [
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Sot 1",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44552.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 1",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Sot 2",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44612.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 2",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44672.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44732.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Entl 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44792.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Entl 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44852.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Pral 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44912.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Pral 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44972.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 1r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45032.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 1r 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45092.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 2n 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45152.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 2n 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45212.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-03",
+          "value_date": "2026-06-03",
+          "concept": "Rebut domiciliat manteniment ascensor",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -145.2,
+          "balance_after": 45067.7,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": "inv-elev-maint",
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-04",
+          "value_date": "2026-06-04",
+          "concept": "Comissió manteniment de compte",
+          "concept_detail": null,
+          "amount": -12.5,
+          "balance_after": 45055.2,
+          "conceptoComun": "17",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-08",
+          "value_date": "2026-06-08",
+          "concept": "Transferència factura FR-2026-0045",
+          "concept_detail": "Fusteria Referència S.L.",
+          "amount": -5082,
+          "balance_after": 39973.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES6190150001200000000205",
+          "unit": null,
+          "linked_invoice": "inv-entrance-door",
+          "recurring": false,
+          "plant_tags": [
+            "B4B5-iban-mismatch-payment"
+          ]
+        },
+        {
+          "date": "2026-06-10",
+          "value_date": "2026-06-10",
+          "concept": "Transferència factura F-2026-0142",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -1573,
+          "balance_after": 38400.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-intercom",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-12",
+          "value_date": "2026-06-12",
+          "concept": "Transferència factura AR-2026-0012",
+          "concept_detail": "Arquitecte Tècnic Exemple",
+          "amount": -3180,
+          "balance_after": 35220.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES7590170001460000000107",
+          "unit": null,
+          "linked_invoice": "inv-architect",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-15",
+          "value_date": "2026-06-15",
+          "concept": "Transferència factura PM-2026-0077",
+          "concept_detail": "Pintures Mostra S.L.",
+          "amount": -2541,
+          "balance_after": 32679.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190140001120000000104",
+          "unit": null,
+          "linked_invoice": "inv-paint",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-16",
+          "value_date": "2026-06-16",
+          "concept": "Transferència factura NX-2026-0033",
+          "concept_detail": "Neteges Exemple S.L.",
+          "amount": -217.8,
+          "balance_after": 32461.4,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES6690180001500000000108",
+          "unit": null,
+          "linked_invoice": "inv-cleaning",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-18",
+          "value_date": "2026-06-18",
+          "concept": "Transferència honoraris administració",
+          "concept_detail": "Administracions Exemple S.L.",
+          "amount": -1089,
+          "balance_after": 31372.4,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5490190001650000000109",
+          "unit": null,
+          "linked_invoice": "inv-admin",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-20",
+          "value_date": "2026-06-20",
+          "concept": "Pagament targeta — Electrodomèstics Exemple",
+          "concept_detail": null,
+          "amount": -62.3,
+          "balance_after": 31310.1,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-22",
+          "value_date": "2026-06-22",
+          "concept": "Bizum — quota associació de veïns",
+          "concept_detail": null,
+          "amount": -40,
+          "balance_after": 31270.1,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-24",
+          "value_date": "2026-06-24",
+          "concept": "Rebut domiciliat pòlissa de responsabilitat civil",
+          "concept_detail": "Asseguradora Exemple",
+          "amount": -180,
+          "balance_after": 31090.1,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-26",
+          "value_date": "2026-06-26",
+          "concept": "Rebut domiciliat subministrament elèctric zona comuna",
+          "concept_detail": null,
+          "amount": -280,
+          "balance_after": 30810.1,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-28",
+          "value_date": "2026-06-28",
+          "concept": "Rebut domiciliat subministrament aigua zona comuna",
+          "concept_detail": null,
+          "amount": -95.4,
+          "balance_after": 30714.7,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-30",
+          "value_date": "2026-06-30",
+          "concept": "Transferència factura CM-2026-0210",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -21780,
+          "balance_after": 8934.7,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": "inv-facade-progress",
+          "recurring": false,
+          "plant_tags": [
+            "A4-paid-exceeds-certified"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "out/statements/statement-2026-06.n43",
+      "doc_type": "extracto_bancario",
+      "format": "norma43",
+      "holder_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "holder_nif": "H00000000",
+      "iban": "ES1590100001850000000001",
+      "period_from": "2026-06-01",
+      "period_to": "2026-06-30",
+      "opening_balance": 44492.9,
+      "closing_balance": 8934.7,
+      "movement_count": 26,
+      "movements": [
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Sot 1",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44552.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 1",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Sot 2",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44612.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 2",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44672.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44732.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Entl 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44792.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Entl 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44852.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Pral 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44912.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Pral 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44972.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 1r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45032.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 1r 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45092.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 2n 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45152.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 2n 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45212.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-03",
+          "value_date": "2026-06-03",
+          "concept": "Rebut domiciliat manteniment ascensor",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -145.2,
+          "balance_after": 45067.7,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": "inv-elev-maint",
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-04",
+          "value_date": "2026-06-04",
+          "concept": "Comissió manteniment de compte",
+          "concept_detail": null,
+          "amount": -12.5,
+          "balance_after": 45055.2,
+          "conceptoComun": "17",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-08",
+          "value_date": "2026-06-08",
+          "concept": "Transferència factura FR-2026-0045",
+          "concept_detail": "Fusteria Referència S.L.",
+          "amount": -5082,
+          "balance_after": 39973.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES6190150001200000000205",
+          "unit": null,
+          "linked_invoice": "inv-entrance-door",
+          "recurring": false,
+          "plant_tags": [
+            "B4B5-iban-mismatch-payment"
+          ]
+        },
+        {
+          "date": "2026-06-10",
+          "value_date": "2026-06-10",
+          "concept": "Transferència factura F-2026-0142",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -1573,
+          "balance_after": 38400.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-intercom",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-12",
+          "value_date": "2026-06-12",
+          "concept": "Transferència factura AR-2026-0012",
+          "concept_detail": "Arquitecte Tècnic Exemple",
+          "amount": -3180,
+          "balance_after": 35220.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES7590170001460000000107",
+          "unit": null,
+          "linked_invoice": "inv-architect",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-15",
+          "value_date": "2026-06-15",
+          "concept": "Transferència factura PM-2026-0077",
+          "concept_detail": "Pintures Mostra S.L.",
+          "amount": -2541,
+          "balance_after": 32679.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190140001120000000104",
+          "unit": null,
+          "linked_invoice": "inv-paint",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-16",
+          "value_date": "2026-06-16",
+          "concept": "Transferència factura NX-2026-0033",
+          "concept_detail": "Neteges Exemple S.L.",
+          "amount": -217.8,
+          "balance_after": 32461.4,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES6690180001500000000108",
+          "unit": null,
+          "linked_invoice": "inv-cleaning",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-18",
+          "value_date": "2026-06-18",
+          "concept": "Transferència honoraris administració",
+          "concept_detail": "Administracions Exemple S.L.",
+          "amount": -1089,
+          "balance_after": 31372.4,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5490190001650000000109",
+          "unit": null,
+          "linked_invoice": "inv-admin",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-20",
+          "value_date": "2026-06-20",
+          "concept": "Pagament targeta — Electrodomèstics Exemple",
+          "concept_detail": null,
+          "amount": -62.3,
+          "balance_after": 31310.1,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-22",
+          "value_date": "2026-06-22",
+          "concept": "Bizum — quota associació de veïns",
+          "concept_detail": null,
+          "amount": -40,
+          "balance_after": 31270.1,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-24",
+          "value_date": "2026-06-24",
+          "concept": "Rebut domiciliat pòlissa de responsabilitat civil",
+          "concept_detail": "Asseguradora Exemple",
+          "amount": -180,
+          "balance_after": 31090.1,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-26",
+          "value_date": "2026-06-26",
+          "concept": "Rebut domiciliat subministrament elèctric zona comuna",
+          "concept_detail": null,
+          "amount": -280,
+          "balance_after": 30810.1,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-28",
+          "value_date": "2026-06-28",
+          "concept": "Rebut domiciliat subministrament aigua zona comuna",
+          "concept_detail": null,
+          "amount": -95.4,
+          "balance_after": 30714.7,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-30",
+          "value_date": "2026-06-30",
+          "concept": "Transferència factura CM-2026-0210",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -21780,
+          "balance_after": 8934.7,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": "inv-facade-progress",
+          "recurring": false,
+          "plant_tags": [
+            "A4-paid-exceeds-certified"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "out/statements/statement-2026-06.csv",
+      "doc_type": "extracto_bancario",
+      "format": "csv",
+      "holder_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "holder_nif": "H00000000",
+      "iban": "ES1590100001850000000001",
+      "period_from": "2026-06-01",
+      "period_to": "2026-06-30",
+      "opening_balance": 44492.9,
+      "closing_balance": 8934.7,
+      "movement_count": 26,
+      "movements": [
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Sot 1",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44552.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 1",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Sot 2",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44612.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Sot 2",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44672.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Bxs 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44732.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Bxs 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Entl 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44792.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Entl 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44852.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Entl 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Pral 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44912.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama Pral 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 44972.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "Pral 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 1r 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45032.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 1r 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45092.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "1r 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 2n 1a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45152.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 1a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-02",
+          "value_date": "2026-06-02",
+          "concept": "Rebut domiciliat quota derrama 2n 2a",
+          "concept_detail": "Comunitat de Propietaris — derrama obres",
+          "amount": 60,
+          "balance_after": 45212.9,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": "2n 2a",
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-03",
+          "value_date": "2026-06-03",
+          "concept": "Rebut domiciliat manteniment ascensor",
+          "concept_detail": "Ascensors Exemple S.A.",
+          "amount": -145.2,
+          "balance_after": 45067.7,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": "inv-elev-maint",
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-04",
+          "value_date": "2026-06-04",
+          "concept": "Comissió manteniment de compte",
+          "concept_detail": null,
+          "amount": -12.5,
+          "balance_after": 45055.2,
+          "conceptoComun": "17",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-08",
+          "value_date": "2026-06-08",
+          "concept": "Transferència factura FR-2026-0045",
+          "concept_detail": "Fusteria Referència S.L.",
+          "amount": -5082,
+          "balance_after": 39973.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES6190150001200000000205",
+          "unit": null,
+          "linked_invoice": "inv-entrance-door",
+          "recurring": false,
+          "plant_tags": [
+            "B4B5-iban-mismatch-payment"
+          ]
+        },
+        {
+          "date": "2026-06-10",
+          "value_date": "2026-06-10",
+          "concept": "Transferència factura F-2026-0142",
+          "concept_detail": "Instal·lacions Exemple S.L.",
+          "amount": -1573,
+          "balance_after": 38400.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5390120001130000000102",
+          "unit": null,
+          "linked_invoice": "inv-intercom",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-12",
+          "value_date": "2026-06-12",
+          "concept": "Transferència factura AR-2026-0012",
+          "concept_detail": "Arquitecte Tècnic Exemple",
+          "amount": -3180,
+          "balance_after": 35220.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES7590170001460000000107",
+          "unit": null,
+          "linked_invoice": "inv-architect",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-15",
+          "value_date": "2026-06-15",
+          "concept": "Transferència factura PM-2026-0077",
+          "concept_detail": "Pintures Mostra S.L.",
+          "amount": -2541,
+          "balance_after": 32679.2,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES1190140001120000000104",
+          "unit": null,
+          "linked_invoice": "inv-paint",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-16",
+          "value_date": "2026-06-16",
+          "concept": "Transferència factura NX-2026-0033",
+          "concept_detail": "Neteges Exemple S.L.",
+          "amount": -217.8,
+          "balance_after": 32461.4,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES6690180001500000000108",
+          "unit": null,
+          "linked_invoice": "inv-cleaning",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-18",
+          "value_date": "2026-06-18",
+          "concept": "Transferència honoraris administració",
+          "concept_detail": "Administracions Exemple S.L.",
+          "amount": -1089,
+          "balance_after": 31372.4,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES5490190001650000000109",
+          "unit": null,
+          "linked_invoice": "inv-admin",
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-20",
+          "value_date": "2026-06-20",
+          "concept": "Pagament targeta — Electrodomèstics Exemple",
+          "concept_detail": null,
+          "amount": -62.3,
+          "balance_after": 31310.1,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-22",
+          "value_date": "2026-06-22",
+          "concept": "Bizum — quota associació de veïns",
+          "concept_detail": null,
+          "amount": -40,
+          "balance_after": 31270.1,
+          "conceptoComun": "12",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": false,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-24",
+          "value_date": "2026-06-24",
+          "concept": "Rebut domiciliat pòlissa de responsabilitat civil",
+          "concept_detail": "Asseguradora Exemple",
+          "amount": -180,
+          "balance_after": 31090.1,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-26",
+          "value_date": "2026-06-26",
+          "concept": "Rebut domiciliat subministrament elèctric zona comuna",
+          "concept_detail": null,
+          "amount": -280,
+          "balance_after": 30810.1,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-28",
+          "value_date": "2026-06-28",
+          "concept": "Rebut domiciliat subministrament aigua zona comuna",
+          "concept_detail": null,
+          "amount": -95.4,
+          "balance_after": 30714.7,
+          "conceptoComun": "03",
+          "counterparty_iban": null,
+          "unit": null,
+          "linked_invoice": null,
+          "recurring": true,
+          "plant_tags": []
+        },
+        {
+          "date": "2026-06-30",
+          "value_date": "2026-06-30",
+          "concept": "Transferència factura CM-2026-0210",
+          "concept_detail": "Construccions Model S.L.",
+          "amount": -21780,
+          "balance_after": 8934.7,
+          "conceptoComun": "04",
+          "counterparty_iban": "ES2090130001080000000103",
+          "unit": null,
+          "linked_invoice": "inv-facade-progress",
+          "recurring": false,
+          "plant_tags": [
+            "A4-paid-exceeds-certified"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "out/actas/acta-ordinaria-2026-03-30.pdf",
+      "doc_type": "acta",
+      "tipo": "ordinaria",
+      "language": "ca",
+      "date": "2026-03-30",
+      "hora": "19:00",
+      "lugar": "Despatx de l'administrador, Carrer de l'Administració 14, 08013 Barcelona",
+      "convened_by_role": "president",
+      "convocation_notice_date": null,
+      "attendance": [
+        {
+          "unit": "Sot 1",
+          "quota_pct": 3.5,
+          "status": "present"
+        },
+        {
+          "unit": "Sot 2",
+          "quota_pct": 3.5,
+          "status": "present"
+        },
+        {
+          "unit": "Bxs 1a",
+          "quota_pct": 6.5,
+          "status": "present"
+        },
+        {
+          "unit": "Bxs 2a",
+          "quota_pct": 6.5,
+          "status": "represented"
+        },
+        {
+          "unit": "Entl 1a",
+          "quota_pct": 8,
+          "status": "present"
+        },
+        {
+          "unit": "Entl 2a",
+          "quota_pct": 8,
+          "status": "present"
+        },
+        {
+          "unit": "Pral 1a",
+          "quota_pct": 8.5,
+          "status": "present"
+        },
+        {
+          "unit": "Pral 2a",
+          "quota_pct": 8.5,
+          "status": "present"
+        },
+        {
+          "unit": "1r 1a",
+          "quota_pct": 9.25,
+          "status": "present"
+        },
+        {
+          "unit": "1r 2a",
+          "quota_pct": 9.25,
+          "status": "represented"
+        },
+        {
+          "unit": "2n 1a",
+          "quota_pct": 9.25,
+          "status": "present"
+        },
+        {
+          "unit": "2n 2a",
+          "quota_pct": 9.25,
+          "status": "absent"
+        },
+        {
+          "unit": "3r 1a",
+          "quota_pct": 10,
+          "status": "present"
+        }
+      ],
+      "resolutions": [
+        {
+          "punto": "1",
+          "kind": "accounts",
+          "works_package": null,
+          "importe_aprobado": null,
+          "delegation_to_role": null,
+          "delegation_scope": null,
+          "votes": null,
+          "texto_literal": "S'aprova la liquidació d'ingressos i despeses de l'exercici 2025, amb un resultat favorable de 5.180,40 €. El fons de reserva a 31/12/2025 és de 7.200,00 €.",
+          "page_no": 1
+        },
+        {
+          "punto": "2",
+          "kind": "budget",
+          "works_package": null,
+          "importe_aprobado": 6850,
+          "delegation_to_role": null,
+          "delegation_scope": null,
+          "votes": null,
+          "texto_literal": "S'aprova el pressupost ordinari per a l'exercici 2026, per import de 6.850,00 €.",
+          "page_no": 1
+        },
+        {
+          "punto": "3",
+          "kind": "derrama",
+          "works_package": null,
+          "importe_aprobado": 60,
+          "delegation_to_role": null,
+          "delegation_scope": null,
+          "votes": {
+            "favorUnits": 11,
+            "favorQuotaPct": 81.5,
+            "contraUnits": 1,
+            "contraQuotaPct": 8.5,
+            "abstencioUnits": 1,
+            "abstencioQuotaPct": 9.25
+          },
+          "texto_literal": "Es manté la quota extraordinària de 60,00 €/mes per unitat per finançar les obres en curs (ascensor, façana posterior, escala, finestres, porta d'entrada, videoporter i pintura interior), sense modificacions.",
+          "page_no": 2
+        },
+        {
+          "punto": "4",
+          "kind": "other",
+          "works_package": null,
+          "importe_aprobado": null,
+          "delegation_to_role": null,
+          "delegation_scope": null,
+          "votes": null,
+          "texto_literal": "Precs i preguntes. No es proposen acords.",
+          "page_no": 2
+        }
+      ],
+      "signed_date": "2026-04-02",
+      "sent_date": "2026-04-07"
+    },
+    {
+      "file": "out/actas/acta-extraordinaria-2026-05-14.pdf",
+      "doc_type": "acta",
+      "tipo": "extraordinaria",
+      "language": "es",
+      "date": "2026-05-14",
+      "hora": "19:00",
+      "lugar": "Despacho del administrador, Carrer de l'Administració 14, 08013 Barcelona",
+      "convened_by_role": "president",
+      "convocation_notice_date": "2026-05-01",
+      "attendance": [
+        {
+          "unit": "Sot 1",
+          "quota_pct": 3.5,
+          "status": "present"
+        },
+        {
+          "unit": "Sot 2",
+          "quota_pct": 3.5,
+          "status": "represented"
+        },
+        {
+          "unit": "Bxs 1a",
+          "quota_pct": 6.5,
+          "status": "present"
+        },
+        {
+          "unit": "Bxs 2a",
+          "quota_pct": 6.5,
+          "status": "represented"
+        },
+        {
+          "unit": "Entl 1a",
+          "quota_pct": 8,
+          "status": "present"
+        },
+        {
+          "unit": "Entl 2a",
+          "quota_pct": 8,
+          "status": "absent"
+        },
+        {
+          "unit": "Pral 1a",
+          "quota_pct": 8.5,
+          "status": "present"
+        },
+        {
+          "unit": "Pral 2a",
+          "quota_pct": 8.5,
+          "status": "present"
+        },
+        {
+          "unit": "1r 1a",
+          "quota_pct": 9.25,
+          "status": "present"
+        },
+        {
+          "unit": "1r 2a",
+          "quota_pct": 9.25,
+          "status": "present"
+        },
+        {
+          "unit": "2n 1a",
+          "quota_pct": 9.25,
+          "status": "present"
+        },
+        {
+          "unit": "2n 2a",
+          "quota_pct": 9.25,
+          "status": "present"
+        },
+        {
+          "unit": "3r 1a",
+          "quota_pct": 10,
+          "status": "absent"
+        }
+      ],
+      "resolutions": [
+        {
+          "punto": "1",
+          "kind": "works_approval",
+          "works_package": "REAR_FACADE",
+          "importe_aprobado": 50820,
+          "delegation_to_role": null,
+          "delegation_scope": null,
+          "votes": {
+            "favorUnits": 10,
+            "favorQuotaPct": 72.75,
+            "contraUnits": 1,
+            "contraQuotaPct": 9.25,
+            "abstencioUnits": 0,
+            "abstencioQuotaPct": 0
+          },
+          "texto_literal": "Se aprueba la ejecución de las obras de rehabilitación de la fachada posterior y balcones, adjudicadas a Construccions Model S.L. por un precio de 50.820,00 € (IVA incluido), con inicio previsto en las semanas siguientes.",
+          "page_no": 1
+        },
+        {
+          "punto": "2",
+          "kind": "delegation",
+          "works_package": "REAR_FACADE",
+          "importe_aprobado": null,
+          "delegation_to_role": "president",
+          "delegation_scope": "Selección final entre los presupuestos presentados y firma del contrato de obras de la fachada posterior y balcones, en las condiciones aprobadas en el punto anterior",
+          "votes": {
+            "favorUnits": 10,
+            "favorQuotaPct": 72.75,
+            "contraUnits": 0,
+            "contraQuotaPct": 0,
+            "abstencioUnits": 1,
+            "abstencioQuotaPct": 9.25
+          },
+          "texto_literal": "Se delega en el/la presidente/a la selección final entre los presupuestos presentados y la firma del contrato de obras en las condiciones aprobadas en el punto anterior.",
+          "page_no": 2
+        }
+      ],
+      "signed_date": "2026-05-17",
+      "sent_date": "2026-05-21"
+    },
+    {
+      "file": "out/contract/contracte-facana-posterior.pdf",
+      "doc_type": "contrato_obra",
+      "works_package": "REAR_FACADE",
+      "works_package_label": "Rehabilitació de la façana posterior i balcons",
+      "client_name": "Comunitat de Propietaris Carrer Exemple 1",
+      "client_nif": "H00000000",
+      "contractor_name": "Construccions Model S.L.",
+      "contractor_nif": "B33344458",
+      "signature_date": "2026-05-16",
+      "authorising_resolution": {
+        "actaId": "acta-extraordinaria-2026-05-14",
+        "punto": "2"
+      },
+      "price_base": 42000,
+      "iva_pct": 21,
+      "price_iva": 8820,
+      "price_total": 50820,
+      "milestones": [
+        {
+          "label": "Avançament a la signatura del contracte",
+          "pct": 40,
+          "amount": 20328,
+          "dueOn": "A la signatura del contracte"
+        },
+        {
+          "label": "Certificacions mensuals d'obra fins al 95% del preu",
+          "pct": 55,
+          "amount": 27951,
+          "dueOn": "Mensual, segons amidament de la direcció facultativa"
+        },
+        {
+          "label": "Retenció de garantia",
+          "pct": 5,
+          "amount": 2541,
+          "dueOn": "Alliberable 12 mesos després de la recepció de l'obra"
+        }
+      ],
+      "start_date": "2026-05-20",
+      "deadline_days": 90,
+      "deadline_date": "2026-08-18",
+      "penalty_per_day": 150,
+      "penalty_cap_pct": 10,
+      "retention_pct": 5,
+      "retention_amount": 2541,
+      "suspension_date": "2026-07-01",
+      "suspension_reason": "seasonal"
+    },
+    {
+      "file": "out/liquidacion/liquidacio-2025.pdf",
+      "doc_type": "liquidacion_anual",
+      "ejercicio": 2025,
+      "period_from": "2025-01-01",
+      "period_to": "2025-12-31",
+      "ingresos": [
+        {
+          "concepto": "Quotes ordinàries (13 unitats)",
+          "importe": 6700
+        },
+        {
+          "concepto": "Derrama extraordinària obres (60,00 €/mes x 13 unitats x 12 mesos)",
+          "importe": 9360
+        },
+        {
+          "concepto": "Interessos bancaris",
+          "importe": 45.2
+        }
+      ],
+      "despesas": [
+        {
+          "concepto": "Manteniment ascensor",
+          "importe": 1440
+        },
+        {
+          "concepto": "Neteja escala i portal",
+          "importe": 2160
+        },
+        {
+          "concepto": "Assegurança de la comunitat",
+          "importe": 980
+        },
+        {
+          "concepto": "Administració de finques",
+          "importe": 3600
+        },
+        {
+          "concepto": "Subministrament elèctric zones comunes",
+          "importe": 620
+        },
+        {
+          "concepto": "Subministrament d'aigua zones comunes",
+          "importe": 210
+        },
+        {
+          "concepto": "Manteniment i reparacions diverses",
+          "importe": 1105.2
+        },
+        {
+          "concepto": "Despeses diverses",
+          "importe": 809.6
+        }
+      ],
+      "total_ingresos": 16105.2,
+      "total_despesas": 10924.8,
+      "resultado": 5180.4,
+      "reserve_opening": 6750,
+      "reserve_dotacio": 450,
+      "reserve_aplicaciones": 0,
+      "reserve_final": 7200,
+      "saldo_final_comptes": 12450,
+      "unit_quota_table": [
+        {
+          "unit": "Sot 1",
+          "quotaPct": 3.5,
+          "ordinaryAnnual": 234.5,
+          "derramaAnnual": 720,
+          "totalAnnual": 954.5
+        },
+        {
+          "unit": "Sot 2",
+          "quotaPct": 3.5,
+          "ordinaryAnnual": 234.5,
+          "derramaAnnual": 720,
+          "totalAnnual": 954.5
+        },
+        {
+          "unit": "Bxs 1a",
+          "quotaPct": 6.5,
+          "ordinaryAnnual": 435.5,
+          "derramaAnnual": 720,
+          "totalAnnual": 1155.5
+        },
+        {
+          "unit": "Bxs 2a",
+          "quotaPct": 6.5,
+          "ordinaryAnnual": 435.5,
+          "derramaAnnual": 720,
+          "totalAnnual": 1155.5
+        },
+        {
+          "unit": "Entl 1a",
+          "quotaPct": 8,
+          "ordinaryAnnual": 536,
+          "derramaAnnual": 720,
+          "totalAnnual": 1256
+        },
+        {
+          "unit": "Entl 2a",
+          "quotaPct": 8,
+          "ordinaryAnnual": 536,
+          "derramaAnnual": 720,
+          "totalAnnual": 1256
+        },
+        {
+          "unit": "Pral 1a",
+          "quotaPct": 8.5,
+          "ordinaryAnnual": 569.5,
+          "derramaAnnual": 720,
+          "totalAnnual": 1289.5
+        },
+        {
+          "unit": "Pral 2a",
+          "quotaPct": 8.5,
+          "ordinaryAnnual": 569.5,
+          "derramaAnnual": 720,
+          "totalAnnual": 1289.5
+        },
+        {
+          "unit": "1r 1a",
+          "quotaPct": 9.25,
+          "ordinaryAnnual": 619.75,
+          "derramaAnnual": 720,
+          "totalAnnual": 1339.75
+        },
+        {
+          "unit": "1r 2a",
+          "quotaPct": 9.25,
+          "ordinaryAnnual": 619.75,
+          "derramaAnnual": 720,
+          "totalAnnual": 1339.75
+        },
+        {
+          "unit": "2n 1a",
+          "quotaPct": 9.25,
+          "ordinaryAnnual": 619.75,
+          "derramaAnnual": 720,
+          "totalAnnual": 1339.75
+        },
+        {
+          "unit": "2n 2a",
+          "quotaPct": 9.25,
+          "ordinaryAnnual": 619.75,
+          "derramaAnnual": 720,
+          "totalAnnual": 1339.75
+        },
+        {
+          "unit": "3r 1a",
+          "quotaPct": 10,
+          "ordinaryAnnual": 670,
+          "derramaAnnual": 720,
+          "totalAnnual": 1390
+        }
+      ]
+    }
+  ],
+  "planted": [
+    {
+      "id": "C3-duplicate-invoice",
+      "rules": [
+        "C3"
+      ],
+      "event_key": "dup:ascensors:4598.00",
+      "description": "Same vendor and total under two different invoice numbers, 20 days apart; both were paid.",
+      "documents": [
+        "out/invoices/inv-elev-install-a.pdf",
+        "out/invoices/inv-elev-install-b.pdf",
+        "out/statements/statement-2026-05.pdf"
+      ],
+      "facts": {
+        "vendor_nif": "A11122231",
+        "total": 4598,
+        "invoice_a": {
+          "series": "AI-2026-0301",
+          "date": "2026-05-05"
+        },
+        "invoice_b": {
+          "series": "AI-2026-0344",
+          "date": "2026-05-25"
+        },
+        "days_apart": 20,
+        "payments": [
+          {
+            "date": "2026-05-07",
+            "amount": -4598
+          },
+          {
+            "date": "2026-05-27",
+            "amount": -4598
+          }
+        ]
+      }
+    },
+    {
+      "id": "C4-split-under-threshold",
+      "rules": [
+        "C4"
+      ],
+      "event_key": "split:installacions:2026-05",
+      "description": "Two invoices from the same vendor within 5 days, each under the €1,000 authority threshold, summing to €1.150,00.",
+      "documents": [
+        "out/invoices/inv-windows-1.pdf",
+        "out/invoices/inv-windows-2.pdf"
+      ],
+      "facts": {
+        "vendor_nif": "B22233340",
+        "invoice_a": {
+          "series": "F-2026-0110",
+          "date": "2026-05-02",
+          "total": 550
+        },
+        "invoice_b": {
+          "series": "F-2026-0115",
+          "date": "2026-05-06",
+          "total": 600
+        },
+        "days_apart": 4,
+        "sum_total": 1150
+      }
+    },
+    {
+      "id": "B4B5-iban-mismatch",
+      "rules": [
+        "B4",
+        "B5"
+      ],
+      "event_key": "iban-mismatch:fusteria:FR-2026-0045",
+      "description": "The IBAN printed on the invoice differs from the IBAN the matching bank transfer actually reached.",
+      "documents": [
+        "out/invoices/inv-entrance-door.pdf",
+        "out/statements/statement-2026-06.pdf",
+        "out/statements/statement-2026-06.n43",
+        "out/statements/statement-2026-06.csv"
+      ],
+      "facts": {
+        "vendor_nif": "B55566673",
+        "invoice_series": "FR-2026-0045",
+        "invoice_date": "2026-06-05",
+        "total": 5082,
+        "iban_printed": "ES9690150001270000000105",
+        "iban_actual_transfer": "ES6190150001200000000205",
+        "payment_date": "2026-06-08"
+      }
+    },
+    {
+      "id": "D4E2-advance-before-acta",
+      "rules": [
+        "D4",
+        "E2"
+      ],
+      "event_key": "tx:advance-facana-posterior:2026-05-04",
+      "description": "A 20.328,00 € advance transfer under the rear-façade works contract was paid 10 days before the extraordinary meeting that approved those works, and before the contract's own signature date.",
+      "documents": [
+        "out/statements/statement-2026-05.pdf",
+        "out/statements/statement-2026-05.n43",
+        "out/statements/statement-2026-05.csv",
+        "out/actas/acta-extraordinaria-2026-05-14.pdf",
+        "out/contract/contracte-facana-posterior.pdf"
+      ],
+      "facts": {
+        "payment_date": "2026-05-04",
+        "amount": 20328,
+        "acta_date": "2026-05-14",
+        "days_before_acta": 10,
+        "contract_signature_date": "2026-05-16",
+        "days_before_contract": 12,
+        "works_package": "REAR_FACADE"
+      },
+      "notes": "The same transfer has no linked invoice (it is a contractual advance). A rule engine that does not treat the contract's own 40% advance clause as sufficient authority may additionally raise D1/R2 on it — that is the same underlying event, not a second finding."
+    },
+    {
+      "id": "D5R6-missing-derrama-credit",
+      "rules": [
+        "D5",
+        "R6"
+      ],
+      "event_key": "derrama:3r-1a:2026-06",
+      "description": "Unit '3r 1a' has no derrama credit in June 2026, while it was credited in May and every other unit is credited in both months.",
+      "documents": [
+        "out/statements/statement-2026-06.pdf",
+        "out/statements/statement-2026-06.n43",
+        "out/statements/statement-2026-06.csv"
+      ],
+      "facts": {
+        "unit": "3r 1a",
+        "expected_month": "2026-06",
+        "expected_amount": 60,
+        "present_in_may": true,
+        "present_in_june": false
+      }
+    },
+    {
+      "id": "C11-private-element",
+      "rules": [
+        "C11"
+      ],
+      "event_key": "doc:inv-windows-3:line1",
+      "description": "A windows invoice includes a line naming a specific unit's bedroom window (a private element) alongside a common-element line.",
+      "documents": [
+        "out/invoices/inv-windows-3.pdf"
+      ],
+      "facts": {
+        "vendor_nif": "B22233340",
+        "invoice_series": "F-2026-0130",
+        "line_index": 1,
+        "line_desc": "Sustitución ventana dormitorio Pral 1a",
+        "unit": "Pral 1a",
+        "element_scope": "private_unit",
+        "line_amount": 385
+      }
+    },
+    {
+      "id": "D1R2-unmatched-debit",
+      "rules": [
+        "D1",
+        "R2"
+      ],
+      "event_key": "tx:jardineria:2026-05-18",
+      "description": "A €480,00 transfer above the outflow minimum (€300) has no matching invoice anywhere in the corpus.",
+      "documents": [
+        "out/statements/statement-2026-05.pdf",
+        "out/statements/statement-2026-05.n43",
+        "out/statements/statement-2026-05.csv"
+      ],
+      "facts": {
+        "date": "2026-05-18",
+        "amount": 480,
+        "counterparty": "Jardineria Exemple",
+        "linked_invoice": null
+      }
+    },
+    {
+      "id": "D2-cash-withdrawal",
+      "rules": [
+        "D2"
+      ],
+      "event_key": "tx:cash:2026-05-20",
+      "description": "A €1.200,00 cash withdrawal exceeds the €1.000 cash-payment limit in effect since 2021-07-11.",
+      "documents": [
+        "out/statements/statement-2026-05.pdf",
+        "out/statements/statement-2026-05.n43",
+        "out/statements/statement-2026-05.csv"
+      ],
+      "facts": {
+        "date": "2026-05-20",
+        "amount": 1200,
+        "limit_applicable": 1000,
+        "limit_valid_from": "2021-07-11"
+      }
+    },
+    {
+      "id": "C2-arithmetic-mismatch",
+      "rules": [
+        "C2"
+      ],
+      "event_key": "doc:inv-elev-inspect:base",
+      "description": "The invoice's printed base (450,00 €) does not equal the sum of its own lines (460,00 €) — a €10,00 difference.",
+      "documents": [
+        "out/invoices/inv-elev-inspect.pdf"
+      ],
+      "facts": {
+        "vendor_nif": "A11122231",
+        "invoice_series": "AI-2026-0290",
+        "printed_base": 450,
+        "line_sum": 460,
+        "difference": 10
+      }
+    },
+    {
+      "id": "A4-paid-exceeds-certified",
+      "rules": [
+        "A4"
+      ],
+      "event_key": "package:REAR_FACADE:paid-vs-certified:2026-07-01",
+      "description": "By the suspension date, progress payments to the contractor beyond the contractual advance exceed the amount the site direction had certified.",
+      "documents": [
+        "out/contract/contracte-facana-posterior.pdf",
+        "out/invoices/inv-facade-progress.pdf",
+        "out/statements/statement-2026-06.pdf",
+        "out/statements/statement-2026-06.n43",
+        "out/statements/statement-2026-06.csv"
+      ],
+      "facts": {
+        "works_package": "REAR_FACADE",
+        "suspension_date": "2026-07-01",
+        "advance_amount": 20328,
+        "progress_payments_total": 21780,
+        "certified_amount_gross": 18000,
+        "certified_as_of": "2026-06-28",
+        "excess": 3780,
+        "note": "No certification PDF is generated in this corpus; the certified amount is recorded only here (see CERTIFICATION_NOTE in lib/contract-model.ts)."
+      }
+    }
+  ]
+}

@@ -347,9 +347,16 @@ export function parseNorma43(text: string): N43File {
         const closing = parseCents(field(line, 60, 73));
         const currency = currencyFromNumeric(field(line, 74, 76));
         if (currency !== a.currency) {
-          warnings.push(`line ${lineNo}: record 33 currency ${currency} differs from header ${a.currency}`);
+          warnings.push(
+            `line ${lineNo}: record 33 currency ${currency} differs from header ${a.currency}`,
+          );
         }
-        if (debitCount === null || debitCents === null || creditCount === null || creditCents === null) {
+        if (
+          debitCount === null ||
+          debitCents === null ||
+          creditCount === null ||
+          creditCents === null
+        ) {
           warnings.push(`line ${lineNo}: record 33 totals unreadable`);
         }
         current.hasTrailer = true;
@@ -383,7 +390,9 @@ export function parseNorma43(text: string): N43File {
   closeCurrent();
 
   if (declaredRecordCount !== undefined && declaredRecordCount !== recordCount) {
-    warnings.push(`record 88 declares ${declaredRecordCount} records but ${recordCount} were parsed`);
+    warnings.push(
+      `record 88 declares ${declaredRecordCount} records but ${recordCount} were parsed`,
+    );
   }
   if (declaredRecordCount === undefined) {
     warnings.push('record 88 (end of file) missing');

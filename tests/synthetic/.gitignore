@@ -1,0 +1,7 @@
+# Full generated corpus — regenerate with `pnpm synth`. Only tests/synthetic/sample/** and
+# tests/synthetic/expected.json are committed (see README.md "Sample set").
+out/
+
+# The repo-root .gitignore blanket-ignores *.n43 (real bank exports must never be committed);
+# the one synthetic sample file is deliberately fake data and safe to commit.
+!sample/**/*.n43

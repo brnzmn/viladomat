@@ -37,7 +37,30 @@ describe('normaliseName', () => {
 
 describe('given-name dictionary', () => {
   it('recognises variants across languages', () => {
-    for (const n of ['Josep', 'José', 'Pep', 'Joan', 'Jordi', 'Francesc', 'Cesc', 'Paco', 'Xavi', 'Miquel', 'Pere', 'Lluís', 'Enric', 'Toni', 'María', 'Àngel', 'Ramon', 'Montse', 'Núria', 'Carles', 'Marc', 'Anna']) {
+    for (const n of [
+      'Josep',
+      'José',
+      'Pep',
+      'Joan',
+      'Jordi',
+      'Francesc',
+      'Cesc',
+      'Paco',
+      'Xavi',
+      'Miquel',
+      'Pere',
+      'Lluís',
+      'Enric',
+      'Toni',
+      'María',
+      'Àngel',
+      'Ramon',
+      'Montse',
+      'Núria',
+      'Carles',
+      'Marc',
+      'Anna',
+    ]) {
       expect(isKnownGivenName(n), n).toBe(true);
     }
     expect(isKnownGivenName('Exemple')).toBe(false);
@@ -68,7 +91,11 @@ describe('splitSpanishName', () => {
       surname1: 'EXEMPLE',
       surname2: 'PROVA',
     });
-    expect(splitSpanishName('Maria Rosa Exemple')).toMatchObject({ given: 'MARIA ROSA', surname1: 'EXEMPLE', surname2: '' });
+    expect(splitSpanishName('Maria Rosa Exemple')).toMatchObject({
+      given: 'MARIA ROSA',
+      surname1: 'EXEMPLE',
+      surname2: '',
+    });
   });
   it('detects surnames first when a dictionary name ends the string', () => {
     expect(splitSpanishName('Exemple Prova Josep Maria')).toEqual({
@@ -77,7 +104,11 @@ describe('splitSpanishName', () => {
       surname2: 'PROVA',
       order: 'surnames_first',
     });
-    expect(splitSpanishName('EXEMPLE JOAN')).toMatchObject({ given: 'JOAN', surname1: 'EXEMPLE', order: 'surnames_first' });
+    expect(splitSpanishName('EXEMPLE JOAN')).toMatchObject({
+      given: 'JOAN',
+      surname1: 'EXEMPLE',
+      order: 'surnames_first',
+    });
   });
   it('treats a comma as surnames, given', () => {
     expect(splitSpanishName('Exemple Prova, Núria')).toEqual({
@@ -86,19 +117,48 @@ describe('splitSpanishName', () => {
       surname2: 'PROVA',
       order: 'surnames_first',
     });
-    expect(splitSpanishName('de la Torre Exemple, Xavier')).toMatchObject({ given: 'XAVIER', surname1: 'TORRE', surname2: 'EXEMPLE' });
+    expect(splitSpanishName('de la Torre Exemple, Xavier')).toMatchObject({
+      given: 'XAVIER',
+      surname1: 'TORRE',
+      surname2: 'EXEMPLE',
+    });
   });
   it('honours an explicit order', () => {
-    expect(splitSpanishName('Exemple Prova Josep', 'surnames_first')).toMatchObject({ given: 'JOSEP', surname1: 'EXEMPLE', surname2: 'PROVA' });
-    expect(splitSpanishName('Josep Exemple Prova', 'surnames_first')).toMatchObject({ given: 'PROVA', surname1: 'JOSEP', surname2: 'EXEMPLE' });
-    expect(splitSpanishName('Exemple Prova Josep', 'given_first')).toMatchObject({ given: 'EXEMPLE', surname1: 'PROVA', surname2: 'JOSEP' });
+    expect(splitSpanishName('Exemple Prova Josep', 'surnames_first')).toMatchObject({
+      given: 'JOSEP',
+      surname1: 'EXEMPLE',
+      surname2: 'PROVA',
+    });
+    expect(splitSpanishName('Josep Exemple Prova', 'surnames_first')).toMatchObject({
+      given: 'PROVA',
+      surname1: 'JOSEP',
+      surname2: 'EXEMPLE',
+    });
+    expect(splitSpanishName('Exemple Prova Josep', 'given_first')).toMatchObject({
+      given: 'EXEMPLE',
+      surname1: 'PROVA',
+      surname2: 'JOSEP',
+    });
   });
   it('falls back sensibly for unknown given names', () => {
-    expect(splitSpanishName('Zyx Exemple Prova')).toMatchObject({ given: 'ZYX', surname1: 'EXEMPLE', surname2: 'PROVA' });
-    expect(splitSpanishName('Zyx Wvu Exemple Prova')).toMatchObject({ given: 'ZYX WVU', surname1: 'EXEMPLE', surname2: 'PROVA' });
+    expect(splitSpanishName('Zyx Exemple Prova')).toMatchObject({
+      given: 'ZYX',
+      surname1: 'EXEMPLE',
+      surname2: 'PROVA',
+    });
+    expect(splitSpanishName('Zyx Wvu Exemple Prova')).toMatchObject({
+      given: 'ZYX WVU',
+      surname1: 'EXEMPLE',
+      surname2: 'PROVA',
+    });
   });
   it('handles degenerate inputs', () => {
-    expect(splitSpanishName('')).toEqual({ given: '', surname1: '', surname2: '', order: 'given_first' });
+    expect(splitSpanishName('')).toEqual({
+      given: '',
+      surname1: '',
+      surname2: '',
+      order: 'given_first',
+    });
     expect(splitSpanishName('Anna')).toMatchObject({ given: 'ANNA', surname1: '', surname2: '' });
     expect(splitSpanishName(null)).toMatchObject({ given: '' });
   });
@@ -151,7 +211,10 @@ describe('jaroWinkler', () => {
     expect(jaroWinkler('DIXON', 'DICKSONX')).toBeCloseTo(0.8133, 3);
   });
   it('is symmetric', () => {
-    expect(jaroWinkler('VENDOR A', 'VENDOR AB')).toBeCloseTo(jaroWinkler('VENDOR AB', 'VENDOR A'), 10);
+    expect(jaroWinkler('VENDOR A', 'VENDOR AB')).toBeCloseTo(
+      jaroWinkler('VENDOR AB', 'VENDOR A'),
+      10,
+    );
   });
 });
 
@@ -162,11 +225,17 @@ describe('tokenSetSimilarity / payeesMatch', () => {
     expect(payeesMatch('Ascensors Vendor B, S.A.', 'VENDOR B ASCENSORES SA')).toBe(true);
   });
   it('tolerates small spelling differences', () => {
-    expect(tokenSetSimilarity('Vendor Alfa Instalaciones SL', 'VENDOR ALFA INSTALACIONS S.L.')).toBeGreaterThanOrEqual(0.85);
-    expect(tokenSetSimilarity('Provador Electric SL', 'PROVADOR ELECTRIK')).toBeGreaterThanOrEqual(0.85);
+    expect(
+      tokenSetSimilarity('Vendor Alfa Instalaciones SL', 'VENDOR ALFA INSTALACIONS S.L.'),
+    ).toBeGreaterThanOrEqual(0.85);
+    expect(tokenSetSimilarity('Provador Electric SL', 'PROVADOR ELECTRIK')).toBeGreaterThanOrEqual(
+      0.85,
+    );
   });
   it('keeps different payees apart', () => {
-    expect(tokenSetSimilarity('Vendor Alfa SL', 'Ascensors Beta Gamma SA')).toBeLessThan(PAYEE_MATCH_THRESHOLD);
+    expect(tokenSetSimilarity('Vendor Alfa SL', 'Ascensors Beta Gamma SA')).toBeLessThan(
+      PAYEE_MATCH_THRESHOLD,
+    );
     expect(payeesMatch('Provador Electric SL', 'Mostra Fontaneria SL')).toBe(false);
   });
   it('handles empty inputs', () => {

@@ -3,6 +3,9 @@ import { env } from './env.ts';
 
 const { Pool } = pg;
 
+// Keep DATE columns as ISO strings (no timezone shifts, stable rendering); numerics stay strings.
+pg.types.setTypeParser(1082, (v: string) => v);
+
 let pool: pg.Pool | undefined;
 
 /** Direct Postgres access (DATABASE_URL: local test server or the Supabase pooler). */
@@ -27,19 +30,19 @@ export async function closeDb(): Promise<void> {
 
 export type Row = Record<string, unknown>;
 
-export async function query<T extends Row = Row>(text: string, params: unknown[] = []): Promise<T[]> {
+export async function query<T extends object = Row>(text: string, params: unknown[] = []): Promise<T[]> {
   const res = await db().query(text, params);
-  return res.rows as T[];
+  return res.rows as unknown as T[];
 }
 
-export async function one<T extends Row = Row>(text: string, params: unknown[] = []): Promise<T> {
+export async function one<T extends object = Row>(text: string, params: unknown[] = []): Promise<T> {
   const rows = await query<T>(text, params);
   const first = rows[0];
   if (!first) throw new Error(`query returned no rows: ${text.slice(0, 80)}`);
   return first;
 }
 
-export async function maybeOne<T extends Row = Row>(text: string, params: unknown[] = []): Promise<T | undefined> {
+export async function maybeOne<T extends object = Row>(text: string, params: unknown[] = []): Promise<T | undefined> {
   const rows = await query<T>(text, params);
   return rows[0];
 }

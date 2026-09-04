@@ -260,12 +260,17 @@ export type ValueKind = 'amount' | 'date' | 'nif' | 'iban' | 'text';
  * - `iban` → {@link normaliseIban};
  * - `text` → diacritics stripped, lower case, whitespace collapsed.
  */
-export function normaliseValue(kind: ValueKind, raw: string | number | null | undefined): string | null {
+export function normaliseValue(
+  kind: ValueKind,
+  raw: string | number | null | undefined,
+): string | null {
   if (raw == null) return null;
   switch (kind) {
     case 'amount': {
       const n = parseAmountEs(raw);
-      return n === null ? null : (Math.round((n + Number.EPSILON * Math.sign(n)) * 100) / 100).toFixed(2);
+      return n === null
+        ? null
+        : (Math.round((n + Number.EPSILON * Math.sign(n)) * 100) / 100).toFixed(2);
     }
     case 'date':
       return parseDateEs(String(raw));
@@ -278,7 +283,10 @@ export function normaliseValue(kind: ValueKind, raw: string | number | null | un
       return n || null;
     }
     case 'text': {
-      const t = stripDiacritics(String(raw).normalize('NFKC')).toLowerCase().replace(/\s+/g, ' ').trim();
+      const t = stripDiacritics(String(raw).normalize('NFKC'))
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
       return t || null;
     }
     default:

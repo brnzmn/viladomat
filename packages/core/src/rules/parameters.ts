@@ -56,7 +56,11 @@ export function resolveParameterValue(
 }
 
 /** Like {@link resolveParameterValue} but throws when no version applies. */
-export function requireParameterValue(params: readonly Parameter[], key: string, onDate: string): number {
+export function requireParameterValue(
+  params: readonly Parameter[],
+  key: string,
+  onDate: string,
+): number {
   const p = resolveParameter(params, key, onDate);
   if (!p) throw new RangeError(`parameter "${key}" has no version valid on ${onDate}`);
   return p.valueNum;
@@ -95,7 +99,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       valueNum: pmWorks,
       unit: 'EUR',
       valueText: '1% of works spend under review',
-      basisText: 'Planning materiality for works: 1% of the works spend under review (professional standard, derived).',
+      basisText:
+        'Planning materiality for works: 1% of the works spend under review (professional standard, derived).',
       version: 1,
       validFrom: EPOCH,
     },
@@ -104,7 +109,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       valueNum: pmOrdinary,
       unit: 'EUR',
       valueText: '5% of ordinary budget',
-      basisText: 'Planning materiality for ordinary accounts: 5% of the ordinary budget (professional standard, derived).',
+      basisText:
+        'Planning materiality for ordinary accounts: 5% of the ordinary budget (professional standard, derived).',
       version: 1,
       validFrom: EPOCH,
     },
@@ -129,7 +135,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       key: 'authority_threshold',
       valueNum: 1000,
       unit: 'EUR',
-      basisText: 'Spend above which a resolution is expected; the community has no written rule, so this value is stated (internal control).',
+      basisText:
+        'Spend above which a resolution is expected; the community has no written rule, so this value is stated (internal control).',
       version: 1,
       validFrom: EPOCH,
     },
@@ -138,7 +145,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       valueNum: Math.max(5000, round2(works * 0.1)),
       unit: 'EUR',
       valueText: 'max(5000, 10% of works spend)',
-      basisText: 'Minimum funding gap reported: the larger of EUR 5,000 and 10% of works spend (internal control).',
+      basisText:
+        'Minimum funding gap reported: the larger of EUR 5,000 and 10% of works spend (internal control).',
       version: 1,
       validFrom: EPOCH,
     },
@@ -146,7 +154,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       key: 'upfront_max_pct_obra',
       valueNum: 40,
       unit: 'pct',
-      basisText: 'Upfront payment share for building works beyond which a contract clause is verified (professional standard).',
+      basisText:
+        'Upfront payment share for building works beyond which a contract clause is verified (professional standard).',
       version: 1,
       validFrom: EPOCH,
     },
@@ -154,7 +163,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       key: 'upfront_max_pct_ascensor',
       valueNum: 60,
       unit: 'pct',
-      basisText: 'Upfront payment share for lift contracts beyond which a contract clause is verified (professional standard).',
+      basisText:
+        'Upfront payment share for lift contracts beyond which a contract clause is verified (professional standard).',
       version: 1,
       validFrom: EPOCH,
     },
@@ -162,7 +172,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       key: 'cash_limit',
       valueNum: 2500,
       unit: 'EUR',
-      basisText: 'Ley 7/2012 art. 7: limit on cash payments where one party acts as a business (statutory).',
+      basisText:
+        'Ley 7/2012 art. 7: limit on cash payments where one party acts as a business (statutory).',
       version: 1,
       validFrom: EPOCH,
     },
@@ -170,7 +181,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       key: 'cash_limit',
       valueNum: 1000,
       unit: 'EUR',
-      basisText: 'Ley 11/2021 amending Ley 7/2012 art. 7: cash payment limit reduced from 2021-07-11 (statutory).',
+      basisText:
+        'Ley 11/2021 amending Ley 7/2012 art. 7: cash payment limit reduced from 2021-07-11 (statutory).',
       version: 2,
       validFrom: '2021-07-11',
     },
@@ -178,7 +190,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       key: 'convene_days',
       valueNum: 30,
       unit: 'days',
-      basisText: 'Informational: days within which a meeting is expected to be convened after a qualified request.',
+      basisText:
+        'Informational: days within which a meeting is expected to be convened after a qualified request.',
       version: 1,
       validFrom: EPOCH,
     },
@@ -186,7 +199,8 @@ export function defaultParameters(input: DefaultParameterInput): Parameter[] {
       key: 'ocr_min',
       valueNum: 1000,
       unit: 'EUR',
-      basisText: 'Documents at or above this amount receive a second OCR reading on every page (process).',
+      basisText:
+        'Documents at or above this amount receive a second OCR reading on every page (process).',
       version: 1,
       validFrom: EPOCH,
     },

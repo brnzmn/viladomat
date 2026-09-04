@@ -20,6 +20,28 @@ program
   });
 
 program
+  .command('ingest')
+  .description('Take a delivery of originals into custody: hash on this machine, store the untouched bytes, record the batch')
+  .argument('<path>', 'file or directory of originals')
+  .requiredOption('--source <source>', 'local | admin_delivery | bank_export | phone_transfer | onsite | drive')
+  .requiredOption('--supplied-by <role>', 'role that supplied the batch (administrator, president, requesting_owner, ...)')
+  .requiredOption('--supplied-on <date>', 'date the documents were handed over, YYYY-MM-DD')
+  .requiredOption('--batch <label>', 'batch label, e.g. entrega-2026-09-12')
+  .option('--transport <note>', 'how the files travelled (airdrop, drive, usb, email-attachment, whatsapp, onsite) and any caveat')
+  .option('--community <uuid>', 'community id (defaults to the only community)')
+  .option('--hires', 'render at 2576 px instead of 1568 px (handwriting, dense tables)')
+  .option('--dry-run', 'walk and hash only; write nothing')
+  .action(
+    async (
+      target: string,
+      opts: { source: string; suppliedBy: string; suppliedOn: string; batch: string; transport?: string; community?: string; hires?: boolean; dryRun?: boolean },
+    ) => {
+      const { ingestCommand } = await import('./commands/ingest.ts');
+      await ingestCommand(target, opts);
+    },
+  );
+
+program
   .command('manifest')
   .description('Export a custody manifest (CSV + SHA-256) for a delivery batch')
   .requiredOption('--batch <label>', 'batch label used at upload/ingest time')
@@ -39,6 +61,27 @@ program
   .action(async (opts: { community?: string; only?: string; dryRun?: boolean }) => {
     const { rulesCommand } = await import('./commands/rules.ts');
     await rulesCommand(opts);
+  });
+
+program
+  .command('match')
+  .description('Reconcile invoices, bank movements, liquidación lines, resolutions and contracts; print control totals and residuals R1-R7')
+  .option('--community <uuid>', 'community id (defaults to the only community)')
+  .option('--dry-run', 'compute and print, do not store')
+  .action(async (opts: { community?: string; dryRun?: boolean }) => {
+    const { matchCommand } = await import('./commands/match.ts');
+    await matchCommand(opts);
+  });
+
+program
+  .command('letters')
+  .description('Render the "Solicitud de aclaraciones" letter for one finding and record the request')
+  .requiredOption('--finding <uuid>', 'finding id')
+  .option('--lang <lang>', 'es | en', 'es')
+  .option('--out <dir>', 'output directory', 'exports/letters')
+  .action(async (opts: { finding: string; lang: string; out: string }) => {
+    const { lettersCommand } = await import('./commands/letters.ts');
+    await lettersCommand(opts);
   });
 
 program
@@ -72,6 +115,27 @@ program
     const { statusCommand } = await import('./commands/status.ts');
     await statusCommand(opts);
   });
+
+program
+  .command('sign-off')
+  .description('Record counsel/reviewer sign-off on a reproduced pack before distribution')
+  .requiredOption('--report <uuid>', 'report_exports id')
+  .requiredOption('--role <role>', 'role signing off (e.g. legal_counsel, owner_reviewer)')
+  .option('--note <text>', 'short note')
+  .action(async (opts: { report: string; role: string; note?: string }) => {
+    const { signoffCommand } = await import('./commands/signoff.ts');
+    await signoffCommand(opts);
+  });
+
+// Milestone command registrars (each milestone registers its own commands to avoid edit conflicts).
+for (const mod of ['./commands/m2.register.ts', './commands/m5.register.ts', './commands/m6.register.ts']) {
+  try {
+    const m = (await import(mod)) as { register?: (p: Command) => void };
+    m.register?.(program);
+  } catch (e) {
+    if (!(e instanceof Error && /Cannot find module|ERR_MODULE_NOT_FOUND/.test(e.message))) throw e;
+  }
+}
 
 program
   .hook('postAction', async () => {

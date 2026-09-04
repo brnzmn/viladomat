@@ -39,16 +39,37 @@ units:
   - { label: "2n 2a", quota_pct: 6.07 }
   - { label: "3r 1a A", quota_pct: 2.79 }
   - { label: "3r 1a B", quota_pct: 2.97 }
+  # units referenced in the minutes but not listed with a quota: complete from the statutes / Catastro
+  - { label: "2n 1a" }
+  - { label: "3r 2a" }
 
 community_rules:
   - topic: works_threshold
     text_literal: "No threshold above which assembly approval is required is set in the statutes; the system uses the parameter authority_threshold and states it."
 
 works_packages:
-  - { code: ELEVATOR, label: Ascensor, status: in_progress, suspension_date: 2026-08-01, suspension_reason: seasonal }
-  - { code: STAIRCASE, label: Rehabilitació escala, status: planned }
-  - { code: REAR_FACADE, label: Façana posterior i balcons, status: approved }
-  - { code: SEWER, label: Col·lector, status: completed, contract_price: 10743 }
+  - code: ELEVATOR
+    label: Ascensor
+    status: in_progress
+    suspension_date: 2026-08-01
+    suspension_reason: seasonal
+    notes: "Architect fee quote attached to the 2023 minutes: technical project + licence 4.600 € (50% at start, 50% on filing) and site direction 3.000 € (50/25/25), covering staircase rehabilitation and lift installation (Comunicat Diferit regime)."
+  - code: STAIRCASE
+    label: Rehabilitació escala
+    status: planned
+    notes: "Same architect quote as the lift (project 4.600 € + site direction 3.000 €)."
+  - code: REAR_FACADE
+    label: Façana posterior i balcons
+    status: approved
+    notes: "Architect fee quote attached to the 2023 minutes: project + licence 2.100 €, site direction 1.100 €."
+  - code: SEWER
+    label: Col·lector
+    status: completed
+    contract_price: 10743
+  - code: DRAIN
+    label: Desguàs
+    status: approved
+    contract_price: 935
 
 bank_accounts:
   - { label: Compte ordinari, bank_name: Example Bank, holder_kind: unknown, purpose: ordinary }
@@ -56,36 +77,111 @@ bank_accounts:
 meetings:
   - tipo: ordinaria
     fecha: 2023-03-23
-    lugar: Administrator's office
+    lugar: Oficina de la administración (única convocatoria, 19:30 h)
     convened_by_role: president
+    quorum_pct: 67.58                  # sum of the quotas listed as present or represented (page 1)
     cuentas_aprobadas: true
     presupuesto_aprobado: 6692.72
+    notes: >-
+      Verbatim quotations transcribed from the minutes; personal names replaced by roles in
+      brackets. Units listed as deprived of vote (arrears) deliberately not transcribed.
     resolutions:
       - punto: "1"
         kind: accounts
-        texto_literal: "Liquidation of income and expenses for 2021 (favourable balance 3,338.52 EUR) and 2022 (favourable balance 5,445.46 EUR) approved. Reserve fund at 31-12-2022: 7,088.79 EUR. Total balance 12,534.25 EUR carried to a new account for 2023."
         page_no: 1
+        texto_literal: >-
+          Se aprueba la liquidación de INGRESOS Y GASTOS CORRIENTES presentada por el administrador,
+          correspondiente a los ejercicios 2021 (saldo favorable de 3.338,52 EUR) y 2022 (saldo
+          favorable de 5.445,46 EUR). Se aprueba también la liquidación correspondiente a FONDO DE
+          RESERVA que a 31-12-2022 presenta un saldo favorable de 7.088,79 EUR. El saldo total de las
+          liquidaciones a 31-12-2022 es de 12.534,25 EUR. Se aprueba pasar el saldo resultante a cuenta
+          nueva para inicio del ejercicio 2023. Se decide que los saldos no se devolverán debido a las
+          actuaciones previsibles que se deben realizar.
       - punto: "2"
         kind: budget
         importe_aprobado: 6692.72
-        texto_literal: "Forecast of ordinary expenses for 2023 approved: 6,692.72 EUR. Extraordinary quota of 60 EUR per month per unit continues to finance the actions decided under later items."
         page_no: 1
+        texto_literal: >-
+          Se aprueba por unanimidad la previsión de gastos ordinarios presentada para el ejercicio
+          2023 por importe de 6.692,72 EUR, para cuya financiación se dejan establecidas las mismas
+          cuotas trimestrales que hasta el momento se venían abonando [...]. Se aprueba por mayoría
+          continuar con las cuotas extraordinarias de 60 EUR mensuales por entidad para financiar las
+          actuaciones que se decidirán en puntos posteriores del orden del día.
+      - punto: "3"
+        kind: delegation
+        delegation_to_role: president and administrator
+        delegation_scope: Implantación de la coordinación de actividades empresariales (CAE)
+        cap_explicit: false
+        page_no: 1
+        texto_literal: >-
+          Ante el riesgo que supone el incumplimiento, se adopta el acuerdo de proceder a su
+          implantación [coordinación de actividades empresariales], facultando ampliamente a
+          presidencia y administrador para efectuarlo.
+      - punto: "4"
+        kind: election
+        page_no: 1
+        texto_literal: >-
+          No se presentan candidatos. Se decide reelegir a la misma junta, nombrando como presidente
+          al [propietario que ya ostentaba el cargo] y como vicepresidente al [propietario de Bajos 1ª],
+          continuando como Secret-Admor [la administración de fincas].
+      - punto: "5"
+        kind: info
+        works_package: Col·lector
+        importe_aprobado: 10743
+        page_no: 2
+        texto_literal: >-
+          Informa el presidente de la obra realizada en el colector de la finca, que finalmente ha
+          podido realizarse resultando económicamente mejor que la previsión efectuada. El gasto ha
+          sido de 10.743 EUR. Esta obra se limita desde el alcantarillado hasta la entrada de la finca
+          [...]. El resultado de la obra ha sido satisfactorio y adecuado a normativa.
       - punto: "6"
         kind: works_approval
         works_package: Façana posterior i balcons
         delegation_to_role: president
-        delegation_scope: "Final approval among quotes presented within 15 days at the president's discretion"
+        delegation_scope: Aprobación final entre presupuestos presentados en 15 días
         cap_explicit: false
-        texto_literal: "Rehabilitation of the beam and two balconies of the rear facade approved; budget attached; 15 days for any owner to present a cheaper quote, final approval at the president's discretion."
         page_no: 2
+        texto_literal: >-
+          Se informa del mal estado que presenta una viga en la parte de la fachada trasera que afecta
+          a dos balcones y es urgente realizarla [...]. Se ha solicitado presupuesto para el proyecto de
+          rehabilitación de esa zona, que se adjunta al acta que se levante de la sesión. Se aprueba el
+          presupuesto y la ejecución de la obra, concediéndose un plazo de 15 días por si algún
+          propietario quiere presentar otro que sea más económico, quedando al criterio del presidente
+          la aprobación final. En cuanto a las 3 ventanas de aluminio, se decide aplazar por el momento
+          su sustitución.
+      - punto: "7"
+        kind: works_approval
+        works_package: Desguàs
+        importe_aprobado: 935
+        delegation_to_role: administrator
+        delegation_scope: Apremiar al industrial para ejecutar con urgencia
+        cap_explicit: true
+        page_no: 2
+        texto_literal: >-
+          Se informa de la fisura existente en un desagüe que afecta a los bajos [de dos propietarios,
+          uno de ellos el presidente]. [...] Se tiene aceptado un presupuesto de 935 EUR que está
+          pendiente de realizar [...]. Se delega en el administrador que apremie al industrial para
+          que lo realice con carácter de urgencia.
       - punto: "8"
         kind: delegation
         works_package: Ascensor
         delegation_to_role: president
-        delegation_scope: "Commission the drafting of the staircase rehabilitation and elevator project"
+        delegation_scope: Poner en marcha la redacción del proyecto de rehabilitación de la escalera e implantación de ascensor
         cap_explicit: false
-        texto_literal: "Project for the rehabilitation of the staircase and installation of an elevator approved by a large majority of attendees; the president is delegated to commission the drafting of the project."
         page_no: 2
+        texto_literal: >-
+          Informa el presidente de haber solicitado presupuesto para el proyecto de rehabilitación de
+          la escalera y la implantación de un ascensor en la finca, que se adjunta al acta que se
+          levante de la sesión. Tras comentar ampliamente el tema [...], se efectúa votación, siendo
+          aprobado por amplia mayoría de los asistentes, por lo que se delega en el presidente para que
+          se ponga en marcha la redacción del proyecto.
+      - punto: "9"
+        kind: info
+        page_no: 2
+        texto_literal: >-
+          Se aprueba que el presidente ordene la instalación de alguna medida de protección en esa zona
+          [antigua garita de portería] para evitar riesgos de caídas. Se aprueba enviar un industrial
+          que arregle el interfono del Pral. 1-A [...].
 
 derramas:
   - objeto: Quota extraordinària obres

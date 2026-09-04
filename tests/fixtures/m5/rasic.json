@@ -1,0 +1,11 @@
+[
+  {
+    "_fixture_note": "Synthetic. Socrata-style row of the industrial-safety agents register; the dataset id is a placeholder in config.ts and the column names are to verify.",
+    "num_registre": "RASIC-EX-00042",
+    "rao_social": "ASCENSORS EXEMPLE, S.L.",
+    "nif": "B58818501",
+    "activitats": ["Ascensors - instal.lacio", "Ascensors - manteniment"],
+    "data_alta": "2015-04-01",
+    "situacio": "alta"
+  }
+]

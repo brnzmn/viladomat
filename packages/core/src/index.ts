@@ -13,3 +13,8 @@ export * from './bank/camt053.ts';
 export * from './bank/classify.ts';
 export * from './rules/parameters.ts';
 export * from './rules/scoring.ts';
+
+// Namespaced modules (subpath imports also work: '@viladomat/core/extraction/index').
+export * as extraction from './extraction/index.ts';
+export * as pricing from './pricing/index.ts';
+export * as taxonomy from './taxonomy/index.ts';

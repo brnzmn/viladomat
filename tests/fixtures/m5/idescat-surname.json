@@ -1,0 +1,9 @@
+{
+  "_fixture_note": "Synthetic. Shape of an Idescat onomastica response; the endpoint, the table id and whether the figure is a rate or a count are all to verify. Figures are invented.",
+  "onomastica": {
+    "ff": [
+      { "cognom": "EXEMPLE", "ordre": 8123, "per_mil": 0.07, "nombre": 553 },
+      { "cognom": "MOSTRA", "ordre": 412, "per_mil": 2.4, "nombre": 18960 }
+    ]
+  }
+}
