@@ -13,6 +13,8 @@ coverage/
 .env
 .env.*
 !.env.example
+# public build-time values only (project URL, publishable key); see the file header
+!apps/web/.env.production
 *.pem
 *.key
 

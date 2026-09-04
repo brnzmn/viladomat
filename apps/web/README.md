@@ -64,4 +64,11 @@ app/(app)/documents      read-only list with filters
 app/(app)/findings       read-only list with filters
 ```
 
-Deployed to Vercel in region `fra1` (`vercel.json`).
+## Deployment
+
+The app is meant to run on Vercel in region `fra1` (`vercel.json`). To create the project, import
+`brnzmn/viladomat` in the Vercel dashboard with **Root Directory** `apps/web`; the pnpm workspace
+is detected from the repository root. No environment variables need to be entered: the two public
+values (project URL and publishable key) are committed in `.env.production`, and nothing secret is
+ever configured on Vercel. The worker (`vx`) and its service-role key stay on the operator's
+machine. Production deploys follow `main`; every pull-request branch gets a preview.
