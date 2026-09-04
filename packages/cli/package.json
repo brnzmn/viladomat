@@ -1,0 +1,30 @@
+{
+  "name": "@viladomat/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "vx: operator CLI and worker (ingest, process, seed, rules, report).",
+  "bin": {
+    "vx": "./bin/vx.mjs"
+  },
+  "scripts": {
+    "vx": "tsx src/main.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.115.0",
+    "@viladomat/core": "workspace:*",
+    "commander": "^15.0.0",
+    "pg": "^8.16.3",
+    "yaml": "^2.9.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.0"
+  }
+}

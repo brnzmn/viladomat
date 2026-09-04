@@ -1,0 +1,125 @@
+# Example seed file. Figures transcribed from the March 2023 ordinary meeting minutes (community-level
+# accounting data; no personal data). Verify every figure against the page before relying on it
+# (the web app records who verified each meeting). Copy to seed/local/<name>.yaml for private working
+# copies (git-ignored). Roles only — never a person's name.
+
+community:
+  name: Comunitat de Propietaris Carrer Exemple 1
+  nif: H00000000
+  address: Carrer Exemple 1, 08015 Barcelona
+  fy_start_month: 1
+  ordinary_budget_default: 6700
+
+request_clock:
+  # request_date: YYYY-MM-DD        # date the >=1/4-quota request was delivered (fill in)
+  # quotas_pct_requesting: 25.0     # sum of the requesting units' quotas (fill in)
+  # units_requesting: 4
+  status: planned
+  notes: Fill in the delivery date and evidence of the owners' request when known.
+
+# Materiality basis: derived defaults are computed from these two figures.
+parameter_basis:
+  works_spend_under_review: 150000
+  ordinary_budget: 6700
+
+# Optional explicit overrides (a new version is appended; nothing is overwritten)
+parameters: []
+
+units:
+  - { label: "Sot 1", use: storage, quota_pct: 6.11, holder_role: president }
+  - { label: "Sot 3", use: storage, quota_pct: 6.60 }
+  - { label: "Bxs 1a", use: commercial, quota_pct: 5.50 }
+  - { label: "Bxs 3a", use: commercial, quota_pct: 3.24, holder_role: president }
+  - { label: "Entl 1a", quota_pct: 6.56 }
+  - { label: "Entl 2a", quota_pct: 6.07 }
+  - { label: "Pral 1B", quota_pct: 2.97 }
+  - { label: "Pral 2a", quota_pct: 6.07 }
+  - { label: "1r 1a", quota_pct: 6.56 }
+  - { label: "1r 2a", quota_pct: 6.07 }
+  - { label: "2n 2a", quota_pct: 6.07 }
+  - { label: "3r 1a A", quota_pct: 2.79 }
+  - { label: "3r 1a B", quota_pct: 2.97 }
+
+community_rules:
+  - topic: works_threshold
+    text_literal: "No threshold above which assembly approval is required is set in the statutes; the system uses the parameter authority_threshold and states it."
+
+works_packages:
+  - { code: ELEVATOR, label: Ascensor, status: in_progress, suspension_date: 2026-08-01, suspension_reason: seasonal }
+  - { code: STAIRCASE, label: Rehabilitació escala, status: planned }
+  - { code: REAR_FACADE, label: Façana posterior i balcons, status: approved }
+  - { code: SEWER, label: Col·lector, status: completed, contract_price: 10743 }
+
+bank_accounts:
+  - { label: Compte ordinari, bank_name: Example Bank, holder_kind: unknown, purpose: ordinary }
+
+meetings:
+  - tipo: ordinaria
+    fecha: 2023-03-23
+    lugar: Administrator's office
+    convened_by_role: president
+    cuentas_aprobadas: true
+    presupuesto_aprobado: 6692.72
+    resolutions:
+      - punto: "1"
+        kind: accounts
+        texto_literal: "Liquidation of income and expenses for 2021 (favourable balance 3,338.52 EUR) and 2022 (favourable balance 5,445.46 EUR) approved. Reserve fund at 31-12-2022: 7,088.79 EUR. Total balance 12,534.25 EUR carried to a new account for 2023."
+        page_no: 1
+      - punto: "2"
+        kind: budget
+        importe_aprobado: 6692.72
+        texto_literal: "Forecast of ordinary expenses for 2023 approved: 6,692.72 EUR. Extraordinary quota of 60 EUR per month per unit continues to finance the actions decided under later items."
+        page_no: 1
+      - punto: "6"
+        kind: works_approval
+        works_package: Façana posterior i balcons
+        delegation_to_role: president
+        delegation_scope: "Final approval among quotes presented within 15 days at the president's discretion"
+        cap_explicit: false
+        texto_literal: "Rehabilitation of the beam and two balconies of the rear facade approved; budget attached; 15 days for any owner to present a cheaper quote, final approval at the president's discretion."
+        page_no: 2
+      - punto: "8"
+        kind: delegation
+        works_package: Ascensor
+        delegation_to_role: president
+        delegation_scope: "Commission the drafting of the staircase rehabilitation and elevator project"
+        cap_explicit: false
+        texto_literal: "Project for the rehabilitation of the staircase and installation of an elevator approved by a large majority of attendees; the president is delegated to commission the drafting of the project."
+        page_no: 2
+
+derramas:
+  - objeto: Quota extraordinària obres
+    criterio: partes_iguales
+    per_unit_amount: 60
+    starts_on: 2023-01-01
+    months: 44                        # adjust: the quota pre-dates 2023 ("continues" in the minutes)
+    resolution_ref: { meeting_fecha: 2023-03-23, punto: "2" }
+    bank_account: Compte ordinari
+
+liquidations:
+  - ejercicio: 2022
+    periodo_desde: 2022-01-01
+    periodo_hasta: 2022-12-31
+    resultado: 5445.46
+    fondo_reserva_final: 7088.79
+    saldo_final: 12534.25
+    basis: unknown
+
+document_requests:
+  - { class: accounts, fiscal_year: 2021, status: planned, description: "request letter item 2(a)" }
+  - { class: accounts, fiscal_year: 2022, status: planned, description: "request letter item 2(a)" }
+  - { class: accounts, fiscal_year: 2023, status: planned, description: "request letter item 2(a)" }
+  - { class: accounts, fiscal_year: 2024, status: planned, description: "request letter item 2(a)" }
+  - { class: accounts, fiscal_year: 2025, status: planned, description: "request letter item 2(a)" }
+  - { class: budget, fiscal_year: 2026, status: planned, description: "request letter item 2(a)" }
+  - { class: derrama_statement, status: planned, description: "request letter item 2(b)" }
+  - { class: invoices, status: planned, description: "request letter item 2(c)" }
+  - { class: bank_statements, status: planned, description: "request letter item 2(c)" }
+  - { class: bank_statements_norma43, status: planned, description: "Export in Norma 43 / CSV for all accounts 2021-2026" }
+  - { class: bank_holder_certificate, status: planned, description: "Bank certificate of account holder and signatories" }
+  - { class: contracts, status: planned, description: "request letter item 2(d)" }
+  - { class: elevator_contract, status: planned, description: "request letter item 2(e)" }
+  - { class: related_party_declaration, status: planned, description: "request letter item 3" }
+  - { class: statutes, status: planned }
+  - { class: permit, status: planned }
+  - { class: subsidy, status: planned }

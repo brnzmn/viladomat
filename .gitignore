@@ -1,0 +1,38 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+
+# environment and secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# local data: originals, renders, exports, seeds with real figures
+data/
+originals/
+derived/
+exports/
+seed/local/
+*.n43
+*.q43
+*.tsr
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# test artefacts
+playwright-report/
+test-results/

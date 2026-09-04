@@ -1,0 +1,26 @@
+{
+  "name": "viladomat",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Document intake, extraction and reconciliation tooling for the accounts of a Barcelona owners' community (comunitat de propietaris).",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r --if-present lint",
+    "build": "pnpm -r --if-present build",
+    "neutrality": "node scripts/neutrality-check.mjs",
+    "db:local:up": "bash scripts/db-local.sh up",
+    "db:local:down": "bash scripts/db-local.sh down",
+    "db:local:migrate": "bash scripts/db-local.sh migrate",
+    "db:local:test": "bash scripts/db-local.sh test",
+    "vx": "pnpm --filter @viladomat/cli vx"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
+  }
+}
