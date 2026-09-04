@@ -2,6 +2,7 @@ import { crosscheckStep } from './crosscheck.ts';
 import { extractStep } from './extract.ts';
 import { groupStep } from './group.ts';
 import { ingestStep } from './ingest.ts';
+import { matchStep } from './match.ts';
 import { ocrStep } from './ocr.ts';
 import { renderStep } from './render.ts';
 import { verifyStep } from './verify.ts';
@@ -26,6 +27,7 @@ import type { RegisterStep } from './types.ts';
  * `group` is enqueued once per batch by the render step and waits for a person to confirm the
  * grouping; `extract` is scheduled by `vx extract`, and enqueues `crosscheck` when it succeeds.
  * `verify` is scheduled deliberately, on the documents whose figures carry weight.
+ * M3 adds `match` `{ community_id }`: the reconciliation pass (links, ledger, timeline, residuals).
  *
  * Every handler is idempotent: re-running a job with the same idempotency key changes nothing.
  */
@@ -37,6 +39,7 @@ export function registerAll(register: RegisterStep): void {
   register('extract', extractStep);
   register('crosscheck', crosscheckStep);
   register('verify', verifyStep);
+  register('match', matchStep);
 }
 
 export { ingestStep } from './ingest.ts';
@@ -46,4 +49,5 @@ export { groupStep } from './group.ts';
 export { extractStep } from './extract.ts';
 export { crosscheckStep } from './crosscheck.ts';
 export { verifyStep } from './verify.ts';
+export { matchStep } from './match.ts';
 export type { RegisterStep, StepHandler, StepJob, StepResult } from './types.ts';

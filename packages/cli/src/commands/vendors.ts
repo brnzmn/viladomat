@@ -93,9 +93,15 @@ export async function vendorsCheckCommand(opts: VendorsCheckOpts): Promise<void>
 
   const subjects = await transaction(async (client) => {
     const res = await client.query(
+      // The account number itself is never held in clear, so the IBAN check is given the stored
+      // pseudonym (bank code, last four, the verdicts recorded when the number was read).
       `select p.id, p.kind::text as kind, p.display_name, p.nif, p.address_norm, p.postcode,
-              (select i.iban_last4 from public.party_ibans i where i.party_id = p.id order by i.created_at limit 1) as iban_last4
+              ib.iban_last4, ib.bank_code, ib.bank_name, ib.country, ib.iban_valid, ib.ccc_dc_valid, ib.iban_hmac
          from public.parties p
+         left join lateral (
+           select i.iban_last4, i.bank_code, i.bank_name, i.country, i.iban_valid, i.ccc_dc_valid, i.iban_hmac
+             from public.party_ibans i where i.party_id = p.id order by i.created_at limit 1
+         ) ib on true
         where p.community_id = $1 and p.kind in ('vendor', 'administrator', 'architect')
           and ($2::uuid is null or p.id = $2::uuid)
         order by p.display_name`,
@@ -118,6 +124,15 @@ export async function vendorsCheckCommand(opts: VendorsCheckOpts): Promise<void>
       nif: (p.nif as string | null) ?? null,
       address: (p.address_norm as string | null) ?? null,
       postcode: (p.postcode as string | null) ?? null,
+      extra: {
+        last4: (p.iban_last4 as string | null) ?? null,
+        bank_code: (p.bank_code as string | null) ?? null,
+        bank_name: (p.bank_name as string | null) ?? null,
+        country: (p.country as string | null) ?? null,
+        iban_valid: (p.iban_valid as boolean | null) ?? null,
+        ccc_dc_valid: (p.ccc_dc_valid as boolean | null) ?? null,
+        iban_hmac: (p.iban_hmac as string | null) ?? null,
+      },
     };
     for (const type of only ? [...only] : VENDOR_DEFAULT_CHECKS) {
       const check = checkByType(type);
