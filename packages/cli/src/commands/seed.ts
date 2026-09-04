@@ -33,7 +33,7 @@ async function insertParameters(c: Client, cid: string, params: Parameter[]): Pr
     const r = await c.query(
       `insert into public.parameters (community_id, key, value_num, value_text, unit, basis_text, version, valid_from)
        values ($1,$2,$3,$4,$5,$6,$7,$8) on conflict (community_id, key, version, valid_from) do nothing`,
-      [cid, p.key, p.valueNum ?? null, p.valueText ?? null, p.unit ?? null, p.basisText ?? null, p.version, p.validFrom],
+      [cid, p.key, Number.isFinite(p.valueNum) ? p.valueNum : null, p.valueText ?? null, p.unit ?? null, p.basisText ?? null, p.version, p.validFrom],
     );
     n += r.rowCount ?? 0;
   }
@@ -76,7 +76,7 @@ export async function seedCommand(file: string, opts: { ownerUser?: string; dryR
     for (const p of seed.parameters) {
       const v = await c.query<{ v: number }>('select coalesce(max(version), 0) + 1 as v from public.parameters where community_id = $1 and key = $2', [cid, p.key]);
       bump('parameters', await insertParameters(c, cid, [{
-        key: p.key, valueNum: p.value_num, valueText: p.value_text, unit: p.unit, basisText: p.basis_text,
+        key: p.key, valueNum: p.value_num ?? Number.NaN, valueText: p.value_text, unit: p.unit, basisText: p.basis_text,
         version: v.rows[0]!.v, validFrom: p.valid_from ?? '1900-01-01',
       }]));
     }
@@ -201,8 +201,8 @@ export async function seedCommand(file: string, opts: { ownerUser?: string; dryR
       if (existing.rows[0]) {
         derramaId = existing.rows[0].id;
         await c.query(
-          `update public.derramas set resolution_id = $2, works_package_id = $4, importe_total = $5, criterio = $6, per_unit_amount = $7, starts_on = $8, months = $9, target_account_id = $10 where id = $11`,
-          [...vals, derramaId],
+          `update public.derramas set resolution_id = $1, works_package_id = $2, importe_total = $3, criterio = $4, per_unit_amount = $5, starts_on = $6, months = $7, target_account_id = $8 where id = $9`,
+          [resId, wp, d.importe_total ?? null, d.criterio, d.per_unit_amount ?? null, d.starts_on ?? null, d.months ?? null, acct, derramaId],
         );
       } else {
         const ins = await c.query<{ id: string }>(
@@ -246,8 +246,8 @@ export async function seedCommand(file: string, opts: { ownerUser?: string; dryR
       if (existing.rows[0]) {
         lid = existing.rows[0].id;
         await c.query(
-          `update public.liquidations set periodo_desde = $3, periodo_hasta = $4, basis = $5, total_ingresos = $6, total_gastos = $7, resultado = $8, saldo_inicial = $9, saldo_final = $10, fondo_reserva_final = $11, saldo_en_poder_administrador = $12, deudores_total = $13 where id = $14`,
-          [...vals, lid],
+          `update public.liquidations set periodo_desde = $1, periodo_hasta = $2, basis = $3, total_ingresos = $4, total_gastos = $5, resultado = $6, saldo_inicial = $7, saldo_final = $8, fondo_reserva_final = $9, saldo_en_poder_administrador = $10, deudores_total = $11 where id = $12`,
+          [...vals.slice(2), lid],
         );
         await c.query('delete from public.liquidation_lines where liquidation_id = $1', [lid]);
       } else {

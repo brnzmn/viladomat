@@ -3,9 +3,9 @@ import { transaction } from '../lib/db.ts';
 import { resolveCommunity } from '../lib/community.ts';
 import { PIPELINE_VERSION } from '../lib/env.ts';
 import { collapse, tierFor, type RuleContext, type RuleMeta } from '../rules/engine.ts';
-import { M0_RULES } from '../rules/m0.ts';
+import { ALL_RULES } from '../rules/index.ts';
 
-const ENGINE_VERSION = 'm0.1';
+const ENGINE_VERSION = 'm3.1';
 
 export async function rulesCommand(opts: { community?: string; only?: string; dryRun?: boolean }): Promise<void> {
   const community = await resolveCommunity(opts.community);
@@ -40,7 +40,7 @@ export async function rulesCommand(opts: { community?: string; only?: string; dr
 
     const allHits = [];
     const ran: string[] = [];
-    for (const [code, rule] of Object.entries(M0_RULES)) {
+    for (const [code, rule] of Object.entries(ALL_RULES)) {
       if (only && !only.has(code)) continue;
       const hits = await rule(ctx);
       ran.push(`${code}:${hits.length}`);
