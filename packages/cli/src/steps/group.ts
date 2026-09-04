@@ -6,7 +6,6 @@ import {
   PROMPT_VERSION,
   SCHEMA_VERSION,
   classifyPagesDetailed,
-  estimateCostUsd,
   extractionClient,
   type DocType,
   type PageClassification,
@@ -146,7 +145,7 @@ const CARRY_RE = /\b(suma\s*(y|i)\s*sigue|suma\s*i\s*segueix|continua|continuaci
 function fold(value: string): string {
   return value
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/\s+/g, ' ')
     .trim();
@@ -625,9 +624,5 @@ export async function groupStep(payload: Record<string, unknown>, job: StepJob):
     created,
     classifications_requested: runIds.length - cachedRuns,
     classifications_reused: cachedRuns,
-    cost_usd: undefined,
   };
 }
-
-/** Re-exported so a caller can price a classification pass without importing the core module. */
-export { estimateCostUsd };
