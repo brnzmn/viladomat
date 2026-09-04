@@ -86,22 +86,3 @@ export async function upsertLink(
   if (!row) return 'kept_decision';
   return row.inserted ? 'inserted' : 'updated';
 }
-
-/** Upsert a batch of links, accumulating counts per link type. */
-export async function upsertLinks(
-  client: pg.PoolClient,
-  cid: string,
-  engineVersion: string,
-  links: readonly LinkInput[],
-  counts: Map<string, LinkCounts>,
-): Promise<void> {
-  for (const link of links) {
-    const outcome = await upsertLink(client, cid, engineVersion, link);
-    const key = link.linkType;
-    const c = counts.get(key) ?? emptyCounts();
-    if (outcome === 'inserted') c.inserted++;
-    else if (outcome === 'updated') c.updated++;
-    else c.keptDecision++;
-    counts.set(key, c);
-  }
-}

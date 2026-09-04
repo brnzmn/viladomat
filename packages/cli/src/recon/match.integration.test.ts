@@ -231,6 +231,44 @@ suite('matcher and M3 rules on a seeded scenario', () => {
     expect(hits.filter((h) => h.entityId === s.invoiceA)).toHaveLength(1);
   });
 
+  it('does not multiply the invoiced total when a package carries several resolutions', async () => {
+    await client.query('savepoint e1_check');
+    try {
+      const pkg = await client.query<{ id: string }>(
+        `insert into public.works_packages (community_id, code, label, status) values ($1, 'STAIRCASE', 'Escala', 'in_progress') returning id`,
+        [s.cid],
+      );
+      const w2 = pkg.rows[0]!.id;
+      const meeting = await client.query<{ id: string }>(
+        `insert into public.meetings (community_id, tipo, fecha) values ($1, 'extraordinaria', '2024-04-10') returning id`,
+        [s.cid],
+      );
+      for (const kind of ['works_approval', 'delegation']) {
+        await client.query(
+          `insert into public.resolutions (community_id, meeting_id, texto_literal, kind, resultado, works_package_id, importe_aprobado, tolerance_pct)
+           values ($1, $2, 'Acord', $3::public.resolution_kind, 'aprobado', $4, 900, 0)`,
+          [s.cid, meeting.rows[0]!.id, kind, w2],
+        );
+      }
+      const doc = await client.query<{ id: string }>(
+        `insert into public.documents (community_id, doc_type, doc_date, works_package_id) values ($1, 'factura', '2024-05-01', $2) returning id`,
+        [s.cid, w2],
+      );
+      await client.query(
+        `insert into public.invoices (community_id, document_id, vendor_party_id, numero, fecha_expedicion, total, works_package_id)
+         values ($1, $2, $3, '200', '2024-05-01', 1210.00, $4)`,
+        [s.cid, doc.rows[0]!.id, s.vendorId, w2],
+      );
+      const hits = await E1_authority(ctx());
+      const cap = hits.find((h) => h.eventKey === `works_package:${w2}:delegated_cap`);
+      expect(cap).toBeDefined();
+      expect(cap!.computed.invoiced).toBe(1210);
+      expect(cap!.amountAtStake).toBe(310);
+    } finally {
+      await client.query('rollback to savepoint e1_check');
+    }
+  });
+
   it('collapses the correlated D4 and E2 hits to one event each', async () => {
     const d4 = await D4_paymentTiming(ctx());
     const e2 = await E2_worksSequence(ctx());

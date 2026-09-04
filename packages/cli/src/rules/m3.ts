@@ -14,6 +14,7 @@
  * never an independent leg.
  */
 import { fmtEur, fp, money, type Rule, type RuleHit } from './engine.ts';
+import { loadControlTotals } from '../recon/control-totals.ts';
 import { sequenceEvents, type WorksEventDraft, type WorksEventType } from '../recon/works-events.ts';
 
 /** Provenance of a bank leg, by how the statement reached the corpus. */
@@ -602,16 +603,11 @@ export const D4_paymentTiming: Rule = async ({ cid, client }) => {
 
 export const D7_balanceContinuity: Rule = async ({ cid, client, param }) => {
   const hits: RuleHit[] = [];
-  const cont = await client.query(
-    `select fiscal_year, liquidation_id, saldo_inicial, prev_saldo_final, opening_gap, saldo_final,
-            bank_saldo_at_close, saldo_en_poder_administrador, pm_ordinary
-       from public.v_year_balance_continuity where community_id = $1 order by fiscal_year`,
-    [cid],
-  );
-  for (const r of cont.rows as Array<Record<string, unknown>>) {
-    const year = Number(r.fiscal_year);
-    const liquidationId = String(r.liquidation_id);
-    const gap = r.opening_gap == null ? null : money(r.opening_gap);
+  const { totals, continuity } = await loadControlTotals(client, cid);
+  for (const r of continuity) {
+    const year = r.fiscalYear;
+    const liquidationId = r.liquidationId;
+    const gap = r.openingGap;
     if (gap != null && Math.abs(gap) > 0.01) {
       hits.push({
         ruleCode: 'D7',
@@ -622,9 +618,9 @@ export const D7_balanceContinuity: Rule = async ({ cid, client, param }) => {
         entityId: liquidationId,
         fiscalYear: year,
         amountAtStake: Math.abs(gap),
-        computed: { saldo_inicial: money(r.saldo_inicial), prev_saldo_final: money(r.prev_saldo_final), opening_gap: gap },
-        summaryEs: `Saldo inicial del ejercicio ${year} (${fmtEur(money(r.saldo_inicial))}) distinto del saldo final del ejercicio anterior (${fmtEur(money(r.prev_saldo_final))}); diferencia ${fmtEur(gap)}. Verificar.`,
-        summaryEn: `Opening balance of ${year} (${fmtEur(money(r.saldo_inicial))}) differs from the prior year's closing balance (${fmtEur(money(r.prev_saldo_final))}); difference ${fmtEur(gap)}. Verify.`,
+        computed: { saldo_inicial: r.saldoInicial, prev_saldo_final: r.prevSaldoFinal, opening_gap: gap },
+        summaryEs: `Saldo inicial del ejercicio ${year} (${fmtEur(r.saldoInicial ?? 0)}) distinto del saldo final del ejercicio anterior (${fmtEur(r.prevSaldoFinal ?? 0)}); diferencia ${fmtEur(gap)}. Verificar.`,
+        summaryEn: `Opening balance of ${year} (${fmtEur(r.saldoInicial ?? 0)}) differs from the prior year's closing balance (${fmtEur(r.prevSaldoFinal ?? 0)}); difference ${fmtEur(gap)}. Verify.`,
         innocentExplanations: [
           'A change of accounting basis (cash vs accrual) or a reclassification between accounts may explain the step.',
           'An adjustment approved with the accounts may have been recorded only in the following year.',
@@ -636,8 +632,8 @@ export const D7_balanceContinuity: Rule = async ({ cid, client, param }) => {
         evidence: [{ label: 'liquidations', computed: { liquidation_id: liquidationId, fiscal_year: year } }],
       });
     }
-    const closing = r.saldo_final == null ? null : money(r.saldo_final);
-    const bankClose = r.bank_saldo_at_close == null ? null : money(r.bank_saldo_at_close);
+    const closing = r.saldoFinal;
+    const bankClose = r.bankSaldoAtClose;
     if (closing != null && bankClose != null && Math.abs(closing - bankClose) > 0.01) {
       const diff = Math.round((closing - bankClose) * 100) / 100;
       hits.push({
@@ -663,7 +659,7 @@ export const D7_balanceContinuity: Rule = async ({ cid, client, param }) => {
         evidence: [{ label: 'liquidation vs statements', computed: { liquidation_id: liquidationId, saldo_final: closing, bank_saldo_at_close: bankClose } }],
       });
     }
-    const held = r.saldo_en_poder_administrador == null ? 0 : money(r.saldo_en_poder_administrador);
+    const held = r.saldoEnPoderAdministrador ?? 0;
     if (held > 0) {
       // Same event key and fingerprint as the M0 hit: one finding, whichever module runs.
       hits.push({
@@ -688,17 +684,11 @@ export const D7_balanceContinuity: Rule = async ({ cid, client, param }) => {
     }
   }
 
-  const totals = await client.query(
-    `select fiscal_year, basis, liq_expenses, bank_debits, invoices_total, opening_payables, closing_payables,
-            retentions_held, bridged_difference, pm_ordinary
-       from public.v_control_totals where community_id = $1 order by fiscal_year`,
-    [cid],
-  );
-  for (const r of totals.rows as Array<Record<string, unknown>>) {
-    if (r.bridged_difference == null) continue;
-    const year = Number(r.fiscal_year);
-    const diff = money(r.bridged_difference);
-    const pmOrdinary = r.pm_ordinary != null ? money(r.pm_ordinary) : ((await param('pm_ordinary', `${year}-12-31`)) ?? 0);
+  for (const r of totals) {
+    if (r.bridgedDifference == null) continue;
+    const year = r.fiscalYear;
+    const diff = r.bridgedDifference;
+    const pmOrdinary = r.pmOrdinary ?? (await param('pm_ordinary', `${year}-12-31`)) ?? 0;
     if (pmOrdinary <= 0 || Math.abs(diff) <= pmOrdinary) continue;
     hits.push({
       ruleCode: 'D7',
@@ -711,12 +701,12 @@ export const D7_balanceContinuity: Rule = async ({ cid, client, param }) => {
       amountAtStake: Math.abs(diff),
       computed: {
         basis: r.basis,
-        liq_expenses: money(r.liq_expenses),
-        bank_debits: money(r.bank_debits),
-        invoices_total: money(r.invoices_total),
-        opening_payables: r.opening_payables == null ? null : money(r.opening_payables),
-        closing_payables: r.closing_payables == null ? null : money(r.closing_payables),
-        retentions_held: r.retentions_held == null ? null : money(r.retentions_held),
+        liq_expenses: r.liqExpenses,
+        bank_debits: r.bankDebits,
+        invoices_total: r.invoicesTotal,
+        opening_payables: r.openingPayables,
+        closing_payables: r.closingPayables,
+        retentions_held: r.retentionsHeld,
         bridged_difference: diff,
         pm_ordinary: pmOrdinary,
       },
@@ -935,15 +925,12 @@ export const E1_authority: Rule = async ({ cid, client, param }) => {
             max(r.importe_aprobado) as highest_quote,
             max(coalesce(r.tolerance_pct, 0)) as tolerance_pct,
             bool_or(r.kind::text = 'delegation') as has_delegation,
-            coalesce(sum(distinct_invoices.total), 0) as invoiced
+            (select coalesce(sum(i.total), 0) from public.invoices i
+               join public.documents d on d.id = i.document_id
+              where i.works_package_id = w.id and d.duplicate_of_document_id is null) as invoiced
        from public.works_packages w
        join public.resolutions r on r.works_package_id = w.id and r.resultado = 'aprobado'
          and r.kind::text in ('delegation', 'contractor_choice', 'works_approval')
-       left join lateral (
-         select sum(i.total) as total from public.invoices i
-           join public.documents d on d.id = i.document_id
-          where i.works_package_id = w.id and d.duplicate_of_document_id is null
-       ) distinct_invoices on true
       where w.community_id = $1
       group by w.id, w.code, w.label
       having max(r.importe_aprobado) is not null`,

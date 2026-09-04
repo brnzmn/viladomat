@@ -227,8 +227,8 @@ export async function materialiseWorksEvents(client: pg.PoolClient, cid: string)
   let permitRows: Array<Record<string, unknown>> = [];
   if (hasPermits) {
     const cols = await columnsOf(client, 'permits');
-    const filed = firstPresent(cols, ['filed_on', 'fecha_solicitud', 'data_presentacio', 'presented_on']);
-    const granted = firstPresent(cols, ['granted_on', 'fecha_concesion', 'data_atorgament', 'issued_on']);
+    const filed = firstPresent(cols, ['data_presentacio', 'filed_on', 'fecha_solicitud', 'presented_on']);
+    const granted = firstPresent(cols, ['data_resolucio', 'granted_on', 'fecha_concesion', 'data_atorgament', 'issued_on']);
     if (cols.has('works_package_id') && (filed || granted)) {
       const select = ['id', 'works_package_id', filed ? `${filed} as filed_on` : 'null::date as filed_on', granted ? `${granted} as granted_on` : 'null::date as granted_on'];
       const res = await client.query(
@@ -243,7 +243,7 @@ export async function materialiseWorksEvents(client: pg.PoolClient, cid: string)
   if (hasCertifications) {
     const cols = await columnsOf(client, 'work_certifications');
     const dateCol = firstPresent(cols, ['fecha', 'fecha_emision', 'data', 'issued_on', 'certified_on']);
-    const amountCol = firstPresent(cols, ['importe', 'importe_total', 'amount', 'total']);
+    const amountCol = firstPresent(cols, ['total_actual', 'liquido_a_pagar', 'total_a_origen', 'importe', 'importe_total', 'amount', 'total']);
     const finalCol = firstPresent(cols, ['es_final', 'is_final', 'final']);
     if (cols.has('works_package_id') && dateCol) {
       const select = [
