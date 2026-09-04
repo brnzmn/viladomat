@@ -387,9 +387,8 @@ export function flattenParsed(
       }
       for (const [key, value] of Object.entries(node)) {
         if (depth === 0 && skipTop.has(key)) continue;
-        if (skipLeaf.has(key) && (value === null || typeof value !== 'object' || Array.isArray(value))) {
-          if (key === 'bbox' || key === 'page_index') continue;
-        }
+        // provenance leaves (page_index, bbox) are carried by the row context, not emitted as values
+        if (skipLeaf.has(key) && (value === null || typeof value !== 'object' || Array.isArray(value))) continue;
         const childPath = path ? `${path}.${key}` : key;
         if (value !== null && typeof value === 'object') {
           walk(value, childPath, ctx, depth + 1);

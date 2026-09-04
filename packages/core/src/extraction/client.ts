@@ -34,7 +34,6 @@ import { schemaFor } from './schemas/index.ts';
 import { PaginaBatchSchema, type PageClassification } from './schemas/pagina.ts';
 import {
   ExtractionInputError,
-  schemaKeyFor,
   type DocType,
   type Language,
   type PageImage,
@@ -355,12 +354,11 @@ export function buildClassifierParams(input: ClassifyInput, opts: BuildOptions =
   }
   let prev = input.window.prev.length ? assertPages(input.window.prev, 'classifyPages.prev') : [];
   let next = input.window.next.length ? assertPages(input.window.next, 'classifyPages.next') : [];
-  let budget = LIMITS.maxImagesPerRequest - thumbs.length;
+  const budget = LIMITS.maxImagesPerRequest - thumbs.length;
   while (prev.length + next.length > budget) {
     if (next.length >= prev.length && next.length > 0) next = next.slice(0, -1);
     else prev = prev.slice(1);
   }
-  budget -= prev.length + next.length;
   const format = outputFormatFor(PaginaBatchSchema);
   const targetIndexes = thumbs.map((p) => p.index);
   const prevIndexes = prev.map((p) => p.index);
@@ -449,7 +447,9 @@ function hasEvidenceArray(v: unknown): v is { evidence: EvidenceItem[] } {
 
 function interpret(message: Message, format: ParseableFormat, pageIndexes: ReadonlySet<number> | null): Interpretation {
   if (message.stop_reason === 'refusal') return { kind: 'refused' };
-  if (message.stop_reason === 'max_tokens') return { kind: 'truncated' };
+  if (message.stop_reason === 'max_tokens' || message.stop_reason === 'model_context_window_exceeded') {
+    return { kind: 'truncated' };
+  }
   const text = textOf(message);
   if (!text.trim()) return { kind: 'parse_failed', error: 'response has no text block', text };
   try {
@@ -552,7 +552,7 @@ export async function extractDocument<T = unknown>(input: ExtractInput, opts: Ex
     repaired,
     attempts: responses.length,
     parseError:
-      outcome.kind === 'parse_failed' ? outcome.error : outcome.kind === 'truncated' ? 'output truncated at max_tokens' : null,
+      outcome.kind === 'parse_failed' ? outcome.error : outcome.kind === 'truncated' ? `output truncated (${last.stop_reason})` : null,
     refinementIssues: outcome.kind === 'ok' ? outcome.issues : [],
     costUsd: estimateCostUsd(usage, built.params.model),
   };
@@ -838,6 +838,3 @@ export function createExtractionClient(options: CreateExtractionClientOptions = 
     parseBatchResult,
   };
 }
-
-/** Schema key for a document type, re-exported for callers that only import the client. */
-export { schemaKeyFor };
