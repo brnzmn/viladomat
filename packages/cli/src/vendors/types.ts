@@ -102,7 +102,11 @@ export interface CheckContext {
    * Cache lookup for checks that may reuse a recent response (surname frequencies).
    * Returns the normalised payload of a previous `ok` row, or null.
    */
-  cacheLookup?: (type: string, subjectKey: string, maxAgeDays: number) => Promise<Record<string, unknown> | null>;
+  cacheLookup?: (
+    type: string,
+    subjectKey: string,
+    maxAgeDays: number,
+  ) => Promise<Record<string, unknown> | null>;
 }
 
 /** One check module. `manual: true` means the reviewer fetches it and uploads the evidence. */
@@ -123,7 +127,12 @@ export function nowOf(ctx: CheckContext): Date {
 }
 
 /** Build an `error` result without throwing, so one failing source never aborts a run. */
-export function errorResult(type: string, url: string | null, err: unknown, request?: Record<string, unknown>): CheckResult {
+export function errorResult(
+  type: string,
+  url: string | null,
+  err: unknown,
+  request?: Record<string, unknown>,
+): CheckResult {
   const message = err instanceof Error ? err.message : String(err);
   return {
     type,

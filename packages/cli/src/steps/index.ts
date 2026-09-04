@@ -1,6 +1,10 @@
+import { crosscheckStep } from './crosscheck.ts';
+import { extractStep } from './extract.ts';
+import { groupStep } from './group.ts';
 import { ingestStep } from './ingest.ts';
 import { ocrStep } from './ocr.ts';
 import { renderStep } from './render.ts';
+import { verifyStep } from './verify.ts';
 import type { RegisterStep } from './types.ts';
 
 /**
@@ -12,11 +16,16 @@ import type { RegisterStep } from './types.ts';
  *   render  page images + thumbnails + pHash + text layer → `pages`; enqueues `ocr` and `group`
  *   ocr     Tesseract word boxes → `ocr_words`
  *
- * `group` is deliberately **not** registered here. `vx process` claims only the steps it has
- * handlers for, so the one `group` job the render step enqueues per batch stays `queued` — with no
- * failed attempts and no dead-lettering — until the grouping step of the next milestone registers
- * itself. Passing `--steps group` before that exists simply finds no handler and fails the job, so
- * do not.
+ * M2 adds the four steps that turn pages into cited values:
+ *
+ *   group       `{ batch_label }`  ordered pages + Sonnet page pass + union-find → `documents`
+ *   extract     `{ document_id }`  Opus reading → `extraction_runs`, `field_revisions`, domain rows
+ *   crosscheck  `{ document_id }`  the OCR words as second reader → `ocr_agrees`, `crop_status`, status
+ *   verify      `{ document_id }`  Sonnet third opinion, which may only demote
+ *
+ * `group` is enqueued once per batch by the render step and waits for a person to confirm the
+ * grouping; `extract` is scheduled by `vx extract`, and enqueues `crosscheck` when it succeeds.
+ * `verify` is scheduled deliberately, on the documents whose figures carry weight.
  *
  * Every handler is idempotent: re-running a job with the same idempotency key changes nothing.
  */
@@ -24,9 +33,17 @@ export function registerAll(register: RegisterStep): void {
   register('ingest', ingestStep);
   register('render', renderStep);
   register('ocr', ocrStep);
+  register('group', groupStep);
+  register('extract', extractStep);
+  register('crosscheck', crosscheckStep);
+  register('verify', verifyStep);
 }
 
 export { ingestStep } from './ingest.ts';
 export { ocrStep } from './ocr.ts';
 export { renderStep } from './render.ts';
+export { groupStep } from './group.ts';
+export { extractStep } from './extract.ts';
+export { crosscheckStep } from './crosscheck.ts';
+export { verifyStep } from './verify.ts';
 export type { RegisterStep, StepHandler, StepJob, StepResult } from './types.ts';

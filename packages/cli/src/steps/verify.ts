@@ -1,9 +1,19 @@
 import { normaliseValue } from '@viladomat/core';
 import { maybeOne, query, transaction } from '../lib/db.ts';
-import { MODELS, criticalSeeds, flattenParsed, kindForPath, type DocType, type FieldValueSeed } from '../extract/adapter.ts';
+import {
+  MODELS,
+  criticalSeeds,
+  extractDocument,
+  extractionClient,
+  flattenParsed,
+  kindForPath,
+  type DocType,
+  type ExtractDocumentResult,
+  type FieldValueSeed,
+  type Language,
+} from '../extract/adapter.ts';
 import { valueKindOf } from '../extract/persist.ts';
-import { insertRun, chunkPages, extractionKey, mergeParsedChunks, type LoadedPage } from './extract.ts';
-import { extractDocument, extractionClient, type ExtractDocumentResult, type Language } from '../extract/adapter.ts';
+import { chunkPages, extractionKey, insertRun, mergeParsedChunks, type LoadedPage } from './extract.ts';
 import { sha256 } from '../lib/images.ts';
 import { getObject, parseStoragePath } from '../lib/storage.ts';
 import type { StepJob, StepResult } from './types.ts';

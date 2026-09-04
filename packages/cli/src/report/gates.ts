@@ -137,6 +137,31 @@ export function legalCitationGate(input: LegalCitationInput, archived: ReadonlyS
   return { printable: true, articles, placeholder: null, missingSources: [], reason: 'ok' };
 }
 
+/**
+ * Statutory citations inside free text that the schema gives no way to point at an archived
+ * source — today that is `parameters.basis_text`, which has no `legal_source_ids` column. The
+ * hard gate treats "no pointer" as "not archived", so the citation is replaced by the pending
+ * placeholder and the descriptive part of the sentence survives.
+ */
+const CITATION_RE = new RegExp(
+  [
+    // "Ley 7/2012 art. 7", "RD 1619/2012", "Decret 67/2015", "Llei 5/2006"
+    String.raw`(?:Ley|Llei|Reial\s+Decret|Real\s+Decreto|RDL?|Decreto|Decret|Ordenança|Ordenanza|Orden)\s*\d+[\d/.‐-―-]*(?:\s*(?:art\.?|arts\.?|articles?|artículos?|articulos?)\s*[\d][\d.ºª/,‐-―-]*)?`,
+    // "CCCat 553-6", "LIVA art. 91", "LIRPF art. 99", "OF 2.1"
+    String.raw`(?:CCCat|LPH|LIVA|LIRPF|RIRPF|LEC|LOE|LCSP|OF)\s*(?:art\.?\s*)?\d+[\d.ºª/,‐-―-]*`,
+    // a bare "art. 553-6" / "artículo 31.3"
+    String.raw`(?:art\.?|arts\.?|artículos?|articulos?|articles?)\s*\d+[\d.ºª/,‐-―-]*`,
+  ].join('|'),
+  'gi',
+);
+
+/** Replace every legal citation in free text with the pending-archive placeholder. */
+export function withholdCitations(text: string | null | undefined, lang: Lang): string {
+  if (!text) return '';
+  const placeholder = m6Strings(lang).gateLegalPending;
+  return text.replace(CITATION_RE, `[${placeholder}]`);
+}
+
 // ---------------------------------------------------------------------------
 // (c) tier
 // ---------------------------------------------------------------------------

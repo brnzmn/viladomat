@@ -55,11 +55,14 @@ export async function persistCheck(
     stored = { archived: true, storage_path: storagePath, bytes: rawJson.length };
   }
 
+  // `fetched_at` is set from clock_timestamp(), not from the column default: `now()` is the
+  // transaction timestamp, so two checks appended in one transaction would carry the same
+  // instant and "the latest answer" would be ambiguous.
   const res = await client.query(
     `insert into public.external_checks
        (id, community_id, check_type, subject_type, subject_key, source_url, request, raw_response,
-        evidence_storage_path, normalised, status, cost_cents, checked_by)
-     values ($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,$9,$10::jsonb,$11,$12,$13)
+        evidence_storage_path, normalised, status, cost_cents, checked_by, fetched_at)
+     values ($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,$9,$10::jsonb,$11,$12,$13, clock_timestamp())
      returning id, check_type, status, evidence_storage_path, fetched_at::text as fetched_at`,
     [
       id,
@@ -194,8 +197,8 @@ export async function attachEvidence(
   const res = await client.query(
     `insert into public.external_checks
        (community_id, check_type, subject_type, subject_key, source_url, request, raw_response,
-        evidence_storage_path, normalised, status, cost_cents, checked_by)
-     values ($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8,$9::jsonb,'ok',$10,$11)
+        evidence_storage_path, normalised, status, cost_cents, checked_by, fetched_at)
+     values ($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8,$9::jsonb,'ok',$10,$11, clock_timestamp())
      returning id, check_type, status, evidence_storage_path, fetched_at::text as fetched_at`,
     [
       cid,

@@ -20,7 +20,11 @@ export const nifValidate: VendorCheck = {
       return Promise.resolve({
         type: 'nif_validate',
         status: 'not_found',
-        normalised: { nif: null, present: false, note: 'No identifier transcribed for this party.' },
+        normalised: {
+          nif: null,
+          present: false,
+          note: 'No identifier transcribed for this party.',
+        },
         raw: { input: null },
         source_url: null,
         cost_cents: 0,
@@ -36,7 +40,9 @@ export const nifValidate: VendorCheck = {
       kind: v.kind,
       shape: v.shape ?? null,
       entity_letter: entityLetter,
-      entity_label: entityLetter ? (CIF_ENTITY_LABELS[entityLetter] ?? v.entityLabel ?? null) : null,
+      entity_label: entityLetter
+        ? (CIF_ENTITY_LABELS[entityLetter] ?? v.entityLabel ?? null)
+        : null,
       natural_person: isNaturalPersonNif(v),
       reason: v.reason ?? null,
     };
@@ -50,7 +56,9 @@ export const nifValidate: VendorCheck = {
       request: { nif: raw },
       ...(v.valid
         ? {}
-        : { note: 'Check digit does not match. Re-read the identifier on the original page before treating it as incorrect.' }),
+        : {
+            note: 'Check digit does not match. Re-read the identifier on the original page before treating it as incorrect.',
+          }),
     });
   },
 };

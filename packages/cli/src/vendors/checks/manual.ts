@@ -17,7 +17,12 @@
 import { MANUAL_SOURCES, type ManualSourceConfig } from '../config.ts';
 import type { CheckContext, CheckResult, CheckSubject, VendorCheck } from '../types.ts';
 
-function manualCheck(type: string, label: string, cfg: ManualSourceConfig, buildQuery: (s: CheckSubject) => string): VendorCheck {
+function manualCheck(
+  type: string,
+  label: string,
+  cfg: ManualSourceConfig,
+  buildQuery: (s: CheckSubject) => string,
+): VendorCheck {
   return {
     type,
     label,
@@ -43,7 +48,13 @@ function manualCheck(type: string, label: string, cfg: ManualSourceConfig, build
         source_url: cfg.url,
         cost_cents: cfg.costCents,
         request: { query, source: cfg.id },
-        manual: { url: cfg.url, evidence: cfg.evidence, query, costCents: cfg.costCents, note: cfg.toVerify },
+        manual: {
+          url: cfg.url,
+          evidence: cfg.evidence,
+          query,
+          costCents: cfg.costCents,
+          note: cfg.toVerify,
+        },
       });
     },
   };
@@ -92,4 +103,10 @@ export const rasicManual = manualCheck(
   nameAndNif,
 );
 
-export const MANUAL_CHECKS: readonly VendorCheck[] = [rea, aeatCensus, registroMercantilNota, insolvency, rasicManual];
+export const MANUAL_CHECKS: readonly VendorCheck[] = [
+  rea,
+  aeatCensus,
+  registroMercantilNota,
+  insolvency,
+  rasicManual,
+];

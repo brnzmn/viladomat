@@ -7,7 +7,16 @@
  */
 import { normaliseName, validateNif } from '@viladomat/core';
 import { envOptional } from '../lib/env.ts';
-import { hmacNif, loadReferenceKeys, type CensusState, type ChecksumState, type RegistryState, type ScoringContext, type VendorSnapshot } from './links.ts';
+import {
+  hmacNif,
+  loadReferenceKeys,
+  normaliseAddress,
+  type CensusState,
+  type ChecksumState,
+  type RegistryState,
+  type ScoringContext,
+  type VendorSnapshot,
+} from './links.ts';
 import { loadOfficers } from './officers.ts';
 import { latestChecks, type Queryable } from './persist.ts';
 import { fingerprintsByParty, findQuoteOverlaps, loadQuoteRows } from './quotes.ts';
@@ -19,54 +28,71 @@ import { fingerprintsByParty, findQuoteOverlaps, loadQuoteRows } from './quotes.
  * CNAE table; a category or code absent from this map yields `null` (not assessed), never
  * `false`, so an unmapped case never produces a signal.
  */
-export const CNAE_DIVISIONS_BY_CATEGORY: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  ELEV_INSTALL: ['28', '33', '43'],
-  ELEV_CIVIL: ['41', '43'],
-  ELEV_MAINT: ['33', '43'],
-  ELEV_INSPECT: ['71', '74'],
-  FACADE_REHAB: ['41', '43'],
-  BALCONY: ['41', '43'],
-  SCAFFOLD: ['43', '77'],
-  ROOF: ['41', '43'],
-  STAIR_REHAB: ['41', '43'],
-  PAINT_INT: ['43'],
-  ENTRANCE_DOOR: ['25', '43', '16'],
-  INTERCOM: ['43', '61'],
-  WINDOWS: ['25', '43', '16'],
-  LOCKSMITH: ['25', '43', '80'],
-  ELECTRICAL: ['43'],
-  PLUMB_SEWER: ['43', '37'],
-  WATER_SUPPLY: ['43', '36'],
-  MASONRY: ['41', '43'],
-  ARCH_PROJECT: ['71'],
-  ARCH_DO: ['71'],
-  HS_COORD: ['71', '74'],
-  ITE: ['71'],
-  ADMIN_FEE: ['68', '69'],
-  ADMIN_EXTRA: ['68', '69'],
-  INSURANCE: ['65', '66'],
-  CLEANING: ['81'],
-  ELECTRICITY: ['35'],
-  WATER_UTIL: ['36'],
-  CAE_PRL: ['71', '74', '86'],
-  LEGAL: ['69'],
-  BANK: ['64'],
-  WASTE: ['38'],
-  PEST: ['81'],
-  FIRE: ['43', '80'],
-  TELECOM: ['43', '61'],
-  GAS: ['43', '35'],
-  ASBESTOS: ['39', '43'],
-});
+export const CNAE_DIVISIONS_BY_CATEGORY: Readonly<Record<string, readonly string[]>> =
+  Object.freeze({
+    ELEV_INSTALL: ['28', '33', '43'],
+    ELEV_CIVIL: ['41', '43'],
+    ELEV_MAINT: ['33', '43'],
+    ELEV_INSPECT: ['71', '74'],
+    FACADE_REHAB: ['41', '43'],
+    BALCONY: ['41', '43'],
+    SCAFFOLD: ['43', '77'],
+    ROOF: ['41', '43'],
+    STAIR_REHAB: ['41', '43'],
+    PAINT_INT: ['43'],
+    ENTRANCE_DOOR: ['25', '43', '16'],
+    INTERCOM: ['43', '61'],
+    WINDOWS: ['25', '43', '16'],
+    LOCKSMITH: ['25', '43', '80'],
+    ELECTRICAL: ['43'],
+    PLUMB_SEWER: ['43', '37'],
+    WATER_SUPPLY: ['43', '36'],
+    MASONRY: ['41', '43'],
+    ARCH_PROJECT: ['71'],
+    ARCH_DO: ['71'],
+    HS_COORD: ['71', '74'],
+    ITE: ['71'],
+    ADMIN_FEE: ['68', '69'],
+    ADMIN_EXTRA: ['68', '69'],
+    INSURANCE: ['65', '66'],
+    CLEANING: ['81'],
+    ELECTRICITY: ['35'],
+    WATER_UTIL: ['36'],
+    CAE_PRL: ['71', '74', '86'],
+    LEGAL: ['69'],
+    BANK: ['64'],
+    WASTE: ['38'],
+    PEST: ['81'],
+    FIRE: ['43', '80'],
+    TELECOM: ['43', '61'],
+    GAS: ['43', '35'],
+    ASBESTOS: ['39', '43'],
+  });
 
 /** Category codes whose vendors are expected in REA (construction) or RASIC (regulated trades). */
 export const REA_CATEGORIES: ReadonlySet<string> = new Set([
-  'ELEV_CIVIL', 'FACADE_REHAB', 'BALCONY', 'ROOF', 'STAIR_REHAB', 'MASONRY', 'PLUMB_SEWER',
-  'WATER_SUPPLY', 'SCAFFOLD', 'PAINT_INT', 'ASBESTOS', 'WINDOWS', 'ENTRANCE_DOOR',
+  'ELEV_CIVIL',
+  'FACADE_REHAB',
+  'BALCONY',
+  'ROOF',
+  'STAIR_REHAB',
+  'MASONRY',
+  'PLUMB_SEWER',
+  'WATER_SUPPLY',
+  'SCAFFOLD',
+  'PAINT_INT',
+  'ASBESTOS',
+  'WINDOWS',
+  'ENTRANCE_DOOR',
 ]);
 
 export const RASIC_CATEGORIES: ReadonlySet<string> = new Set([
-  'ELEV_INSTALL', 'ELEV_MAINT', 'ELECTRICAL', 'GAS', 'INTERCOM', 'FIRE',
+  'ELEV_INSTALL',
+  'ELEV_MAINT',
+  'ELECTRICAL',
+  'GAS',
+  'INTERCOM',
+  'FIRE',
 ]);
 
 export interface PartyFacts {
@@ -92,9 +118,7 @@ export interface PartyFacts {
 }
 
 function normAddress(s: string | null | undefined): string | null {
-  if (!s) return null;
-  const t = normaliseName(s).replace(/\s+/g, ' ').trim();
-  return t || null;
+  return normaliseAddress(s) || null;
 }
 
 /** Parties with their accounts, the categories they invoiced and their first dates. */
@@ -150,12 +174,17 @@ export async function loadPartyFacts(client: Queryable, cid: string): Promise<Pa
     invoiceTotal: Number(r.invoice_total ?? 0),
     worksTotal: Number(r.works_total ?? 0),
     ordinaryTotal: Number(r.ordinary_total ?? 0),
-    numeroInts: ((r.numero_ints as Array<string | number> | null) ?? []).map(Number).filter(Number.isFinite),
+    numeroInts: ((r.numero_ints as Array<string | number> | null) ?? [])
+      .map(Number)
+      .filter(Number.isFinite),
   }));
 }
 
 /** Latest check of each type, keyed by `<check_type>|<subject_key>`. */
-export async function loadLatestCheckMap(client: Queryable, cid: string): Promise<Map<string, Record<string, unknown>>> {
+export async function loadLatestCheckMap(
+  client: Queryable,
+  cid: string,
+): Promise<Map<string, Record<string, unknown>>> {
   const rows = await latestChecks(client, cid);
   const map = new Map<string, Record<string, unknown>>();
   for (const r of rows) map.set(`${String(r.check_type)}|${String(r.subject_key)}`, r);
@@ -187,7 +216,11 @@ function censusState(row: Record<string, unknown> | undefined): CensusState {
   return 'unknown';
 }
 
-function checksumState(nif: string | null, nifValid: boolean | null, row: Record<string, unknown> | undefined): ChecksumState {
+function checksumState(
+  nif: string | null,
+  nifValid: boolean | null,
+  row: Record<string, unknown> | undefined,
+): ChecksumState {
   const n = (row?.normalised as Record<string, unknown> | null) ?? null;
   if (n && typeof n.valid === 'boolean') return n.valid ? 'valid' : 'invalid';
   if (typeof nifValid === 'boolean') return nifValid ? 'valid' : 'invalid';
@@ -213,24 +246,34 @@ export interface LinkInputs {
 }
 
 /** Build every input the scorer needs for one community. */
-export async function loadLinkInputs(client: Queryable, cid: string, today: string): Promise<LinkInputs> {
-  const [parties, officers, reference, checkMap, quoteRows] = await Promise.all([
-    loadPartyFacts(client, cid),
-    loadOfficers(client, cid),
-    loadReferenceKeys(client, cid),
-    loadLatestCheckMap(client, cid),
-    loadQuoteRows(client, cid),
-  ]);
+export async function loadLinkInputs(
+  client: Queryable,
+  cid: string,
+  today: string,
+): Promise<LinkInputs> {
+  // Sequential, not Promise.all: `client` may be a single pooled connection, which serialises
+  // queries anyway and warns when two are issued at once.
+  const parties = await loadPartyFacts(client, cid);
+  const officers = await loadOfficers(client, cid);
+  const reference = await loadReferenceKeys(client, cid);
+  const checkMap = await loadLatestCheckMap(client, cid);
+  const quoteRows = await loadQuoteRows(client, cid);
 
-  const communityRes = await client.query(`select address from public.communities where id = $1`, [cid]);
-  const communityAddress = normAddress((communityRes.rows[0] as { address?: string | null } | undefined)?.address ?? null);
+  const communityRes = await client.query(`select address from public.communities where id = $1`, [
+    cid,
+  ]);
+  const communityAddress = normAddress(
+    (communityRes.rows[0] as { address?: string | null } | undefined)?.address ?? null,
+  );
 
   const adminRes = await client.query(
     `select distinct party_id from public.office_terms
       where community_id = $1 and office = 'administrator' and party_id is not null`,
     [cid],
   );
-  const administratorPartyIds = (adminRes.rows as Array<{ party_id: string }>).map((r) => String(r.party_id));
+  const administratorPartyIds = (adminRes.rows as Array<{ party_id: string }>).map((r) =>
+    String(r.party_id),
+  );
 
   const officersByParty = new Map<string, typeof officers>();
   for (const o of officers) {
@@ -296,13 +339,17 @@ export async function loadLinkInputs(client: Queryable, cid: string, today: stri
     const profile = (profileRow?.normalised as Record<string, unknown> | null) ?? null;
     const notaRow = checkMap.get(`registro_mercantil_nota|${p.id}`);
     const notaOn =
-      notaRow && String(notaRow.status) === 'ok' ? String(notaRow.fetched_at ?? '').slice(0, 10) || null : null;
+      notaRow && String(notaRow.status) === 'ok'
+        ? String(notaRow.fetched_at ?? '').slice(0, 10) || null
+        : null;
 
     const evidenceIds = [
-      profileRow?.id, checkMap.get(`rea|${p.id}`)?.id, checkMap.get(`rasic|${p.id}`)?.id,
-      checkMap.get(`aeat_census|${p.id}`)?.id, notaRow?.id,
-    ]
-      .filter((v): v is string => typeof v === 'string');
+      profileRow?.id,
+      checkMap.get(`rea|${p.id}`)?.id,
+      checkMap.get(`rasic|${p.id}`)?.id,
+      checkMap.get(`aeat_census|${p.id}`)?.id,
+      notaRow?.id,
+    ].filter((v): v is string => typeof v === 'string');
 
     const cnae = (profile?.cnae as string | null) ?? null;
     vendors.push({
@@ -324,7 +371,10 @@ export async function loadLinkInputs(client: Queryable, cid: string, today: stri
         nifHmac: null,
       })),
       incorporationDate: (profile?.incorporation_date as string | null) ?? null,
-      capitalEur: profile?.capital_eur === null || profile?.capital_eur === undefined ? null : Number(profile.capital_eur),
+      capitalEur:
+        profile?.capital_eur === null || profile?.capital_eur === undefined
+          ? null
+          : Number(profile.capital_eur),
       cnae,
       cnaeRelated: cnaeRelated(cnae, p.categories),
       firstInvoiceDate: p.firstInvoiceDate,
@@ -337,7 +387,11 @@ export async function loadLinkInputs(client: Queryable, cid: string, today: stri
       quoteFingerprints: fingerprints.get(p.id) ?? [],
       signerAlsoAdvises: null,
       profileSource: profileRow
-        ? { checkType: 'company_profile', date: String(profileRow.fetched_at ?? '').slice(0, 10) || null, checkId: String(profileRow.id) }
+        ? {
+            checkType: 'company_profile',
+            date: String(profileRow.fetched_at ?? '').slice(0, 10) || null,
+            checkId: String(profileRow.id),
+          }
         : null,
       evidenceIds,
       notaInformativaOn: notaOn,

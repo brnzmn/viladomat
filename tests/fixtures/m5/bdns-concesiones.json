@@ -1,0 +1,27 @@
+{
+  "_fixture_note": "Synthetic. Shape of a BDNS `concesiones/busqueda` response; the path and every parameter name are guesses (see SOURCES.bdns.toVerify). Amounts and references are invented.",
+  "page": 0,
+  "totalElements": 2,
+  "content": [
+    {
+      "idConcesion": "9990001",
+      "beneficiario": "COMUNITAT DE PROPIETARIS EXEMPLE 25",
+      "nifBeneficiario": "H12345674",
+      "organo": "CONSORCI DE L'HABITATGE DE BARCELONA",
+      "convocatoria": "Ajuts a la rehabilitacio d'elements comuns 2023",
+      "fechaConcesion": "2023-11-30",
+      "importe": "18500.00",
+      "importePagado": "0.00"
+    },
+    {
+      "idConcesion": "9990002",
+      "beneficiario": "COMUNITAT DE PROPIETARIS EXEMPLE 25",
+      "nifBeneficiario": "H12345674",
+      "organo": "CONSORCI DE L'HABITATGE DE BARCELONA",
+      "convocatoria": "Ajuts a l'accessibilitat 2024",
+      "fechaConcesion": "2024-06-14",
+      "importe": "30000.00",
+      "importePagado": "12000.00"
+    }
+  ]
+}

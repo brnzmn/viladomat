@@ -42,12 +42,17 @@
  */
 import { createHmac } from 'node:crypto';
 import { canonicalGivenName, normaliseName, normaliseNif } from '@viladomat/core';
-import { COMMON_SURNAME_PER_MILLE, DOMICILIATION_MIN_COMPANIES, HOMONYM_POPULATION } from './config.ts';
+import {
+  COMMON_SURNAME_PER_MILLE,
+  DOMICILIATION_MIN_COMPANIES,
+  HOMONYM_POPULATION,
+} from './config.ts';
 import type { Queryable } from './persist.ts';
 
 export const LINKS_ENGINE_VERSION = 'm5.links.1';
 
-export type LinkSignalCode = 'S1' | 'S2' | 'S3' | 'S4' | 'S5' | 'S6' | 'S7' | 'S8' | 'S9' | 'S10' | 'S11';
+export type LinkSignalCode =
+  'S1' | 'S2' | 'S3' | 'S4' | 'S5' | 'S6' | 'S7' | 'S8' | 'S9' | 'S10' | 'S11';
 export type LinkRole = 'president' | 'president_family' | 'administrator';
 export type LinkTier = 'priority' | 'review' | 'note';
 
@@ -67,12 +72,29 @@ export function hmacNif(nif: string, keyBase64: string): string {
 // Rarity and expected homonyms
 // ---------------------------------------------------------------------------
 
+/**
+ * Normalise an address for equality tests: accents stripped, upper case, everything that is not
+ * a letter or a digit becomes a space, spaces collapsed. Deliberately **not** the person-name
+ * normaliser, which drops particles and digits and would turn "Carrer de Prova 7" into
+ * "CARRER PROVA". Both sides of every address comparison go through this one function.
+ */
+export function normaliseAddress(s: string | null | undefined): string {
+  if (s == null) return '';
+  return String(s)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, ' ')
+    .trim();
+}
+
 /** Weight used when the frequency could not be obtained: the "fairly common" band. */
 export const UNKNOWN_FREQUENCY_WEIGHT = 0.6;
 
 /** Rarity weight of a surname from its frequency in ‰. */
 export function rarityWeight(perMille: number | null | undefined): number {
-  if (perMille === null || perMille === undefined || !Number.isFinite(perMille)) return UNKNOWN_FREQUENCY_WEIGHT;
+  if (perMille === null || perMille === undefined || !Number.isFinite(perMille))
+    return UNKNOWN_FREQUENCY_WEIGHT;
   if (perMille < 0.1) return 1.3;
   if (perMille <= 1) return 1.0;
   if (perMille <= 10) return 0.6;
@@ -88,7 +110,9 @@ export function pairWeight(a: number, b: number): number {
  * Number of people in the reference population expected to carry the same surname (or the same
  * pair), printed next to every surname coincidence. `null` when a frequency is unknown.
  */
-export function expectedCollisions(perMille: readonly (number | null | undefined)[]): number | null {
+export function expectedCollisions(
+  perMille: readonly (number | null | undefined)[],
+): number | null {
   let acc = HOMONYM_POPULATION;
   for (const f of perMille) {
     if (f === null || f === undefined || !Number.isFinite(f)) return null;
@@ -157,7 +181,12 @@ export interface VendorSnapshot {
   /** null when the activity code was never compared with what the vendor invoiced. */
   cnaeRelated: boolean | null;
   firstInvoiceDate: string | null;
-  registry: { rea: RegistryState; rasic: RegistryState; census: CensusState; nifChecksum: ChecksumState };
+  registry: {
+    rea: RegistryState;
+    rasic: RegistryState;
+    census: CensusState;
+    nifChecksum: ChecksumState;
+  };
   quoteFingerprints: QuoteFingerprint[];
   /** Set when the same person signs for the vendor and appears advising in the minutes. */
   signerAlsoAdvises: { role: LinkRole; note: string } | null;
@@ -239,7 +268,11 @@ function others(list: readonly string[] | undefined, self: string): string[] {
  */
 export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): LinkSignal[] {
   const out: LinkSignal[] = [];
-  const source = vendor.profileSource ?? { checkType: 'company_profile', date: null, checkId: null };
+  const source = vendor.profileSource ?? {
+    checkType: 'company_profile',
+    date: null,
+    checkId: null,
+  };
   const base = {
     partyId: vendor.partyId,
     source: { checkType: source.checkType, date: source.date },
@@ -256,16 +289,24 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     if (!ref.nifHmac) continue;
     if (vendor.nifHmac && vendor.nifHmac === ref.nifHmac) {
       push({
-        signal: 'S1', role: ref.role, points: 100, rarityWeight: null, expectedCollisions: null,
-        facts: ['the vendor\'s identifier digest equals the one recorded for this role'],
+        signal: 'S1',
+        role: ref.role,
+        points: 100,
+        rarityWeight: null,
+        expectedCollisions: null,
+        facts: ["the vendor's identifier digest equals the one recorded for this role"],
         detail: { basis: 'party_nif_hmac' },
       });
     }
     const officer = vendor.officers.find((o) => o.nifHmac && o.nifHmac === ref.nifHmac);
     if (officer) {
       push({
-        signal: 'S1', role: ref.role, points: 100, rarityWeight: null, expectedCollisions: null,
-        facts: ['an officer\'s identifier digest equals the one recorded for this role'],
+        signal: 'S1',
+        role: ref.role,
+        points: 100,
+        rarityWeight: null,
+        expectedCollisions: null,
+        facts: ["an officer's identifier digest equals the one recorded for this role"],
         detail: { basis: 'officer_nif_hmac', cargo: officer.cargo ?? null },
       });
     }
@@ -274,15 +315,23 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
   // ---- S2 / S3 / S4: names ----------------------------------------------------
   for (const ref of ctx.reference) {
     for (const o of vendor.officers) {
-      const bothSameOrder = Boolean(o.surname1 && o.surname2 && o.surname1 === ref.surname1 && o.surname2 === ref.surname2);
-      const bothReversed = Boolean(o.surname1 && o.surname2 && o.surname1 === ref.surname2 && o.surname2 === ref.surname1);
+      const bothSameOrder = Boolean(
+        o.surname1 && o.surname2 && o.surname1 === ref.surname1 && o.surname2 === ref.surname2,
+      );
+      const bothReversed = Boolean(
+        o.surname1 && o.surname2 && o.surname1 === ref.surname2 && o.surname2 === ref.surname1,
+      );
 
       if (bothSameOrder && ref.given && sameGiven(o.given, ref.given)) {
         push({
-          signal: 'S2', role: ref.role, points: 90,
+          signal: 'S2',
+          role: ref.role,
+          points: 90,
           rarityWeight: null,
           expectedCollisions: expectedCollisions([freq(ref.surname1), freq(ref.surname2)]),
-          facts: ['an officer\'s given name and both surnames coincide with those recorded for this role'],
+          facts: [
+            "an officer's given name and both surnames coincide with those recorded for this role",
+          ],
           detail: { cargo: o.cargo ?? null, order: 'same' },
         });
         continue;
@@ -293,7 +342,9 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
         const w = pairWeight(w1, w2);
         const points = round((bothSameOrder ? 45 : 30) * w);
         push({
-          signal: 'S3', role: ref.role, points,
+          signal: 'S3',
+          role: ref.role,
+          points,
           rarityWeight: round(w),
           expectedCollisions: expectedCollisions([freq(ref.surname1), freq(ref.surname2)]),
           facts: [
@@ -302,8 +353,12 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
               : 'both surnames of an officer coincide, in the reverse order, with those recorded for this role',
           ],
           detail: {
-            cargo: o.cargo ?? null, order: bothSameOrder ? 'same' : 'reversed',
-            surname_frequencies_per_mille: { first: freq(ref.surname1), second: freq(ref.surname2) },
+            cargo: o.cargo ?? null,
+            order: bothSameOrder ? 'same' : 'reversed',
+            surname_frequencies_per_mille: {
+              first: freq(ref.surname1),
+              second: freq(ref.surname2),
+            },
             weights: { first: w1, second: w2 },
           },
         });
@@ -320,7 +375,9 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
       if (f !== null && f > COMMON_SURNAME_PER_MILLE) continue; // too common to carry weight
       const w = rarityWeight(f);
       push({
-        signal: 'S4', role: ref.role, points: round(8 * w),
+        signal: 'S4',
+        role: ref.role,
+        points: round(8 * w),
         rarityWeight: round(w),
         expectedCollisions: expectedCollisions([f]),
         facts: ['one surname of an officer coincides with one recorded for this role'],
@@ -338,16 +395,24 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     const addr = vendor.addressNorm;
     if (ctx.buildingAddresses.includes(addr)) {
       push({
-        signal: 'S5', role: null, points: 80, rarityWeight: null, expectedCollisions: null,
-        facts: ['the vendor\'s registered address is the building itself'],
+        signal: 'S5',
+        role: null,
+        points: 80,
+        rarityWeight: null,
+        expectedCollisions: null,
+        facts: ["the vendor's registered address is the building itself"],
         detail: { address_norm: addr, basis: 'building' },
       });
     }
     for (const ref of ctx.reference) {
       if (!ref.addresses.includes(addr)) continue;
       push({
-        signal: 'S5', role: ref.role, points: 80, rarityWeight: null, expectedCollisions: null,
-        facts: ['the vendor\'s registered address coincides with an address recorded for this role'],
+        signal: 'S5',
+        role: ref.role,
+        points: 80,
+        rarityWeight: null,
+        expectedCollisions: null,
+        facts: ["the vendor's registered address coincides with an address recorded for this role"],
         detail: { address_norm: addr, basis: 'reference_address' },
       });
     }
@@ -359,19 +424,27 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
       const domiciliation = count >= DOMICILIATION_MIN_COMPANIES;
       const withAdministrator = sharing.some((id) => ctx.administratorPartyIds.includes(id));
       push({
-        signal: 'S6', role: withAdministrator ? 'administrator' : null,
-        points: domiciliation ? 15 : 40, rarityWeight: null, expectedCollisions: null,
+        signal: 'S6',
+        role: withAdministrator ? 'administrator' : null,
+        points: domiciliation ? 15 : 40,
+        rarityWeight: null,
+        expectedCollisions: null,
         facts: [
           withAdministrator
-            ? 'the vendor\'s address coincides with the administrator\'s office address'
-            : 'the vendor\'s address coincides with another vendor\'s address',
+            ? "the vendor's address coincides with the administrator's office address"
+            : "the vendor's address coincides with another vendor's address",
           ...(domiciliation
-            ? [`the address hosts ${count} entities on the record, which is consistent with a domiciliation or accountancy address`]
+            ? [
+                `the address hosts ${count} entities on the record, which is consistent with a domiciliation or accountancy address`,
+              ]
             : []),
         ],
         detail: {
-          address_norm: addr, entities_at_address: count, domiciliation,
-          shared_with_party_ids: sharing, shared_with_administrator: withAdministrator,
+          address_norm: addr,
+          entities_at_address: count,
+          domiciliation,
+          shared_with_party_ids: sharing,
+          shared_with_administrator: withAdministrator,
         },
       });
     }
@@ -381,8 +454,14 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
   for (const iban of vendor.ibanHmacs) {
     if (ctx.presidencyQuotaIbans.includes(iban)) {
       push({
-        signal: 'S7', role: 'president', points: 100, rarityWeight: null, expectedCollisions: null,
-        facts: ['an account digest of the vendor equals one that the presidency\'s quotas are paid from'],
+        signal: 'S7',
+        role: 'president',
+        points: 100,
+        rarityWeight: null,
+        expectedCollisions: null,
+        facts: [
+          "an account digest of the vendor equals one that the presidency's quotas are paid from",
+        ],
         detail: { basis: 'presidency_quota_iban' },
       });
     }
@@ -390,8 +469,11 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     if (sharing.length > 0) {
       const withAdministrator = sharing.some((id) => ctx.administratorPartyIds.includes(id));
       push({
-        signal: 'S7', role: withAdministrator ? 'administrator' : null, points: 90,
-        rarityWeight: null, expectedCollisions: null,
+        signal: 'S7',
+        role: withAdministrator ? 'administrator' : null,
+        points: 90,
+        rarityWeight: null,
+        expectedCollisions: null,
         facts: ['an account digest of the vendor is also recorded for another party'],
         detail: { basis: 'iban_reuse', shared_with_party_ids: sharing },
       });
@@ -402,8 +484,11 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     if (sharing.length > 0) {
       const withAdministrator = sharing.some((id) => ctx.administratorPartyIds.includes(id));
       push({
-        signal: 'S7', role: withAdministrator ? 'administrator' : null, points: 60,
-        rarityWeight: null, expectedCollisions: null,
+        signal: 'S7',
+        role: withAdministrator ? 'administrator' : null,
+        points: 60,
+        rarityWeight: null,
+        expectedCollisions: null,
         facts: ['the telephone number printed by the vendor is also printed by another party'],
         detail: { basis: 'phone', shared_with_party_ids: sharing },
       });
@@ -413,7 +498,11 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     const sharing = others(ctx.mailboxOwners[vendor.emailNorm], vendor.partyId);
     if (sharing.length > 0) {
       push({
-        signal: 'S7', role: null, points: 50, rarityWeight: null, expectedCollisions: null,
+        signal: 'S7',
+        role: null,
+        points: 50,
+        rarityWeight: null,
+        expectedCollisions: null,
         facts: ['the e-mail mailbox printed by the vendor is also printed by another party'],
         detail: { basis: 'email_mailbox', shared_with_party_ids: sharing },
       });
@@ -423,9 +512,17 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     const sharing = others(ctx.emailDomainOwners[vendor.emailDomain], vendor.partyId);
     if (sharing.length > 0) {
       push({
-        signal: 'S7', role: null, points: 50, rarityWeight: null, expectedCollisions: null,
+        signal: 'S7',
+        role: null,
+        points: 50,
+        rarityWeight: null,
+        expectedCollisions: null,
         facts: ['the e-mail domain printed by the vendor is also printed by another party'],
-        detail: { basis: 'email_domain', domain: vendor.emailDomain, shared_with_party_ids: sharing },
+        detail: {
+          basis: 'email_domain',
+          domain: vendor.emailDomain,
+          shared_with_party_ids: sharing,
+        },
       });
     }
   }
@@ -437,13 +534,19 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     let points = 0;
     if (vendor.incorporationDate && vendor.firstInvoiceDate) {
       const months = monthsBetween(vendor.incorporationDate, vendor.firstInvoiceDate);
-      detail.months_between_incorporation_and_first_invoice = Number.isFinite(months) ? round(months) : null;
+      detail.months_between_incorporation_and_first_invoice = Number.isFinite(months)
+        ? round(months)
+        : null;
       if (Number.isFinite(months) && months >= 0 && months < 3) {
         points += 45;
-        facts.push('the first invoice is dated less than three months after the company was incorporated');
+        facts.push(
+          'the first invoice is dated less than three months after the company was incorporated',
+        );
       } else if (Number.isFinite(months) && months >= 0 && months < 12) {
         points += 25;
-        facts.push('the first invoice is dated less than twelve months after the company was incorporated');
+        facts.push(
+          'the first invoice is dated less than twelve months after the company was incorporated',
+        );
       }
     }
     if (points > 0 || vendor.capitalEur !== null || vendor.cnaeRelated === false) {
@@ -460,8 +563,17 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     }
     if (points > 0) {
       push({
-        signal: 'S8', role: null, points, rarityWeight: null, expectedCollisions: null,
-        facts, detail: { ...detail, incorporation_date: vendor.incorporationDate, first_invoice_date: vendor.firstInvoiceDate },
+        signal: 'S8',
+        role: null,
+        points,
+        rarityWeight: null,
+        expectedCollisions: null,
+        facts,
+        detail: {
+          ...detail,
+          incorporation_date: vendor.incorporationDate,
+          first_invoice_date: vendor.firstInvoiceDate,
+        },
       });
     }
   }
@@ -472,10 +584,19 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
     const withOthers = vendor.quoteFingerprints.filter((f) => f.otherPartyIds.length > 0);
     if (withOthers.length > 0) {
       push({
-        signal: 'S9', role: null, points: 50, rarityWeight: null, expectedCollisions: null,
+        signal: 'S9',
+        role: null,
+        points: 50,
+        rarityWeight: null,
+        expectedCollisions: null,
         facts: [`quotes presented as coming from different vendors share ${kinds.join(', ')}`],
         detail: {
-          fingerprints: withOthers.map((f) => ({ kind: f.kind, value: f.value, other_party_ids: f.otherPartyIds, quote_ids: f.quoteIds })),
+          fingerprints: withOthers.map((f) => ({
+            kind: f.kind,
+            value: f.value,
+            other_party_ids: f.otherPartyIds,
+            quote_ids: f.quoteIds,
+          })),
         },
       });
     }
@@ -484,15 +605,39 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
   // ---- S10: registry and identifier state ------------------------------------
   {
     const candidates: Array<{ points: number; fact: string; key: string }> = [];
-    if (vendor.registry.census === 'fail') candidates.push({ points: 60, fact: 'the census check of the identifier did not confirm the entity', key: 'census' });
-    if (vendor.registry.rasic === 'absent') candidates.push({ points: 50, fact: 'no entry located in the industrial-safety agents register', key: 'rasic' });
-    if (vendor.registry.rea === 'absent') candidates.push({ points: 30, fact: 'no entry located in the register of accredited construction companies', key: 'rea' });
-    if (vendor.registry.nifChecksum === 'invalid') candidates.push({ points: 20, fact: 'the identifier as transcribed does not pass its check digit', key: 'checksum' });
+    if (vendor.registry.census === 'fail')
+      candidates.push({
+        points: 60,
+        fact: 'the census check of the identifier did not confirm the entity',
+        key: 'census',
+      });
+    if (vendor.registry.rasic === 'absent')
+      candidates.push({
+        points: 50,
+        fact: 'no entry located in the industrial-safety agents register',
+        key: 'rasic',
+      });
+    if (vendor.registry.rea === 'absent')
+      candidates.push({
+        points: 30,
+        fact: 'no entry located in the register of accredited construction companies',
+        key: 'rea',
+      });
+    if (vendor.registry.nifChecksum === 'invalid')
+      candidates.push({
+        points: 20,
+        fact: 'the identifier as transcribed does not pass its check digit',
+        key: 'checksum',
+      });
     if (candidates.length > 0) {
       candidates.sort((a, b) => b.points - a.points);
       const top = candidates[0] as { points: number; fact: string; key: string };
       push({
-        signal: 'S10', role: null, points: top.points, rarityWeight: null, expectedCollisions: null,
+        signal: 'S10',
+        role: null,
+        points: top.points,
+        rarityWeight: null,
+        expectedCollisions: null,
         facts: candidates.map((c) => c.fact),
         detail: { states: vendor.registry, leading: top.key },
       });
@@ -502,7 +647,11 @@ export function scoreVendorLinks(vendor: VendorSnapshot, ctx: ScoringContext): L
   // ---- S11: the signer also advises ------------------------------------------
   if (vendor.signerAlsoAdvises) {
     push({
-      signal: 'S11', role: vendor.signerAlsoAdvises.role, points: 40, rarityWeight: null, expectedCollisions: null,
+      signal: 'S11',
+      role: vendor.signerAlsoAdvises.role,
+      points: 40,
+      rarityWeight: null,
+      expectedCollisions: null,
       facts: ['the person who signs for the vendor also appears advising in the minutes'],
       detail: { note: vendor.signerAlsoAdvises.note },
     });
@@ -551,9 +700,7 @@ export function aggregateLinks(signals: readonly LinkSignal[]): AggregatedLink[]
       : round(Math.max(...list.map((s) => s.points)));
     const leading = [...list].sort((a, b) => b.points - a.points)[0] as LinkSignal;
     const facts = [...new Set(list.flatMap((s) => s.facts))];
-    const collisions = list
-      .map((s) => s.expectedCollisions)
-      .filter((n): n is number => n !== null);
+    const collisions = list.map((s) => s.expectedCollisions).filter((n): n is number => n !== null);
     const link: AggregatedLink = {
       partyId: first.partyId,
       role: first.role,
@@ -571,7 +718,10 @@ export function aggregateLinks(signals: readonly LinkSignal[]): AggregatedLink[]
     link.explanation = explanationFor(link, leading.notaInformativaOn);
     out.push(link);
   }
-  out.sort((a, b) => b.points - a.points || a.partyId.localeCompare(b.partyId) || a.signal.localeCompare(b.signal));
+  out.sort(
+    (a, b) =>
+      b.points - a.points || a.partyId.localeCompare(b.partyId) || a.signal.localeCompare(b.signal),
+  );
   return out;
 }
 
@@ -580,11 +730,18 @@ export function aggregateLinks(signals: readonly LinkSignal[]): AggregatedLink[]
  * coincided, how many people would be expected to produce the same coincidence, where the fact
  * came from, and whether the registry document that would confirm identity has been obtained.
  */
-export function explanationFor(link: Pick<AggregatedLink, 'facts' | 'expectedCollisions' | 'source'>, notaOn: string | null): string {
-  const signals = link.facts.length > 0 ? link.facts.join('; ') : 'coincidence recorded without detail';
-  const homonyms = link.expectedCollisions === null ? 'not applicable' : String(link.expectedCollisions);
+export function explanationFor(
+  link: Pick<AggregatedLink, 'facts' | 'expectedCollisions' | 'source'>,
+  notaOn: string | null,
+): string {
+  const signals =
+    link.facts.length > 0 ? link.facts.join('; ') : 'coincidence recorded without detail';
+  const homonyms =
+    link.expectedCollisions === null ? 'not applicable' : String(link.expectedCollisions);
   const date = link.source.date ?? 'date not recorded';
-  const nota = notaOn ? `nota informativa obtained on ${notaOn}.` : 'nota informativa not yet obtained.';
+  const nota = notaOn
+    ? `nota informativa obtained on ${notaOn}.`
+    : 'nota informativa not yet obtained.';
   return `Possible link to verify: ${signals}; expected homonyms: ${homonyms}; source: ${link.source.checkType} ${date}; ${nota}`;
 }
 
@@ -635,8 +792,17 @@ export async function writePartyLinks(
          expected_collisions = excluded.expected_collisions, evidence_ids = excluded.evidence_ids,
          tier = excluded.tier, explanation = excluded.explanation, engine_version = excluded.engine_version`,
       [
-        cid, link.partyId, link.role, link.signal, link.points, link.rarityWeight, link.expectedCollisions,
-        link.evidenceIds, link.tier, link.explanation, engineVersion,
+        cid,
+        link.partyId,
+        link.role,
+        link.signal,
+        link.points,
+        link.rarityWeight,
+        link.expectedCollisions,
+        link.evidenceIds,
+        link.tier,
+        link.explanation,
+        engineVersion,
       ],
     );
     written++;
@@ -652,14 +818,19 @@ export async function loadReferenceKeys(client: Queryable, cid: string): Promise
     surname1: normaliseName((r.surname1_norm as string | null) ?? ''),
     surname2: normaliseName((r.surname2_norm as string | null) ?? ''),
     given: normaliseName((r.given_norm as string | null) ?? ''),
-    addresses: ((r.addresses_norm as string[] | null) ?? []).map((a) => a ?? ''),
+    addresses: ((r.addresses_norm as string[] | null) ?? [])
+      .map((a) => normaliseAddress(a))
+      .filter(Boolean),
     ibanHmacs: (r.iban_hmacs as string[] | null) ?? [],
     nifHmac: (r.nif_hmac as string | null) ?? null,
   }));
 }
 
 /** Links already stored, for the CLI listing and for rule B3. */
-export async function loadPartyLinks(client: Queryable, cid: string): Promise<Array<Record<string, unknown>>> {
+export async function loadPartyLinks(
+  client: Queryable,
+  cid: string,
+): Promise<Array<Record<string, unknown>>> {
   const res = await client.query(
     `select l.id, l.from_party_id, p.display_name, l.to_role, l.signal, l.points, l.rarity_weight,
             l.expected_collisions, l.tier, l.status, l.explanation, l.engine_version, l.evidence_ids

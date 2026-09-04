@@ -14,7 +14,13 @@
  */
 import { SOURCES } from '../config.ts';
 import { asArray, asNumber, asString, fetchJson, firstOf, pick, qs } from '../http.ts';
-import { errorResult, type CheckContext, type CheckResult, type CheckSubject, type VendorCheck } from '../types.ts';
+import {
+  errorResult,
+  type CheckContext,
+  type CheckResult,
+  type CheckSubject,
+  type VendorCheck,
+} from '../types.ts';
 
 export interface CatastroUnit {
   /** 20-character cadastral reference when the pieces could be joined. */
@@ -44,7 +50,10 @@ function parseOne(node: unknown): CatastroUnit | null {
   const rcNode = firstOf(node, ['rc', 'idbi']) ?? node;
   const rc = joinRc(firstOf(rcNode, ['rc']) ?? rcNode);
   const dt = firstOf(node, ['dt']);
-  const loint = pick(dt, 'locs', 'lous', 'lourb', 'loint') ?? pick(node, 'dt', 'lourb', 'loint') ?? firstOf(node, ['loint']);
+  const loint =
+    pick(dt, 'locs', 'lous', 'lourb', 'loint') ??
+    pick(node, 'dt', 'lourb', 'loint') ??
+    firstOf(node, ['loint']);
   const debi = firstOf(node, ['debi']) ?? pick(node, 'bi', 'debi');
   const unit: CatastroUnit = {
     rc,
@@ -66,7 +75,9 @@ export function parseCatastroUnits(payload: unknown): { units: CatastroUnit[]; e
   const consulta = firstOf(payload, ['consulta_dnp', 'consulta_dnprc', 'consulta']) ?? payload;
   const list = pick(consulta, 'lrcdnp', 'rcdnp');
   if (list !== undefined) {
-    const units = asArray(list).map(parseOne).filter((u): u is CatastroUnit => u !== null);
+    const units = asArray(list)
+      .map(parseOne)
+      .filter((u): u is CatastroUnit => u !== null);
     return { units, envelope: 'lrcdnp' };
   }
   const bico = firstOf(consulta, ['bico']);
@@ -88,15 +99,35 @@ const cfg = SOURCES.catastro;
 /** Split "Carrer de Viladomat 25" into the pieces the service expects. */
 export function splitStreet(address: string): { sigla: string; calle: string; numero: string } {
   const cleaned = address.replace(/\s+/g, ' ').trim();
-  const m = /^(?:(c\/|carrer|calle|av|avinguda|avenida|pg|passeig|paseo|rda|ronda|pl|plaça|plaza|trav|travessera)\.?\s+)?(?:de\s+la\s+|de\s+l'|dels?\s+|d'|de\s+)?(.+?)[,\s]+(\d+[A-Za-z]?)(?:\s|$)/i.exec(cleaned);
+  const m =
+    /^(?:(c\/|carrer|calle|av|avinguda|avenida|pg|passeig|paseo|rda|ronda|pl|plaça|plaza|trav|travessera)\.?\s+)?(?:de\s+la\s+|de\s+l'|dels?\s+|d'|de\s+)?(.+?)[,\s]+(\d+[A-Za-z]?)(?:\s|$)/i.exec(
+      cleaned,
+    );
   const siglaMap: Record<string, string> = {
-    'c/': 'CL', carrer: 'CL', calle: 'CL', av: 'AV', avinguda: 'AV', avenida: 'AV',
-    pg: 'PS', passeig: 'PS', paseo: 'PS', rda: 'RD', ronda: 'RD', pl: 'PZ', 'plaça': 'PZ', plaza: 'PZ',
-    trav: 'TR', travessera: 'TR',
+    'c/': 'CL',
+    carrer: 'CL',
+    calle: 'CL',
+    av: 'AV',
+    avinguda: 'AV',
+    avenida: 'AV',
+    pg: 'PS',
+    passeig: 'PS',
+    paseo: 'PS',
+    rda: 'RD',
+    ronda: 'RD',
+    pl: 'PZ',
+    plaça: 'PZ',
+    plaza: 'PZ',
+    trav: 'TR',
+    travessera: 'TR',
   };
   if (!m) return { sigla: 'CL', calle: cleaned, numero: '' };
   const key = (m[1] ?? '').toLowerCase().replace(/\.$/, '');
-  return { sigla: siglaMap[key] ?? 'CL', calle: (m[2] ?? '').trim().toUpperCase(), numero: m[3] ?? '' };
+  return {
+    sigla: siglaMap[key] ?? 'CL',
+    calle: (m[2] ?? '').trim().toUpperCase(),
+    numero: m[3] ?? '',
+  };
 }
 
 export const catastroUnits: VendorCheck = {
@@ -117,10 +148,24 @@ export const catastroUnits: VendorCheck = {
     } else if (address) {
       const parts = splitStreet(address);
       url = `${cfg.baseUrl}/Consulta_DNPLOC${qs({
-        Provincia: province, Municipio: municipality, Sigla: parts.sigla, Calle: parts.calle, Numero: parts.numero,
-        Bloque: '', Escalera: '', Planta: '', Puerta: '',
+        Provincia: province,
+        Municipio: municipality,
+        Sigla: parts.sigla,
+        Calle: parts.calle,
+        Numero: parts.numero,
+        Bloque: '',
+        Escalera: '',
+        Planta: '',
+        Puerta: '',
       })}`;
-      request = { address, parsed: parts, province, municipality, endpoint: url, source_verified: cfg.verified };
+      request = {
+        address,
+        parsed: parts,
+        province,
+        municipality,
+        endpoint: url,
+        source_verified: cfg.verified,
+      };
     } else {
       return {
         type: 'catastro_units',
@@ -148,7 +193,7 @@ export const catastroUnits: VendorCheck = {
           source_verified: cfg.verified,
           note:
             units.length > 0
-              ? 'Cadastral description of the units at the address as published on the fetch date. Coefficients are the Cadastre\'s, which may differ from the participation quotas in the constitutive title.'
+              ? "Cadastral description of the units at the address as published on the fetch date. Coefficients are the Cadastre's, which may differ from the participation quotas in the constitutive title."
               : 'No unit list returned for the address as written. Try the cadastral reference of the building.',
         },
         raw: res.json ?? res.text,

@@ -164,7 +164,8 @@ export const MANUAL_SOURCES = {
       'The purchase receipt showing the date and the company searched',
     ],
     costCents: 1500,
-    toVerify: 'Current price and the exact product name (nota informativa vs nota simple mercantil).',
+    toVerify:
+      'Current price and the exact product name (nota informativa vs nota simple mercantil).',
   },
   insolvency: {
     id: 'insolvency',

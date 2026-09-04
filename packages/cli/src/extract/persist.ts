@@ -451,19 +451,31 @@ const RESOLUTION_RESULT: Readonly<Record<string, string>> = Object.freeze({
   no_consta: 'pendiente',
 });
 
-/** Classify a resolution from what it says it does; `other` when nothing matches. */
+/**
+ * Classify a resolution from what it says it does; `other` when nothing matches.
+ *
+ * The order matters where a resolution does two things at once. "S'aprova contractar la
+ * instal·lació de l'ascensor … per un import de 52.800 €" both approves works and names a company:
+ * it is recorded as a works approval, because that is the fact the authority and funding checks
+ * need. `contractor_choice` is kept for a decision whose subject is the award itself (adjudicar,
+ * escollir, seleccionar the company).
+ */
 export function resolutionKind(text: string, hasDelegation: boolean): string {
   const t = normaliseValue('text', text) ?? '';
   if (/derrama|quota extraordinaria|cuota extraordinaria/.test(t)) return 'derrama';
-  if (/prestec|prestamo|credit bancari|poliza de credito/.test(t)) return 'loan';
+  if (/prestec|prestamo|credit bancari|poliza de credito|hipotec/.test(t)) return 'loan';
   if (/subvenci/.test(t)) return 'subsidy';
   if (/auditor/.test(t)) return 'audit';
-  if (/adjudic|contractista|contratista|s'aprova contractar|se aprueba contratar|escollir empresa/.test(t)) return 'contractor_choice';
-  if (/obra|ascensor|reforma|rehabilitaci|instal·laci|instalaci/.test(t)) return 'works_approval';
+  if (/adjudic|escollir (l'|la |el )?empresa|seleccionar (la |el )?empresa|triar (l'|la |el )?empresa|elegir (la |el )?empresa/.test(t)) {
+    return 'contractor_choice';
+  }
+  if (/obra|ascensor|reforma|rehabilitaci|instal.?laci|instalaci|façana|fachada|bastida|andami/.test(t)) return 'works_approval';
   if (/pressupost|presupuesto/.test(t)) return 'budget';
   if (/comptes|cuentas|liquidaci|balanc|balance/.test(t)) return 'accounts';
-  if (/elecci|nomena|nombra|carrec|cargo|president|secretari/.test(t)) return 'election';
-  if (hasDelegation || /delega|faculta|autoritza|autoriza/.test(t)) return 'delegation';
+  // the structured delegation block outranks a keyword: "el titular del càrrec" appears in both
+  if (hasDelegation) return 'delegation';
+  if (/elecci|es nomena|se nombra|nomenament|nombramiento|es designa|se designa|renovacio? de/.test(t)) return 'election';
+  if (/delega|faculta|autoritza|autoriza|apodera/.test(t)) return 'delegation';
   return 'other';
 }
 

@@ -1,0 +1,19 @@
+{
+  "_fixture_note": "Synthetic. Shape of an OpenMercantil-style company search response; every key name is a guess and is marked to verify in packages/cli/src/vendors/config.ts. No real company appears here.",
+  "query": "B12345674",
+  "total": 2,
+  "results": [
+    {
+      "id": "obres-exemple-barna-sl",
+      "name": "OBRES EXEMPLE BARNA, S.L.",
+      "nif": "B12345674",
+      "address": "CARRER DE MOSTRA 100, 08011 BARCELONA"
+    },
+    {
+      "id": "exemple-serveis-generals-sl",
+      "name": "EXEMPLE SERVEIS GENERALS, S.L.",
+      "nif": "B58818501",
+      "address": "CARRER DE MOSTRA 100, 08011 BARCELONA"
+    }
+  ]
+}

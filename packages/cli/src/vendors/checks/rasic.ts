@@ -13,7 +13,13 @@
  */
 import { RASIC_DATASET_ID, MANUAL_SOURCES, SOURCES } from '../config.ts';
 import { asArray, asIsoDate, asString, fetchJson, firstOf, qs } from '../http.ts';
-import { errorResult, type CheckContext, type CheckResult, type CheckSubject, type VendorCheck } from '../types.ts';
+import {
+  errorResult,
+  type CheckContext,
+  type CheckResult,
+  type CheckSubject,
+  type VendorCheck,
+} from '../types.ts';
 
 export interface RasicRow {
   registration_number: string | null;
@@ -26,18 +32,31 @@ export interface RasicRow {
 }
 
 export function parseRasicRows(payload: unknown): RasicRow[] {
-  const list = Array.isArray(payload) ? payload : asArray(firstOf(payload, ['results', 'data', 'items', 'records']));
+  const list = Array.isArray(payload)
+    ? payload
+    : asArray(firstOf(payload, ['results', 'data', 'items', 'records']));
   return list
     .map((o): RasicRow => {
-      const activities = asArray(firstOf(o, ['activitats', 'actividades', 'activities', 'ambit', 'especialitat']))
-        .map((a) => asString(a) ?? (asString(firstOf(a, ['nom', 'name', 'descripcio'])) ?? ''))
+      const activities = asArray(
+        firstOf(o, ['activitats', 'actividades', 'activities', 'ambit', 'especialitat']),
+      )
+        .map((a) => asString(a) ?? asString(firstOf(a, ['nom', 'name', 'descripcio'])) ?? '')
         .filter(Boolean);
       return {
-        registration_number: asString(firstOf(o, ['num_registre', 'numero_registro', 'registration_number', 'codi', 'num'])),
-        name: asString(firstOf(o, ['rao_social', 'razon_social', 'nom', 'nombre', 'name', 'empresa'])),
-        nif: asString(firstOf(o, ['nif', 'cif', 'document']))?.toUpperCase().replace(/[\s-]/g, '') ?? null,
+        registration_number: asString(
+          firstOf(o, ['num_registre', 'numero_registro', 'registration_number', 'codi', 'num']),
+        ),
+        name: asString(
+          firstOf(o, ['rao_social', 'razon_social', 'nom', 'nombre', 'name', 'empresa']),
+        ),
+        nif:
+          asString(firstOf(o, ['nif', 'cif', 'document']))
+            ?.toUpperCase()
+            .replace(/[\s-]/g, '') ?? null,
         activities,
-        date_from: asIsoDate(firstOf(o, ['data_alta', 'fecha_alta', 'date_from', 'data_inscripcio'])),
+        date_from: asIsoDate(
+          firstOf(o, ['data_alta', 'fecha_alta', 'date_from', 'data_inscripcio']),
+        ),
         date_to: asIsoDate(firstOf(o, ['data_baixa', 'fecha_baja', 'date_to'])),
         status: asString(firstOf(o, ['situacio', 'estat', 'estado', 'status'])),
       };

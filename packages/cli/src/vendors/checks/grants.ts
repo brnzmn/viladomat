@@ -12,7 +12,13 @@
  */
 import { RAISC_DATASET_ID, SOURCES } from '../config.ts';
 import { asArray, asIsoDate, asNumber, asString, fetchJson, firstOf, qs } from '../http.ts';
-import { errorResult, type CheckContext, type CheckResult, type CheckSubject, type VendorCheck } from '../types.ts';
+import {
+  errorResult,
+  type CheckContext,
+  type CheckResult,
+  type CheckSubject,
+  type VendorCheck,
+} from '../types.ts';
 
 /** One grant as published, in a shape both registers can be mapped onto. */
 export interface GrantRow {
@@ -27,21 +33,31 @@ export interface GrantRow {
   amount_paid: number | null;
 }
 
-const RESULT_KEYS = ['content', 'results', 'data', 'items', 'concesiones', 'records'];
+const RESULT_KEYS = ['content', 'results', 'data', 'items', 'concesiones', 'records', 'rows'];
 
 export function parseBdnsGrants(payload: unknown): GrantRow[] {
   const list = Array.isArray(payload) ? payload : asArray(firstOf(payload, RESULT_KEYS));
   return list
     .map((o): GrantRow => ({
       register: 'BDNS',
-      reference: asString(firstOf(o, ['idConcesion', 'id', 'numeroConvocatoria', 'codigoBDNS', 'referencia'])),
-      beneficiary: asString(firstOf(o, ['beneficiario', 'nombreBeneficiario', 'beneficiary', 'denominacion'])),
+      reference: asString(
+        firstOf(o, ['idConcesion', 'id', 'numeroConvocatoria', 'codigoBDNS', 'referencia']),
+      ),
+      beneficiary: asString(
+        firstOf(o, ['beneficiario', 'nombreBeneficiario', 'beneficiary', 'denominacion']),
+      ),
       beneficiary_nif:
-        asString(firstOf(o, ['nifBeneficiario', 'nifCif', 'nif', 'idBeneficiario']))?.toUpperCase().replace(/[\s-]/g, '') ?? null,
+        asString(firstOf(o, ['nifBeneficiario', 'nifCif', 'nif', 'idBeneficiario']))
+          ?.toUpperCase()
+          .replace(/[\s-]/g, '') ?? null,
       grantor: asString(firstOf(o, ['organo', 'administracion', 'organoConcedente', 'grantor'])),
-      programme: asString(firstOf(o, ['convocatoria', 'tituloConvocatoria', 'programa', 'instrumento'])),
+      programme: asString(
+        firstOf(o, ['convocatoria', 'tituloConvocatoria', 'programa', 'instrumento']),
+      ),
       date: asIsoDate(firstOf(o, ['fechaConcesion', 'fecha', 'fechaPago', 'date'])),
-      amount_granted: asNumber(firstOf(o, ['importe', 'importeConcedido', 'ayudaEquivalente', 'amount'])),
+      amount_granted: asNumber(
+        firstOf(o, ['importe', 'importeConcedido', 'ayudaEquivalente', 'amount']),
+      ),
       amount_paid: asNumber(firstOf(o, ['importePagado', 'pagado', 'amount_paid'])),
     }))
     .filter((g) => g.reference !== null || g.beneficiary !== null || g.amount_granted !== null);
@@ -53,9 +69,13 @@ export function parseRaiscGrants(payload: unknown): GrantRow[] {
     .map((o): GrantRow => ({
       register: 'RAISC',
       reference: asString(firstOf(o, ['identificador', 'id', 'expedient', 'codi'])),
-      beneficiary: asString(firstOf(o, ['beneficiari', 'beneficiario', 'nom_beneficiari', 'denominacio'])),
+      beneficiary: asString(
+        firstOf(o, ['beneficiari', 'beneficiario', 'nom_beneficiari', 'denominacio']),
+      ),
       beneficiary_nif:
-        asString(firstOf(o, ['nif', 'nif_beneficiari', 'cif', 'document']))?.toUpperCase().replace(/[\s-]/g, '') ?? null,
+        asString(firstOf(o, ['nif', 'nif_beneficiari', 'cif', 'document']))
+          ?.toUpperCase()
+          .replace(/[\s-]/g, '') ?? null,
       grantor: asString(firstOf(o, ['organ', 'departament', 'organisme', 'entitat'])),
       programme: asString(firstOf(o, ['linia', 'convocatoria', 'programa', 'objecte'])),
       date: asIsoDate(firstOf(o, ['data', 'data_concessio', 'data_atorgament', 'any'])),
@@ -68,8 +88,15 @@ export function parseRaiscGrants(payload: unknown): GrantRow[] {
 function summarise(rows: readonly GrantRow[]): Record<string, unknown> {
   const total = rows.reduce((acc, r) => acc + (r.amount_granted ?? 0), 0);
   const paid = rows.reduce((acc, r) => acc + (r.amount_paid ?? 0), 0);
-  const years = [...new Set(rows.map((r) => (r.date ? r.date.slice(0, 4) : null)).filter(Boolean))].sort();
-  return { count: rows.length, total_granted: Math.round(total * 100) / 100, total_paid: Math.round(paid * 100) / 100, years };
+  const years = [
+    ...new Set(rows.map((r) => (r.date ? r.date.slice(0, 4) : null)).filter(Boolean)),
+  ].sort();
+  return {
+    count: rows.length,
+    total_granted: Math.round(total * 100) / 100,
+    total_paid: Math.round(paid * 100) / 100,
+    years,
+  };
 }
 
 const bdnsCfg = SOURCES.bdns;
@@ -83,8 +110,20 @@ export const bdnsGrants: VendorCheck = {
     const nif = subject.nif ?? null;
     const url =
       `${bdnsCfg.baseUrl}/concesiones/busqueda` +
-      qs({ page: 0, pageSize: 100, order: 'fechaConcesion', direccion: 'desc', nifCif: nif, beneficiario: nif ? null : (subject.name ?? null) });
-    const request = { nif, name: subject.name ?? null, endpoint: url, source_verified: bdnsCfg.verified };
+      qs({
+        page: 0,
+        pageSize: 100,
+        order: 'fechaConcesion',
+        direccion: 'desc',
+        nifCif: nif,
+        beneficiario: nif ? null : (subject.name ?? null),
+      });
+    const request = {
+      nif,
+      name: subject.name ?? null,
+      endpoint: url,
+      source_verified: bdnsCfg.verified,
+    };
     if (!nif && !subject.name) {
       return {
         type: 'bdns_grants',
@@ -141,7 +180,13 @@ export const raiscGrants: VendorCheck = {
         ? `upper(beneficiari) like '%${name.toUpperCase().replace(/'/g, "''")}%'`
         : null;
     const url = `${raiscCfg.baseUrl}/${RAISC_DATASET_ID}.json${qs({ $where: where, $limit: 200 })}`;
-    const request = { nif, name, dataset: RAISC_DATASET_ID, endpoint: url, source_verified: raiscCfg.verified };
+    const request = {
+      nif,
+      name,
+      dataset: RAISC_DATASET_ID,
+      endpoint: url,
+      source_verified: raiscCfg.verified,
+    };
     if (!where) {
       return {
         type: 'raisc_grants',

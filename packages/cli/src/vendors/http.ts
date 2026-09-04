@@ -5,6 +5,7 @@
  * The checks never call `fetch` directly — they call {@link fetchJson} with the source id, so a
  * limit is impossible to forget and a test can replace the transport wholesale.
  */
+import { parseAmountEs } from '@viladomat/core';
 import { DEFAULT_TIMEOUT_MS, type CheckContext, type HttpRequestInit } from './types.ts';
 import { SOURCES, type SourceId } from './config.ts';
 
@@ -13,7 +14,10 @@ export class RateLimiter {
   private nextAt = 0;
   readonly intervalMs: number;
 
-  constructor(perMinute: number, private readonly sleep: (ms: number) => Promise<void> = defaultSleep) {
+  constructor(
+    perMinute: number,
+    private readonly sleep: (ms: number) => Promise<void> = defaultSleep,
+  ) {
     this.intervalMs = perMinute > 0 ? Math.ceil(60_000 / perMinute) : 0;
   }
 
@@ -59,7 +63,11 @@ export function qs(params: Record<string, string | number | boolean | null | und
 }
 
 export class HttpError extends Error {
-  constructor(readonly status: number, readonly url: string, readonly bodySnippet: string) {
+  constructor(
+    readonly status: number,
+    readonly url: string,
+    readonly bodySnippet: string,
+  ) {
     super(`HTTP ${status} for ${url}${bodySnippet ? `: ${bodySnippet.slice(0, 200)}` : ''}`);
     this.name = 'HttpError';
   }
@@ -95,7 +103,10 @@ export async function fetchJson<T = unknown>(
 
   const timeoutMs = ctx.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(new Error(`timeout after ${timeoutMs} ms`)), timeoutMs);
+  const timer = setTimeout(
+    () => controller.abort(new Error(`timeout after ${timeoutMs} ms`)),
+    timeoutMs,
+  );
   try {
     const res = await ctx.fetch(url, {
       method: opts.method ?? 'GET',
@@ -153,13 +164,13 @@ export function asString(v: unknown): string | null {
   return null;
 }
 
+/**
+ * A number from a response field. Strings go through the core amount parser, which handles both
+ * Spanish (`3.000,00`) and international (`30000.00`) notation; the registers use both.
+ */
 export function asNumber(v: unknown): number | null {
   if (typeof v === 'number') return Number.isFinite(v) ? v : null;
-  if (typeof v === 'string') {
-    const cleaned = v.replace(/\./g, '').replace(',', '.').replace(/[^0-9.\-]/g, '');
-    const n = Number(cleaned);
-    return Number.isFinite(n) && cleaned !== '' ? n : null;
-  }
+  if (typeof v === 'string') return parseAmountEs(v);
   return null;
 }
 

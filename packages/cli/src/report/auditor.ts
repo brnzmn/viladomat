@@ -19,7 +19,9 @@ import {
   loadArchivedLegalSources,
   loadGateFindings,
   loadLegalSourceRegister,
+  legalCitationGate,
   loadRuleCatalogue,
+  withholdCitations,
   type GateOutcome,
   type GatedFinding,
   type LegalSourceRegisterRow,
@@ -112,6 +114,7 @@ export interface AuditorData {
   revisionsBySource: Row[];
   reviewsByStatus: Row[];
   legalRegister: LegalSourceRegisterRow[];
+  archivedSources: Set<string>;
   redaction: RedactionContext;
 }
 
@@ -147,6 +150,7 @@ export async function loadAuditorData(client: pg.PoolClient, cid: string, today:
   );
 
   const [goldenRow] = await q('select count(*) as n from public.golden_set where community_id = $1');
+  const [paramVersion] = await q('select max(version)::text as v from public.parameters where community_id = $1');
 
   const findings = await loadGateFindings(client, cid);
   const archived = await loadArchivedLegalSources(client);
@@ -192,7 +196,7 @@ export async function loadAuditorData(client: pg.PoolClient, cid: string, today:
     runStats: (run?.stats as Record<string, unknown> | undefined) ?? null,
     pipelineVersion: run ? str(run.pipeline_version) : null,
     engineVersion: run ? str(run.engine_version) : null,
-    parametersVersion: null,
+    parametersVersion: paramVersion?.v == null ? null : Number(paramVersion.v),
     corpus: {
       files: Number(corpusRow?.files ?? 0),
       filesVerified: Number(corpusRow?.files_verified ?? 0),
@@ -325,6 +329,7 @@ export async function loadAuditorData(client: pg.PoolClient, cid: string, today:
         where f.community_id = $1 group by fr.to_status order by fr.to_status`,
     ),
     legalRegister: await loadLegalSourceRegister(client),
+    archivedSources: archived,
     redaction: await loadRedactionContext(client, cid, lang),
   };
 }
@@ -436,11 +441,13 @@ export function renderAuditor(data: AuditorData, lang: Lang): string {
     t.paramCols,
     data.parameters.map((p) => [
       p.key,
-      p.value_num == null ? (p.value_text ?? '') : fmtInt(p.value_num, lang) === '—' ? '' : String(p.value_num),
+      p.value_num == null ? (p.value_text ?? '') : String(p.value_num),
       p.unit ?? '',
       `v${String(p.version)}`,
       fmtDate(p.valid_from),
-      p.basis_text ?? '',
+      // `parameters` cannot point at an archived source, so a citation in its basis text is
+      // withheld exactly like an unarchived rule citation.
+      withholdCitations(p.basis_text == null ? '' : String(p.basis_text), lang),
     ]),
     t.none,
   );
@@ -760,7 +767,12 @@ export function renderAuditor(data: AuditorData, lang: Lang): string {
     table(
       t.ruleCatalogueCols,
       data.ruleCatalogue.map((r) => {
-        const cited = r.articleRefs.length === 0 ? '—' : data.legalRegister.filter((l) => r.legalSourceIds.includes(l.id)).every((l) => l.archived) && r.legalSourceIds.length > 0 && (r.legalBasisKind === 'statutory' || r.legalBasisKind === 'subsidy_bases') ? r.articleRefs.join('; ') : t.gateLegalPending;
+        const gate = legalCitationGate(
+          { legalBasisKind: r.legalBasisKind, articleRefs: r.articleRefs, legalSourceIds: r.legalSourceIds },
+          data.archivedSources,
+          lang,
+        );
+        const cited = gate.printable ? gate.articles.join('; ') : (gate.placeholder ?? '—');
         return [
           r.code,
           r.family,
@@ -860,6 +872,7 @@ export function renderAuditor(data: AuditorData, lang: Lang): string {
       [t.lang, lang],
       [t.run, data.findingRunId ? data.findingRunId.slice(0, 8) : t.notRecorded],
       [t.pipelineVersion, data.pipelineVersion ?? t.notRecorded],
+      [t.parametersVersion, data.parametersVersion == null ? t.notRecorded : `v${data.parametersVersion}`],
     ],
     body,
   });

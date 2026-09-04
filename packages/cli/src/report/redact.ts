@@ -30,8 +30,17 @@ const BUSINESS_PARTY_KINDS = new Set(['vendor', 'administrator', 'architect', 'b
 const BUSINESS_TOKEN_RE =
   /(^|[^a-z0-9])(s\.?\s?l\.?\s?u?\.?|s\.?\s?a\.?\s?u?\.?|s\.?\s?c\.?\s?p\.?|s\.?\s?c\.?\s?c\.?\s?l\.?|s\.?\s?l\.?\s?n\.?\s?e\.?|c\.?\s?b\.?|sociedad|societat|cooperativ\w*|coop|asociaci\w*|associaci\w*|fundaci\w*|comunidad|comunitat|ajuntament|ayuntamiento|generalitat|diputaci\w*|consorci\w*|agencia|ag[eè]ncia|tesorer\w*|hisenda|hacienda|banc|banco|bank|caixa|caja|seguros|assegurances|insurance|ltd|limited|gmbh|b\.?v\.?|s\.?a\.?r\.?l\.?|a\.?g\.?|inc|plc|holding|group|grup|serveis|servicios|reformes|reformas|construccion\w*|construccion\w*|constructor\w*|ascensor\w*|elevator\w*|instal·?lacion\w*|instalacion\w*|manteniment\w*|mantenimiento\w*|administraci\w*|gestor\w*|assessor\w*|asesor\w*|arquitect\w*|enginyer\w*|ingenier\w*|electric\w*|fontaner\w*|pintur\w*|obras|obres|energ\w*|telecom\w*|movil|m[oò]vil|endesa|naturgy|iberdrola|aigues|aguas)([^a-z0-9]|$)/i;
 
-/** IBAN-shaped strings anywhere in free text (with or without spacing). */
-const IBAN_RE = /\b([A-Z]{2}\d{2})[ ]?((?:[A-Za-z0-9]{4}[ ]?){2,7}[A-Za-z0-9]{1,4})\b/g;
+/**
+ * IBAN-shaped strings anywhere in free text, compact or in groups of four. Groups are uppercase
+ * or digits, exactly four characters, and a shorter tail must be attached without a space: an
+ * IBAN is written in upper case, so the pattern cannot swallow the prose that follows it. The
+ * compacted length is checked against the IBAN range before anything is rewritten.
+ */
+const IBAN_RE = /\b([A-Z]{2}\d{2})((?:[ ]?[A-Z0-9]{4})+[A-Z0-9]{0,3})(?![A-Za-z0-9])/g;
+
+/** Shortest and longest IBAN in use; anything outside is some other alphanumeric string. */
+const IBAN_MIN = 15;
+const IBAN_MAX = 34;
 
 export interface RedactionContext {
   lang: Lang;
@@ -103,7 +112,11 @@ export function maskIban(value: string | null | undefined): string {
 /** Rewrite every IBAN-shaped string in free text down to its last four characters. */
 export function redactIbansInText(text: string | null | undefined): string {
   if (!text) return '';
-  return text.replace(IBAN_RE, (_m, prefix: string, rest: string) => `${prefix.slice(0, 2)}** **** ${rest.replace(/\s+/g, '').slice(-4)}`);
+  return text.replace(IBAN_RE, (match: string, prefix: string, rest: string) => {
+    const compact = `${prefix}${rest}`.replace(/\s+/g, '');
+    if (compact.length < IBAN_MIN || compact.length > IBAN_MAX) return match;
+    return `${prefix.slice(0, 2)}** **** ${compact.slice(-4)}`;
+  });
 }
 
 /**

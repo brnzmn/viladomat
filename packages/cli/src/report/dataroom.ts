@@ -14,6 +14,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type pg from 'pg';
 import type { Lang } from './i18n.ts';
+import { applyGates, loadArchivedLegalSources, loadGateFindings, type GateStats } from './gates.ts';
 import { loadRedactionContext, redactBankRow, redactRecord, type RedactionContext } from './redact.ts';
 import { sha256 } from './sections.ts';
 
@@ -212,6 +213,8 @@ export interface DataRoomManifest {
   rule_versions: Record<string, number>;
   redaction: string;
   methodology_note: string;
+  /** what the distributed packs built from this data included and withheld */
+  gates: GateStats;
   files: Array<{ name: string; sha256: string; bytes: number; rows: number }>;
   bundle_sha256: string;
 }
@@ -235,7 +238,8 @@ export async function buildDataRoom(client: pg.PoolClient, cid: string, today: s
   const files: DataRoomFile[] = [];
 
   for (const spec of DATA_ROOM_TABLES) {
-    const res = await client.query(spec.sql, [cid]);
+    // global catalogues carry no community_id, so they take no parameter
+    const res = spec.sql.includes('$1') ? await client.query(spec.sql, [cid]) : await client.query(spec.sql);
     const columns = res.fields.map((f) => f.name);
     const raw = res.rows as Array<Record<string, unknown>>;
     let rows: Array<Record<string, unknown>>;
@@ -284,6 +288,8 @@ export async function buildDataRoom(client: pg.PoolClient, cid: string, today: s
       .join('\n'),
   );
 
+  const gates = applyGates(await loadGateFindings(client, cid), await loadArchivedLegalSources(client), lang).stats;
+
   const manifest: DataRoomManifest = {
     community_id: cid,
     generated_on: today,
@@ -294,6 +300,7 @@ export async function buildDataRoom(client: pg.PoolClient, cid: string, today: s
     rule_versions: ruleVersions,
     redaction: REDACTION_NOTE,
     methodology_note: METHODOLOGY_NOTE[lang],
+    gates,
     files: files.map((f) => ({ name: f.name, sha256: f.sha256, bytes: f.bytes, rows: f.rows })),
     bundle_sha256: bundleSha256,
   };

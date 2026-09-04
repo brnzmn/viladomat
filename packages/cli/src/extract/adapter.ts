@@ -107,11 +107,6 @@ export function setExtractionClient(client: ExtractionClientLike | null): Extrac
   return previous;
 }
 
-/** True when a fake client is installed. */
-export function hasInjectedClient(): boolean {
-  return injected !== null;
-}
-
 /**
  * The extraction client the steps use: the injected one when present, otherwise a real client
  * wired to `ANTHROPIC_API_KEY` (the SDK also reads that variable itself; passing it explicitly

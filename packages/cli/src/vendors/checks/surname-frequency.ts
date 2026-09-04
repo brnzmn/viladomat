@@ -15,7 +15,13 @@
 import { normaliseName } from '@viladomat/core';
 import { SOURCES, SURNAME_CACHE_DAYS } from '../config.ts';
 import { asNumber, asString, fetchJson, firstOf, qs } from '../http.ts';
-import { errorResult, type CheckContext, type CheckResult, type CheckSubject, type VendorCheck } from '../types.ts';
+import {
+  errorResult,
+  type CheckContext,
+  type CheckResult,
+  type CheckSubject,
+  type VendorCheck,
+} from '../types.ts';
 
 /** Population of Catalonia used only to convert an absolute count into a rate. To verify. */
 export const CATALONIA_POPULATION = 7_900_000;
@@ -31,8 +37,28 @@ export interface SurnameFrequency {
   rank: number | null;
 }
 
-const RATE_KEYS = ['per_mil', 'permil', 'tantpermil', 'tant_per_mil', 'freq', 'frequencia', 'frecuencia', 'rate', 'f'];
-const COUNT_KEYS = ['nombre', 'numero', 'count', 'total', 'n', 'persones', 'personas', 'valor', 'v'];
+const RATE_KEYS = [
+  'per_mil',
+  'permil',
+  'tantpermil',
+  'tant_per_mil',
+  'freq',
+  'frequencia',
+  'frecuencia',
+  'rate',
+  'f',
+];
+const COUNT_KEYS = [
+  'nombre',
+  'numero',
+  'count',
+  'total',
+  'n',
+  'persones',
+  'personas',
+  'valor',
+  'v',
+];
 const RANK_KEYS = ['ordre', 'orden', 'rank', 'posicio', 'posicion'];
 
 /**
@@ -40,9 +66,9 @@ const RANK_KEYS = ['ordre', 'orden', 'rank', 'posicio', 'posicion'];
  * recorded fixture; the shape of the real response is unverified.
  */
 export function parseSurnameFrequency(payload: unknown, surname: string): SurnameFrequency {
-  const container =
-    firstOf(payload, ['onomastica', 'dades', 'data', 'result', 'v']) ?? payload;
-  const rowsSource = firstOf(container, ['ff', 'f', 'rows', 'items', 'cognoms', 'list']) ?? container;
+  const container = firstOf(payload, ['onomastica', 'dades', 'data', 'result', 'v']) ?? payload;
+  const rowsSource =
+    firstOf(container, ['ff', 'f', 'rows', 'items', 'cognoms', 'list']) ?? container;
   const rows = Array.isArray(rowsSource) ? rowsSource : [rowsSource];
   const target = normaliseName(surname);
   const row =
@@ -78,7 +104,11 @@ export const surnameFrequency: VendorCheck = {
   source: cfg.id,
   async run(subject: CheckSubject, ctx: CheckContext): Promise<CheckResult> {
     const surname = normaliseName(asString(subject.extra?.surname) ?? subject.subjectKey);
-    const request = { surname, endpoint: `${cfg.baseUrl}/dades.json`, source_verified: cfg.verified };
+    const request = {
+      surname,
+      endpoint: `${cfg.baseUrl}/dades.json`,
+      source_verified: cfg.verified,
+    };
     if (!surname) {
       return {
         type: 'surname_frequency',

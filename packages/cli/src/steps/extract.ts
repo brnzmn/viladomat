@@ -5,6 +5,8 @@ import { getObject, parseStoragePath } from '../lib/storage.ts';
 import {
   LIMITS,
   MODELS,
+  PROMPT_VERSION,
+  SCHEMA_VERSION,
   extractDocument,
   extractionClient,
   flattenParsed,
@@ -292,11 +294,13 @@ export async function extractStep(payload: Record<string, unknown>, _job: StepJo
   }
 
   const chunks = chunkPages(pages);
+  // idempotency is keyed by prompt and schema version, not by document: a version bump is meant to
+  // re-read the paper, an ordinary re-run is not
   const done = await maybeOne<{ id: string; model: string }>(
     `select id, model from public.extraction_runs
-      where document_id = $1 and stage = 'extract' and status = 'succeeded'
+      where document_id = $1 and stage = 'extract' and status = 'succeeded' and idempotency_key like $2
       order by created_at desc limit 1`,
-    [documentId],
+    [documentId, `${extractionKey(documentId, PROMPT_VERSION, SCHEMA_VERSION, '')}%`],
   );
   if (done) {
     console.log(`extract ${documentId}: already extracted by run ${done.id.slice(0, 8)} (${done.model})`);
@@ -389,12 +393,12 @@ export async function extractStep(payload: Record<string, unknown>, _job: StepJo
       `$${cost.toFixed(4)}`,
   );
   return {
+    ...persisted,
     document_id: documentId,
     status: 'extracted',
     run_ids: runIds,
     chunks: chunks.length,
     refusal_retried: refusalRetried,
     cost_usd: Number(cost.toFixed(6)),
-    ...persisted,
   };
 }

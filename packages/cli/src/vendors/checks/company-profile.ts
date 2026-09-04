@@ -15,7 +15,13 @@
 import { normaliseCompanyName, normaliseName, tokenSetSimilarity } from '@viladomat/core';
 import { SOURCES } from '../config.ts';
 import { asArray, asIsoDate, asNumber, asString, fetchJson, firstOf, qs } from '../http.ts';
-import { errorResult, type CheckContext, type CheckResult, type CheckSubject, type VendorCheck } from '../types.ts';
+import {
+  errorResult,
+  type CheckContext,
+  type CheckResult,
+  type CheckSubject,
+  type VendorCheck,
+} from '../types.ts';
 
 /** One officer as published in the gazette. */
 export interface ProfileOfficer {
@@ -53,17 +59,52 @@ export interface CompanyProfile {
   unread: string[];
 }
 
-const NAME_KEYS = ['name', 'nombre', 'denominacion', 'denominacion_social', 'razon_social', 'company_name', 'title'];
+const NAME_KEYS = [
+  'name',
+  'nombre',
+  'denominacion',
+  'denominacion_social',
+  'razon_social',
+  'company_name',
+  'title',
+];
 const NIF_KEYS = ['nif', 'cif', 'nif_cif', 'tax_id', 'identificador'];
-const ADDRESS_KEYS = ['address', 'domicilio', 'domicilio_social', 'direccion', 'registered_address', 'adreca'];
+const ADDRESS_KEYS = [
+  'address',
+  'domicilio',
+  'domicilio_social',
+  'direccion',
+  'registered_address',
+  'adreca',
+];
 const POSTCODE_KEYS = ['postcode', 'postal_code', 'codigo_postal', 'cp'];
 const CITY_KEYS = ['municipality', 'municipio', 'city', 'localidad', 'poblacion'];
-const INCORP_KEYS = ['incorporation_date', 'fecha_constitucion', 'constitucion', 'date_incorporated', 'fecha_alta', 'founded'];
+const INCORP_KEYS = [
+  'incorporation_date',
+  'fecha_constitucion',
+  'constitucion',
+  'date_incorporated',
+  'fecha_alta',
+  'founded',
+];
 const CAPITAL_KEYS = ['capital', 'capital_social', 'share_capital', 'capital_eur'];
 const CNAE_KEYS = ['cnae', 'cnae_code', 'codigo_cnae', 'actividad_cnae', 'sic'];
-const CNAE_LABEL_KEYS = ['cnae_label', 'cnae_descripcion', 'actividad', 'objeto_social', 'activity'];
+const CNAE_LABEL_KEYS = [
+  'cnae_label',
+  'cnae_descripcion',
+  'actividad',
+  'objeto_social',
+  'activity',
+];
 const STATUS_KEYS = ['status', 'situacion', 'estado', 'situacion_registral'];
-const OFFICERS_KEYS = ['officers', 'cargos', 'administradores', 'directors', 'organos', 'appointments'];
+const OFFICERS_KEYS = [
+  'officers',
+  'cargos',
+  'administradores',
+  'directors',
+  'organos',
+  'appointments',
+];
 const EVENTS_KEYS = ['events', 'acts', 'actos', 'borme', 'anuncios', 'timeline', 'historial'];
 const ID_KEYS = ['id', 'slug', 'company_id', 'uid', 'ref'];
 const ROLE_KEYS = ['role', 'cargo', 'position', 'tipo_cargo'];
@@ -73,7 +114,9 @@ const RESULT_KEYS = ['results', 'data', 'items', 'companies', 'empresas', 'hits'
 
 function bormeRef(o: unknown): Record<string, unknown> | null {
   const seccion = asString(firstOf(o, ['seccion', 'section', 'borme_seccion']));
-  const fecha = asIsoDate(firstOf(o, ['borme_fecha', 'fecha_borme', 'published_at', 'fecha_publicacion', 'fecha']));
+  const fecha = asIsoDate(
+    firstOf(o, ['borme_fecha', 'fecha_borme', 'published_at', 'fecha_publicacion', 'fecha']),
+  );
   const num = asString(firstOf(o, ['borme_num', 'num_borme', 'numero', 'issue']));
   const pagina = asString(firstOf(o, ['pagina', 'page', 'borme_pagina']));
   const anuncio = asString(firstOf(o, ['anuncio', 'announcement', 'registro', 'num_anuncio']));
@@ -149,7 +192,9 @@ export function parseCompanyProfile(payload: unknown): CompanyProfile {
 }
 
 /** Candidates from a search response, tolerant of the envelope shape. */
-export function parseSearchResults(payload: unknown): Array<{ id: string | null; name: string | null; nif: string | null }> {
+export function parseSearchResults(
+  payload: unknown,
+): Array<{ id: string | null; name: string | null; nif: string | null }> {
   const list = Array.isArray(payload) ? payload : asArray(firstOf(payload, RESULT_KEYS));
   return list
     .map((o) => ({
@@ -164,7 +209,11 @@ export function parseSearchResults(payload: unknown): Array<{ id: string | null;
 export function pickCandidate(
   candidates: ReturnType<typeof parseSearchResults>,
   subject: { nif?: string | null; name?: string | null },
-): { candidate: ReturnType<typeof parseSearchResults>[number]; how: 'nif' | 'name'; score: number } | null {
+): {
+  candidate: ReturnType<typeof parseSearchResults>[number];
+  how: 'nif' | 'name';
+  score: number;
+} | null {
   const nif = subject.nif?.toUpperCase().replace(/[\s-]/g, '') ?? null;
   if (nif) {
     const exact = candidates.find((c) => c.nif === nif);
@@ -177,7 +226,8 @@ export function pickCandidate(
       const score = tokenSetSimilarity(subject.name, c.name);
       if (!best || score > best.score) best = { candidate: c, score };
     }
-    if (best && best.score >= 0.85) return { candidate: best.candidate, how: 'name', score: best.score };
+    if (best && best.score >= 0.85)
+      return { candidate: best.candidate, how: 'name', score: best.score };
   }
   return null;
 }
@@ -197,18 +247,28 @@ function manualFallback(subject: CheckSubject): { url: string; instruction: stri
 
 export const companyProfile: VendorCheck = {
   type: 'company_profile',
-  label: 'Company registry profile (officers, address, incorporation, capital, CNAE, gazette timeline)',
+  label:
+    'Company registry profile (officers, address, incorporation, capital, CNAE, gazette timeline)',
   manual: false,
   source: cfg.id,
   async run(subject: CheckSubject, ctx: CheckContext): Promise<CheckResult> {
     const term = subject.nif ?? subject.name ?? null;
     const searchUrl = `${cfg.baseUrl}/companies/search${qs({ q: term, nif: subject.nif ?? null, limit: 10 })}`;
-    const request = { term, nif: subject.nif ?? null, name: subject.name ?? null, endpoint: searchUrl, source_verified: cfg.verified };
+    const request = {
+      term,
+      nif: subject.nif ?? null,
+      name: subject.name ?? null,
+      endpoint: searchUrl,
+      source_verified: cfg.verified,
+    };
     if (!term) {
       return {
         type: 'company_profile',
         status: 'not_found',
-        normalised: { note: 'No name or identifier to search with.', fallback: manualFallback(subject) },
+        normalised: {
+          note: 'No name or identifier to search with.',
+          fallback: manualFallback(subject),
+        },
         raw: null,
         source_url: cfg.baseUrl,
         cost_cents: 0,
@@ -241,7 +301,12 @@ export const companyProfile: VendorCheck = {
         return {
           type: 'company_profile',
           status: 'not_found',
-          normalised: { searched: term, matched_by: chosen.how, note: 'Search matched but the detail page was empty.', fallback: manualFallback(subject) },
+          normalised: {
+            searched: term,
+            matched_by: chosen.how,
+            note: 'Search matched but the detail page was empty.',
+            fallback: manualFallback(subject),
+          },
           raw: detail.json ?? detail.text,
           source_url: detailUrl,
           cost_cents: 0,
@@ -263,7 +328,9 @@ export const companyProfile: VendorCheck = {
         source_url: detailUrl,
         cost_cents: 0,
         request: { ...request, detail_endpoint: detailUrl },
-        ...(profile.unread.length > 0 ? { note: `Fields not read from the response: ${profile.unread.join(', ')}.` } : {}),
+        ...(profile.unread.length > 0
+          ? { note: `Fields not read from the response: ${profile.unread.join(', ')}.` }
+          : {}),
       };
     } catch (err) {
       const out = errorResult('company_profile', searchUrl, err, request);

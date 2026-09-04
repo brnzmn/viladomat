@@ -67,7 +67,8 @@ export async function loadQuoteRows(client: Queryable, cid: string): Promise<Quo
       author: str('Author', 'author'),
       creator: str('Creator', 'creator'),
       phoneNorm: (r.phone_norm as string | null) ?? null,
-      total: r.total_con_iva === null || r.total_con_iva === undefined ? null : Number(r.total_con_iva),
+      total:
+        r.total_con_iva === null || r.total_con_iva === undefined ? null : Number(r.total_con_iva),
     };
   });
 }
@@ -86,7 +87,12 @@ export interface QuoteOverlap {
   kind: QuoteFingerprint['kind'];
   value: string;
   /** quote id → vendor party id */
-  quotes: Array<{ quoteId: string; vendorPartyId: string | null; vendorName: string | null; numero: string | null }>;
+  quotes: Array<{
+    quoteId: string;
+    vendorPartyId: string | null;
+    vendorName: string | null;
+    numero: string | null;
+  }>;
   partyIds: string[];
 }
 
@@ -95,7 +101,10 @@ export interface QuoteOverlap {
  * vendors. Quotes with no vendor are ignored: a fingerprint shared with an unidentified issuer
  * says nothing.
  */
-export function findQuoteOverlaps(rows: readonly QuoteRow[], opts: { sequentialWindow?: number } = {}): QuoteOverlap[] {
+export function findQuoteOverlaps(
+  rows: readonly QuoteRow[],
+  opts: { sequentialWindow?: number } = {},
+): QuoteOverlap[] {
   const window = opts.sequentialWindow ?? 5;
   const byPackage = new Map<string, QuoteRow[]>();
   for (const r of rows) {
@@ -107,7 +116,10 @@ export function findQuoteOverlaps(rows: readonly QuoteRow[], opts: { sequentialW
   const out: QuoteOverlap[] = [];
   for (const [pkg, list] of byPackage) {
     const worksPackageId = pkg === '-' ? null : pkg;
-    const group = (kind: QuoteFingerprint['kind'], valueOf: (r: QuoteRow) => string | null): void => {
+    const group = (
+      kind: QuoteFingerprint['kind'],
+      valueOf: (r: QuoteRow) => string | null,
+    ): void => {
       const buckets = new Map<string, QuoteRow[]>();
       for (const r of list) {
         const v = valueOf(r);
@@ -117,11 +129,20 @@ export function findQuoteOverlaps(rows: readonly QuoteRow[], opts: { sequentialW
         buckets.set(v, b);
       }
       for (const [value, bucket] of buckets) {
-        const parties = [...new Set(bucket.map((r) => r.vendorPartyId).filter((v): v is string => v !== null))];
+        const parties = [
+          ...new Set(bucket.map((r) => r.vendorPartyId).filter((v): v is string => v !== null)),
+        ];
         if (parties.length < 2) continue;
         out.push({
-          worksPackageId, kind, value,
-          quotes: bucket.map((r) => ({ quoteId: r.quoteId, vendorPartyId: r.vendorPartyId, vendorName: r.vendorName, numero: r.numero })),
+          worksPackageId,
+          kind,
+          value,
+          quotes: bucket.map((r) => ({
+            quoteId: r.quoteId,
+            vendorPartyId: r.vendorPartyId,
+            vendorName: r.vendorName,
+            numero: r.numero,
+          })),
           partyIds: parties,
         });
       }
@@ -133,7 +154,9 @@ export function findQuoteOverlaps(rows: readonly QuoteRow[], opts: { sequentialW
     // Sequential numbers: two quotes of different vendors whose numbers are within `window`.
     const numbered = list
       .map((r) => ({ row: r, n: numeroInt(r.numero) }))
-      .filter((x): x is { row: QuoteRow; n: number } => x.n !== null && x.row.vendorPartyId !== null);
+      .filter(
+        (x): x is { row: QuoteRow; n: number } => x.n !== null && x.row.vendorPartyId !== null,
+      );
     for (let i = 0; i < numbered.length; i++) {
       for (let j = i + 1; j < numbered.length; j++) {
         const a = numbered[i] as { row: QuoteRow; n: number };
@@ -144,7 +167,12 @@ export function findQuoteOverlaps(rows: readonly QuoteRow[], opts: { sequentialW
           worksPackageId,
           kind: 'sequential_numbers',
           value: `${a.n}/${b.n}`,
-          quotes: [a.row, b.row].map((r) => ({ quoteId: r.quoteId, vendorPartyId: r.vendorPartyId, vendorName: r.vendorName, numero: r.numero })),
+          quotes: [a.row, b.row].map((r) => ({
+            quoteId: r.quoteId,
+            vendorPartyId: r.vendorPartyId,
+            vendorName: r.vendorName,
+            numero: r.numero,
+          })),
           partyIds: [a.row.vendorPartyId as string, b.row.vendorPartyId as string],
         });
       }
@@ -154,7 +182,9 @@ export function findQuoteOverlaps(rows: readonly QuoteRow[], opts: { sequentialW
 }
 
 /** Overlaps regrouped per vendor, in the shape the link scorer takes. */
-export function fingerprintsByParty(overlaps: readonly QuoteOverlap[]): Map<string, QuoteFingerprint[]> {
+export function fingerprintsByParty(
+  overlaps: readonly QuoteOverlap[],
+): Map<string, QuoteFingerprint[]> {
   const map = new Map<string, QuoteFingerprint[]>();
   for (const o of overlaps) {
     for (const partyId of o.partyIds) {

@@ -1,0 +1,4 @@
+{
+  "_fixture_note": "Synthetic. Same source, a response that publishes an absolute count and no rate; the parser then derives the rate over the population constant, which is itself to verify.",
+  "dades": [{ "cognom": "MOSTRA", "nombre": 79000 }]
+}

@@ -117,6 +117,27 @@ program
   });
 
 program
+  .command('sign-off')
+  .description('Record counsel/reviewer sign-off on a reproduced pack before distribution')
+  .requiredOption('--report <uuid>', 'report_exports id')
+  .requiredOption('--role <role>', 'role signing off (e.g. legal_counsel, owner_reviewer)')
+  .option('--note <text>', 'short note')
+  .action(async (opts: { report: string; role: string; note?: string }) => {
+    const { signoffCommand } = await import('./commands/signoff.ts');
+    await signoffCommand(opts);
+  });
+
+// Milestone command registrars (each milestone registers its own commands to avoid edit conflicts).
+for (const mod of ['./commands/m2.register.ts', './commands/m5.register.ts', './commands/m6.register.ts']) {
+  try {
+    const m = (await import(mod)) as { register?: (p: Command) => void };
+    m.register?.(program);
+  } catch (e) {
+    if (!(e instanceof Error && /Cannot find module|ERR_MODULE_NOT_FOUND/.test(e.message))) throw e;
+  }
+}
+
+program
   .hook('postAction', async () => {
     await closeDb();
   });

@@ -59,12 +59,20 @@ export const ibanValidate: VendorCheck = {
       type: 'iban_validate',
       status: 'ok',
       normalised,
-      raw: { country: v.country, bank_code: v.bankCode ?? null, last4: v.last4, valid: v.valid, reason: v.reason ?? null },
+      raw: {
+        country: v.country,
+        bank_code: v.bankCode ?? null,
+        last4: v.last4,
+        valid: v.valid,
+        reason: v.reason ?? null,
+      },
       source_url: null,
       cost_cents: 0,
       request: { last4: v.last4 },
       ...(bank?.absorbedInto
-        ? { note: `Bank code ${v.bankCode} was absorbed into ${bank.currentCode}${bank.currentName ? ` (${bank.currentName})` : ''}; a change of IBAN around the migration date is expected.` }
+        ? {
+            note: `Bank code ${v.bankCode} was absorbed into ${bank.currentCode}${bank.currentName ? ` (${bank.currentName})` : ''}; a change of IBAN around the migration date is expected.`,
+          }
         : {}),
     });
   },
