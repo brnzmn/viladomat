@@ -17,8 +17,9 @@ pnpm --filter web dev                          # http://localhost:3000
 ```
 
 Accounts are created by the operator in the Supabase dashboard (or `vx` once available); sign-up
-is disabled. After the first sign-in the app asks to enrol a TOTP authenticator; every later session
-must pass the challenge before any screen loads. Membership rows in `public.community_members`
+is disabled. After the first sign-in the app requires a TOTP authenticator to be enrolled before any
+other screen is reachable; every later session must pass the challenge before any screen loads.
+Membership rows in `public.community_members`
 decide which community a user sees and whether they may write (`owner_reviewer`,
 `second_reviewer`) or only read (`viewer`, `auditor_readonly`).
 

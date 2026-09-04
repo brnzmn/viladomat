@@ -7,10 +7,11 @@ const MFA_PATH = '/mfa';
 const LOGOUT_PATH = '/logout';
 
 /**
- * Refreshes the Supabase session cookies on every request and enforces the two access gates:
+ * Refreshes the Supabase session cookies on every request and enforces the access gates:
  *   unauthenticated                                    -> /login
+ *   authenticated, no verified TOTP factor             -> /mfa (enrol)
  *   authenticated, TOTP factor enrolled, session aal1  -> /mfa (challenge and verify)
- * A user without an enrolled factor is let through; the app shell shows an enrolment prompt.
+ * MFA is mandatory: nothing but /mfa and /logout is reachable until the session is at aal2.
  */
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
   let response = NextResponse.next({ request });
@@ -65,13 +66,15 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
 
   const hasVerifiedFactor = (user.factors ?? []).some((f) => f.status === 'verified');
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const needsEnrol = !hasVerifiedFactor;
   const needsStepUp = hasVerifiedFactor && aal?.currentLevel === 'aal1';
+  const mfaPending = needsEnrol || needsStepUp;
 
-  if (needsStepUp && !isMfa && !isLogout) {
+  if (mfaPending && !isMfa && !isLogout) {
     return redirectTo(MFA_PATH);
   }
-  if (isLogin && !needsStepUp) {
-    return redirectTo('/');
+  if (isLogin) {
+    return redirectTo(mfaPending ? MFA_PATH : '/');
   }
   return response;
 }
