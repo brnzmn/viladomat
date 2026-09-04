@@ -1,0 +1,30 @@
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFiumLibrary } from '@hyzyla/pdfium';
+import sharp from 'sharp';
+
+const doc = await PDFDocument.create();
+doc.setProducer('probe-producer');
+doc.setCreator('probe-creator');
+const font = await doc.embedFont(StandardFonts.Helvetica);
+const p = doc.addPage([420, 595]);
+p.drawRectangle({ x: 0, y: 0, width: 420, height: 595, color: rgb(1, 0, 0) });
+p.drawText('Hola prova 123', { x: 40, y: 500, size: 24, font });
+doc.addPage([420, 595]).drawText('Pagina dos', { x: 40, y: 500, size: 24, font });
+const bytes = await doc.save();
+console.log('pdf bytes', bytes.length);
+const head = Buffer.from(bytes).toString('latin1');
+console.log('info idx', head.indexOf('/Producer'), head.slice(head.indexOf('/Producer') - 20, head.indexOf('/Producer') + 220).replace(/\n/g, '|'));
+
+const lib = await PDFiumLibrary.init();
+const pdoc = await lib.loadDocument(new Uint8Array(bytes));
+console.log('pages', pdoc.getPageCount());
+const page = pdoc.getPage(0);
+console.log('text:', JSON.stringify(page.getText()));
+console.log('size', page.getOriginalSize());
+const r = await page.render({ render: 'bitmap', scale: 2 });
+console.log('render', r.width, r.height, r.data.length, 'first px', r.data.slice(0, 8));
+const jpeg = await sharp(Buffer.from(r.data), { raw: { width: r.width, height: r.height, channels: 4 } }).jpeg({ quality: 88 }).toBuffer();
+const stats = await sharp(jpeg).stats();
+console.log('channel means (r,g,b):', stats.channels.map((c) => Math.round(c.mean)));
+pdoc.destroy();
+lib.destroy();

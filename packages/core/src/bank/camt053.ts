@@ -15,7 +15,9 @@ export interface XmlNode {
 
 function decodeEntities(s: string): string {
   return s
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) =>
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    )
     .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(Number.parseInt(dec, 10)))
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
@@ -147,7 +149,11 @@ export function xmlFind(node: XmlNode | undefined, name: string): XmlNode | unde
 }
 
 /** Depth-first collection of all descendants with a local name. */
-export function xmlFindAll(node: XmlNode | undefined, name: string, out: XmlNode[] = []): XmlNode[] {
+export function xmlFindAll(
+  node: XmlNode | undefined,
+  name: string,
+  out: XmlNode[] = [],
+): XmlNode[] {
   if (!node) return out;
   for (const c of node.children) {
     if (c.name === name) out.push(c);
@@ -253,7 +259,9 @@ function mapEntry(ntry: XmlNode, warnings: string[], index: number): BankMovemen
           ? partyName(xmlChild(parties, 'Cdtr')) || partyName(xmlChild(parties, 'UltmtCdtr'))
           : partyName(xmlChild(parties, 'Dbtr')) || partyName(xmlChild(parties, 'UltmtDbtr'));
       counterpartyIban =
-        sign < 0 ? accountIban(xmlChild(parties, 'CdtrAcct')) : accountIban(xmlChild(parties, 'DbtrAcct'));
+        sign < 0
+          ? accountIban(xmlChild(parties, 'CdtrAcct'))
+          : accountIban(xmlChild(parties, 'DbtrAcct'));
     }
     if (!endToEndId) endToEndId = xmlText(tx, 'Refs/EndToEndId');
   }
@@ -272,7 +280,8 @@ function mapEntry(ntry: XmlNode, warnings: string[], index: number): BankMovemen
     extraConcepts: ustrd,
     counterpartyText: counterpartyText || ustrd.join(' '),
   };
-  if (counterpartyIban) movement.counterpartyIban = counterpartyIban.replace(/\s+/g, '').toUpperCase();
+  if (counterpartyIban)
+    movement.counterpartyIban = counterpartyIban.replace(/\s+/g, '').toUpperCase();
   if (domain.length > 0) movement.bankTxCode = domain.join('/');
   return movement;
 }
@@ -294,7 +303,8 @@ function mapStatement(stmt: XmlNode, warnings: string[]): CamtStatement {
       date: dateOf(xmlChild(bal, 'Dt')),
     });
   }
-  const opening = balances.find((b) => b.type === 'OPBD') ?? balances.find((b) => b.type === 'PRCD');
+  const opening =
+    balances.find((b) => b.type === 'OPBD') ?? balances.find((b) => b.type === 'PRCD');
   const closing = balances.find((b) => b.type === 'CLBD');
 
   const movements: BankMovement[] = [];
@@ -305,7 +315,10 @@ function mapStatement(stmt: XmlNode, warnings: string[]): CamtStatement {
 
   let selfCheckOk = false;
   if (opening && closing) {
-    const derived = movements.reduce((acc, mv) => acc + toCents(mv.amount), toCents(opening.amount));
+    const derived = movements.reduce(
+      (acc, mv) => acc + toCents(mv.amount),
+      toCents(opening.amount),
+    );
     selfCheckOk = derived === toCents(closing.amount);
     if (!selfCheckOk) {
       warnings.push(

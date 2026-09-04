@@ -93,7 +93,7 @@ describe('parseDateEs', () => {
     expect(parseDateEs('31 dic 2023')).toBe('2023-12-31');
   });
   it('parses Catalan month names including apostrophes and "del"', () => {
-    expect(parseDateEs("3 de març de 2023")).toBe('2023-03-03');
+    expect(parseDateEs('3 de març de 2023')).toBe('2023-03-03');
     expect(parseDateEs("1 d'abril de 2023")).toBe('2023-04-01');
     expect(parseDateEs('12 de gener del 2024')).toBe('2024-01-12');
     expect(parseDateEs("5 d'octubre de 2022")).toBe('2022-10-05');
@@ -134,11 +134,15 @@ describe('normaliseValue', () => {
   });
   it('identifiers → normalised', () => {
     expect(normaliseValue('nif', 'b-12.345.674')).toBe('B12345674');
-    expect(normaliseValue('iban', 'es91 2100 0418 4502 0005 1332')).toBe('ES9121000418450200051332');
+    expect(normaliseValue('iban', 'es91 2100 0418 4502 0005 1332')).toBe(
+      'ES9121000418450200051332',
+    );
     expect(normaliseValue('nif', '')).toBeNull();
   });
   it('text → accent-free lower case with collapsed spaces', () => {
-    expect(normaliseValue('text', '  Instal·lacions   Elèctriques  ')).toBe('instal·lacions electriques');
+    expect(normaliseValue('text', '  Instal·lacions   Elèctriques  ')).toBe(
+      'instal·lacions electriques',
+    );
     expect(normaliseValue('text', 'Ç à É')).toBe('c a e');
     expect(normaliseValue('text', null)).toBeNull();
   });

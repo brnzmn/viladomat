@@ -80,7 +80,11 @@ describe('validateNif — DNI', () => {
   });
   it('accepts a DNI given without leading zeros', () => {
     const letter = expectedPersonLetter(1234567);
-    expect(validateNif(`1234567${letter}`)).toMatchObject({ valid: true, kind: 'DNI', normalised: `01234567${letter}` });
+    expect(validateNif(`1234567${letter}`)).toMatchObject({
+      valid: true,
+      kind: 'DNI',
+      normalised: `01234567${letter}`,
+    });
   });
 });
 
@@ -93,7 +97,12 @@ describe('validateNif — NIE', () => {
     expect(validateNif(`Y1234567${y}`)).toMatchObject({ valid: true, kind: 'NIE' });
     expect(validateNif(`Z1234567${z}`)).toMatchObject({ valid: true, kind: 'NIE' });
     // The X letter applied to a Y number fails unless the two coincide.
-    if (x !== y) expect(validateNif(`Y1234567${x}`)).toMatchObject({ valid: false, reason: 'checksum', shape: 'NIE' });
+    if (x !== y)
+      expect(validateNif(`Y1234567${x}`)).toMatchObject({
+        valid: false,
+        reason: 'checksum',
+        shape: 'NIE',
+      });
   });
 });
 
@@ -120,13 +129,24 @@ describe('validateNif — CIF', () => {
   });
   it('rejects a B CIF whose control is the (correct) letter instead of a digit', () => {
     const { letter } = expectedCifControl('1234567');
-    expect(validateNif(`B1234567${letter}`)).toMatchObject({ valid: false, reason: 'control_type', entityLetter: 'B' });
+    expect(validateNif(`B1234567${letter}`)).toMatchObject({
+      valid: false,
+      reason: 'control_type',
+      entityLetter: 'B',
+    });
   });
   it('requires a letter control for N, P, Q, S, R, W', () => {
     const { digit, letter } = expectedCifControl('7654321');
     for (const e of ['N', 'P', 'Q', 'S', 'R', 'W']) {
-      expect(validateNif(`${e}7654321${letter}`)).toMatchObject({ valid: true, kind: 'CIF', entityLetter: e });
-      expect(validateNif(`${e}7654321${digit}`)).toMatchObject({ valid: false, reason: 'control_type' });
+      expect(validateNif(`${e}7654321${letter}`)).toMatchObject({
+        valid: true,
+        kind: 'CIF',
+        entityLetter: e,
+      });
+      expect(validateNif(`${e}7654321${digit}`)).toMatchObject({
+        valid: false,
+        reason: 'control_type',
+      });
     }
   });
   it('accepts either control for C, D, F, G, J, U, V', () => {
@@ -139,14 +159,24 @@ describe('validateNif — CIF', () => {
   it('rejects a wrong checksum', () => {
     const { digit } = expectedCifControl('1234567');
     const wrongDigit = String((Number(digit) + 1) % 10);
-    expect(validateNif(`B1234567${wrongDigit}`)).toMatchObject({ valid: false, reason: 'checksum', shape: 'CIF' });
+    expect(validateNif(`B1234567${wrongDigit}`)).toMatchObject({
+      valid: false,
+      reason: 'checksum',
+      shape: 'CIF',
+    });
     const { letter } = expectedCifControl('1234567');
     const wrongLetter = letter === 'A' ? 'B' : 'A';
-    expect(validateNif(`N1234567${wrongLetter}`)).toMatchObject({ valid: false, reason: 'checksum' });
+    expect(validateNif(`N1234567${wrongLetter}`)).toMatchObject({
+      valid: false,
+      reason: 'checksum',
+    });
   });
   it('handles the digit-sum carry (2×digit > 9) correctly', () => {
     const { digit } = expectedCifControl('9876543');
-    expect(validateNif(`A9876543${digit}`)).toMatchObject({ valid: true, entityLabel: 'Sociedad anónima' });
+    expect(validateNif(`A9876543${digit}`)).toMatchObject({
+      valid: true,
+      entityLabel: 'Sociedad anónima',
+    });
   });
   it('labels U as UTE and J as sociedad civil', () => {
     const { digit } = expectedCifControl('1111111');
@@ -167,13 +197,21 @@ describe('validateNif — special personal numbers K/L/M', () => {
   it('rejects a wrong letter', () => {
     const letter = expectedPersonLetter(1234567);
     const wrong = letter === 'A' ? 'B' : 'A';
-    expect(validateNif(`M1234567${wrong}`)).toMatchObject({ valid: false, reason: 'checksum', shape: 'SPECIAL' });
+    expect(validateNif(`M1234567${wrong}`)).toMatchObject({
+      valid: false,
+      reason: 'checksum',
+      shape: 'SPECIAL',
+    });
   });
   it('falls back to a legacy K CIF with letter control', () => {
     const { letter } = expectedCifControl('7654321');
     const person = expectedPersonLetter(7654321);
     if (letter !== person) {
-      expect(validateNif(`K7654321${letter}`)).toMatchObject({ valid: true, kind: 'CIF', entityLetter: 'K' });
+      expect(validateNif(`K7654321${letter}`)).toMatchObject({
+        valid: true,
+        kind: 'CIF',
+        entityLetter: 'K',
+      });
     }
   });
 });

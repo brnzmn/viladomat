@@ -63,7 +63,9 @@ describe('check digit helpers', () => {
   });
   it('computes ISO 13616 check digits with BigInt matching the iterative helper', () => {
     expect(computeIbanCheckDigits('ES', '21000418450200051332')).toBe('91');
-    expect(computeIbanCheckDigits('DE', '370400440532013000')).toBe(testIbanCheck('DE', '370400440532013000'));
+    expect(computeIbanCheckDigits('DE', '370400440532013000')).toBe(
+      testIbanCheck('DE', '370400440532013000'),
+    );
   });
   it('builds a Spanish IBAN from CCC parts', () => {
     expect(cccToIban('0081', '0123', '0001234567')).toBe(ES_SYNTHETIC);
@@ -99,7 +101,12 @@ describe('validateIban — Spanish', () => {
   });
   it('reports the successor of an absorbed entity', () => {
     const v = validateIban(buildEsIban('2038', '0001', '0000000001'));
-    expect(v).toMatchObject({ valid: true, bankCode: '2038', bankName: 'Bankia', absorbedInto: '2100' });
+    expect(v).toMatchObject({
+      valid: true,
+      bankCode: '2038',
+      bankName: 'Bankia',
+      absorbedInto: '2100',
+    });
   });
   it('flags wrong CCC control digits even when the IBAN check digits are right', () => {
     const dc = testCccDigit('0000810123') + testCccDigit('0001234567');
@@ -107,15 +114,27 @@ describe('validateIban — Spanish', () => {
     const bban = `00810123${wrongDc}0001234567`;
     const iban = `ES${testIbanCheck('ES', bban)}${bban}`;
     const v = validateIban(iban);
-    expect(v).toMatchObject({ valid: false, checkDigitsOk: true, cccDcOk: false, reason: 'ccc_dc' });
+    expect(v).toMatchObject({
+      valid: false,
+      checkDigitsOk: true,
+      cccDcOk: false,
+      reason: 'ccc_dc',
+    });
   });
   it('flags a wrong IBAN check', () => {
     const wrong = `ES00${ES_SYNTHETIC.slice(4)}`;
     const alt = wrong === ES_SYNTHETIC ? `ES01${ES_SYNTHETIC.slice(4)}` : wrong;
-    expect(validateIban(alt)).toMatchObject({ valid: false, checkDigitsOk: false, reason: 'check_digits' });
+    expect(validateIban(alt)).toMatchObject({
+      valid: false,
+      checkDigitsOk: false,
+      reason: 'check_digits',
+    });
   });
   it('flags a wrong length and malformed input', () => {
-    expect(validateIban(ES_SYNTHETIC.slice(0, 23))).toMatchObject({ valid: false, reason: 'length' });
+    expect(validateIban(ES_SYNTHETIC.slice(0, 23))).toMatchObject({
+      valid: false,
+      reason: 'length',
+    });
     expect(validateIban('')).toMatchObject({ valid: false, reason: 'empty' });
     expect(validateIban('1234')).toMatchObject({ valid: false, reason: 'format' });
   });
@@ -170,7 +189,12 @@ describe('ES_BANKS / lookupEsBank', () => {
     expect(ES_BANKS['2048']?.absorbedInto).toBe('2103');
   });
   it('follows absorption chains to the current entity', () => {
-    expect(lookupEsBank('2077')).toMatchObject({ name: 'Bancaja', absorbedInto: '2038', currentCode: '2100', currentName: 'CaixaBank' });
+    expect(lookupEsBank('2077')).toMatchObject({
+      name: 'Bancaja',
+      absorbedInto: '2038',
+      currentCode: '2100',
+      currentName: 'CaixaBank',
+    });
     expect(lookupEsBank('2100')).toMatchObject({ currentCode: '2100', currentName: 'CaixaBank' });
     expect(lookupEsBank('9999')).toEqual({ code: '9999', currentCode: '9999' });
   });

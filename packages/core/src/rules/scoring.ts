@@ -50,7 +50,9 @@ function clamp01(x: number): number {
 }
 
 /** Confidence = extractionQuality × specificity × independence, each clamped to [0, 1]. */
-export function confidence(hit: Pick<Hit, 'extractionQuality' | 'specificity' | 'independence'>): number {
+export function confidence(
+  hit: Pick<Hit, 'extractionQuality' | 'specificity' | 'independence'>,
+): number {
   return clamp01(hit.extractionQuality) * clamp01(hit.specificity) * clamp01(hit.independence);
 }
 
@@ -248,9 +250,16 @@ export function independenceFromProvenance(
   const hasDegradingStep = chain.some((s) => DEGRADING_STEPS.has(s));
   const intermediaries = chain.slice(1).filter((s) => !DEGRADING_STEPS.has(s) && s !== 'scan');
 
-  if (ISSUER_ORIGINS.has(origin) && obtainedDirectly && intermediaries.length === 0 && !hasDegradingStep) {
-    if (origin === 'vendor_direct' && options.vendorHasOpenLinkFinding) return INDEPENDENCE.singleDocument;
-    if (origin === 'bank' && holderKind && holderKind !== 'community') return INDEPENDENCE.bankViaAdministrator;
+  if (
+    ISSUER_ORIGINS.has(origin) &&
+    obtainedDirectly &&
+    intermediaries.length === 0 &&
+    !hasDegradingStep
+  ) {
+    if (origin === 'vendor_direct' && options.vendorHasOpenLinkFinding)
+      return INDEPENDENCE.singleDocument;
+    if (origin === 'bank' && holderKind && holderKind !== 'community')
+      return INDEPENDENCE.bankViaAdministrator;
     return INDEPENDENCE.issuerDirect;
   }
   if (origin === 'bank' && !hasDegradingStep) return INDEPENDENCE.bankViaAdministrator;
