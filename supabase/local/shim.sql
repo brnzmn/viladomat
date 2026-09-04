@@ -60,3 +60,11 @@ end $$;
 
 grant usage on schema auth, storage to anon, authenticated, service_role;
 grant all on all tables in schema storage to authenticated, service_role;
+
+-- Supabase resolves unqualified names through "$user", public, extensions; mirror it locally so
+-- extension types (citext) and functions keep resolving after 0014 moves them out of public.
+create schema if not exists extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
+do $$ begin
+  execute format('alter database %I set search_path = "$user", public, extensions', current_database());
+end $$;
