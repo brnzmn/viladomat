@@ -33,8 +33,14 @@ export type FetchLike = (url: string, init?: HttpRequestInit) => Promise<HttpRes
 /** Status of a check, mirroring `public.external_checks.status`. */
 export type CheckStatus = 'ok' | 'not_found' | 'error' | 'manual_pending';
 
-/** What a check is about. Mirrors `public.external_checks.subject_type`. */
-export type SubjectType = 'party' | 'community' | 'unit' | 'works_package';
+/**
+ * What a check is about. Mirrors `public.external_checks.subject_type` (free text in the schema).
+ *
+ * For `party` the subject key is the party's uuid, so a corrected identifier does not orphan the
+ * earlier rows; for `surname` and `address` it is the normalised value, because those checks are
+ * about reference data shared by several parties.
+ */
+export type SubjectType = 'party' | 'community' | 'unit' | 'works_package' | 'surname' | 'address';
 
 /** The subject of a check: a vendor, the community itself, a unit or a works package. */
 export interface CheckSubject {

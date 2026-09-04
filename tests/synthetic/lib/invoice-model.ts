@@ -34,7 +34,33 @@ export interface InvoiceSpec {
   notes?: string;
 }
 
-export const LABELS: Record<Lang, Record<string, string>> = {
+interface InvoiceLabels {
+  title: string;
+  number: string;
+  date: string;
+  issuer: string;
+  recipient: string;
+  nif: string;
+  address: string;
+  desc: string;
+  qty: string;
+  unit: string;
+  unitPrice: string;
+  amount: string;
+  base: string;
+  ivaRate: string;
+  quota: string;
+  irpf: string;
+  total: string;
+  paymentTerms: string;
+  transfer: string;
+  directDebit: string;
+  dueDate: string;
+  days30: string;
+  onReceipt: string;
+}
+
+export const LABELS: Record<Lang, InvoiceLabels> = {
   es: {
     title: 'FACTURA',
     number: 'Nº factura',
