@@ -4,6 +4,7 @@ import exifr from 'exifr';
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import * as tus from 'tus-js-client';
 import type { Json } from '@/lib/database.types';
+import { supabaseEnv } from '@/lib/env';
 import { bytes as fmtBytes } from '@/lib/format';
 import { getBrowserClient } from '@/lib/supabase/client';
 
@@ -192,7 +193,7 @@ export function UploadClient({ communityId, userId, pipelineVersion }: { communi
 
       const ext = extensionOf(item.file.name);
       const objectName = `${communityId}/${sha256.slice(0, 2)}/${sha256}.${ext}`;
-      const endpoint = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/upload/resumable`;
+      const endpoint = `${supabaseEnv().url}/storage/v1/upload/resumable`;
 
       patch(key, { status: 'uploading' });
       try {

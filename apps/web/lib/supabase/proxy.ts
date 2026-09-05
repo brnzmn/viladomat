@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { Database } from '@/lib/database.types';
+import { supabaseEnv } from '@/lib/env';
 
 const LOGIN_PATH = '/login';
 const MFA_PATH = '/mfa';
@@ -16,12 +17,7 @@ const LOGOUT_PATH = '/logout';
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
   let response = NextResponse.next({ request });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) {
-    // Misconfigured deployment: let the page render its configuration error.
-    return response;
-  }
+  const { url, anonKey } = supabaseEnv();
 
   const supabase = createServerClient<Database>(url, anonKey, {
     cookies: {
