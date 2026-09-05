@@ -1,6 +1,13 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Inline the two public values into every bundle at build time. Server code otherwise reads
+  // process.env at request time, and hosted functions do not load .env.production at runtime.
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+    NEXT_PUBLIC_PIPELINE_VERSION: process.env.NEXT_PUBLIC_PIPELINE_VERSION ?? '1',
+  },
   transpilePackages: ['@viladomat/core'],
   typedRoutes: true,
   poweredByHeader: false,
