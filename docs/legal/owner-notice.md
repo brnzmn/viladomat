@@ -40,7 +40,11 @@ cuenta de propietarios se guardan cifrados y solo se muestran sus cuatro última
 **Origen de los datos.** Documentación de la Comunidad (actas, liquidaciones, facturas, contratos,
 certificaciones, extractos bancarios, recibos) facilitada por el administrador o por propietarios, y
 registros públicos (BORME, registros administrativos de empresas, base de datos de subvenciones,
-Catastro).
+Catastro). Respecto de los proveedores, se comprueba ante la Agencia Tributaria si el NIF y el
+nombre impresos en sus facturas se corresponden entre sí (resultado «identificado» o «no
+identificado», sin obtener ningún otro dato), y del Catastro se obtiene únicamente la descripción
+del edificio (entidades, superficies y coeficientes), sin datos de titulares. No se realiza ninguna
+consulta a registros sobre los propietarios.
 
 **Destinatarios y encargados.** Los propietarios solicitantes; la junta de propietarios a través de sus
 cauces formales (convocatoria y sesión); el abogado y, en su caso, el revisor independiente que
@@ -93,7 +97,11 @@ propietaris es guarden xifrats i només se'n mostren les quatre últimes xifres.
 **Origen de les dades.** Documentació de la Comunitat (actes, liquidacions, factures, contractes,
 certificacions, extractes bancaris, rebuts) facilitada per l'administrador o per propietaris, i
 registres públics (BORME, registres administratius d'empreses, base de dades de subvencions,
-Cadastre).
+Cadastre). Respecte dels proveïdors, es comprova davant l'Agència Tributària si el NIF i el nom
+impresos a les seves factures es corresponen entre si (resultat «identificat» o «no identificat»,
+sense obtenir cap altra dada), i del Cadastre s'obté únicament la descripció de l'edifici
+(entitats, superfícies i coeficients), sense dades de titulars. No es fa cap consulta a registres
+sobre els propietaris.
 
 **Destinataris i encarregats.** Els propietaris sol·licitants; la junta de propietaris a través dels
 seus canals formals (convocatòria i sessió); l'advocat i, si escau, el revisor independent que
@@ -146,7 +154,11 @@ only their last four digits are displayed.
 
 **Source of the data.** Community records (minutes, liquidations, invoices, contracts, certifications,
 bank statements, receipts) supplied by the administrator or by owners, and public registries (BORME,
-administrative company registers, the national subsidies database, Cadastre).
+administrative company registers, the national subsidies database, Cadastre). For vendors, the Tax
+Agency (Agencia Tributaria) is asked whether the NIF and the name printed on their invoices
+correspond to each other (outcome "identified" or "not identified", with no other data obtained),
+and from the Cadastre only the description of the building (units, surfaces and coefficients) is
+obtained, without holder data. No registry lookup is made about owners.
 
 **Recipients and processors.** The requesting owners; the assembly of owners through its formal
 channels (convocation and meeting); legal counsel and, where applicable, the independent reviewer

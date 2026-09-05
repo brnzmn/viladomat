@@ -12,6 +12,7 @@ import { vendorFactSheet } from './factsheet.ts';
 const CID = '00000000-0000-0000-0000-0000000000c1';
 const VENDOR = '11111111-1111-1111-1111-111111111111';
 const MAINTAINER = '22222222-2222-2222-2222-222222222222';
+const ARCHITECT = '33333333-3333-3333-3333-333333333333';
 
 function fakeClient(
   canned: Array<{ match: string; rows: Array<Record<string, unknown>> }>,
@@ -52,6 +53,19 @@ const client = fakeClient([
         address_norm: null,
         first_invoice: null,
         invoice_count: 0,
+        first_document: null,
+      },
+      {
+        id: ARCHITECT,
+        kind: 'architect',
+        display_name: 'ESTUDI EXEMPLE ARQUITECTES SLP',
+        nif: 'B65432106',
+        nif_valid: true,
+        nif_kind: 'CIF',
+        entity_letter: 'B',
+        address_norm: null,
+        first_invoice: '2022-03-01',
+        invoice_count: 2,
         first_document: null,
       },
     ],
@@ -123,6 +137,91 @@ const client = fakeClient([
         fetched_at: '2026-09-01T10:07:00Z',
       },
       {
+        id: 'c6',
+        check_type: 'aeat_census',
+        subject_type: 'party',
+        subject_key: VENDOR,
+        status: 'ok',
+        source_url: 'https://www1.agenciatributaria.gob.es/wlpl/BURT-JDIT/ws/VNifV2SOAP',
+        normalised: {
+          census_match: false,
+          result: 'NO IDENTIFICADO',
+          nif: 'B12345674',
+          name_sent: 'OBRES EXEMPLE BARNA SL',
+          name_registered: null,
+          natural_person: false,
+          source_verified: false,
+        },
+        fetched_at: '2026-09-01T10:09:00Z',
+      },
+      {
+        id: 'c7',
+        check_type: 'insolvency',
+        subject_type: 'party',
+        subject_key: VENDOR,
+        status: 'manual_pending',
+        source_url: 'https://www.publicidadconcursal.es/consulta-publicidad-concursal-new',
+        normalised: { manual: true },
+        fetched_at: '2026-09-01T10:10:00Z',
+      },
+      {
+        id: 'c8',
+        check_type: 'aeat_census',
+        subject_type: 'party',
+        subject_key: MAINTAINER,
+        status: 'ok',
+        source_url: 'https://www1.agenciatributaria.gob.es/wlpl/BURT-JDIT/ws/VNifV2SOAP',
+        normalised: {
+          census_match: true,
+          result: 'IDENTIFICADO',
+          nif: 'B58818501',
+          name_sent: 'ASCENSORS EXEMPLE SL',
+          name_registered: 'ASCENSORS EXEMPLE SOCIEDAD LIMITADA',
+          natural_person: false,
+          source_verified: true,
+        },
+        fetched_at: '2026-09-01T10:11:00Z',
+      },
+      {
+        // A manual completion: the reviewer's PDF is on file, the row carries no census_match.
+        id: 'c9',
+        check_type: 'aeat_census',
+        subject_type: 'party',
+        subject_key: ARCHITECT,
+        status: 'ok',
+        source_url: 'https://sede.agenciatributaria.gob.es/Sede/tramitacion/G321.shtml',
+        normalised: {
+          manual: true,
+          evidence_uploaded: true,
+          evidence_bytes: 1024,
+          evidence_note: 'response page captured',
+          answers_check_id: 'c-pending',
+        },
+        fetched_at: '2026-09-02T09:00:00Z',
+      },
+      {
+        // An automated answer of the insolvency register in the shape REA and RASIC use.
+        id: 'c10',
+        check_type: 'insolvency',
+        subject_type: 'party',
+        subject_key: ARCHITECT,
+        status: 'ok',
+        source_url: 'https://www.publicidadconcursal.es/consulta-publicidad-concursal-new',
+        normalised: { registered: false, source_verified: false },
+        fetched_at: '2026-09-02T09:01:00Z',
+      },
+      {
+        // A REA manual completion: evidence on file, no structured outcome.
+        id: 'c11',
+        check_type: 'rea',
+        subject_type: 'party',
+        subject_key: ARCHITECT,
+        status: 'ok',
+        source_url: 'https://expinterweb.mites.gob.es/rea/pub/consulta.htm',
+        normalised: { manual: true, evidence_uploaded: true, answers_check_id: 'c-rea-pending' },
+        fetched_at: '2026-09-02T09:02:00Z',
+      },
+      {
         id: 'c5',
         check_type: 'bdns_grants',
         subject_type: 'community',
@@ -190,11 +289,42 @@ describe('vendorFactSheet', () => {
     expect(sheet.vendors.find((v) => v.party_id === MAINTAINER)?.rea_status).toBe('not checked');
   });
 
+  it('reports the census and the insolvency register with the same closed vocabulary', async () => {
+    const sheet = await vendorFactSheet(client, CID);
+    const vendor = sheet.vendors.find((v) => v.party_id === VENDOR);
+    const maintainer = sheet.vendors.find((v) => v.party_id === MAINTAINER);
+    const architect = sheet.vendors.find((v) => v.party_id === ARCHITECT);
+    expect(vendor?.census_status).toBe('not located');
+    expect(vendor?.insolvency_status).toBe('pending manual check');
+    expect(maintainer?.census_status).toBe('registered');
+    expect(maintainer?.insolvency_status).toBe('not checked');
+    expect(architect?.insolvency_status).toBe('not located');
+    const vocabulary = ['registered', 'not located', 'not checked', 'pending manual check'];
+    for (const v of sheet.vendors) {
+      expect(vocabulary).toContain(v.census_status);
+      expect(vocabulary).toContain(v.insolvency_status);
+    }
+    // The result string a register answered with stays on the check row.
+    expect(JSON.stringify(sheet)).not.toContain('NO IDENTIFICADO');
+  });
+
+  it('reads a manual completion as "not checked": the outcome is in the evidence, not in the row', async () => {
+    const sheet = await vendorFactSheet(client, CID);
+    const architect = sheet.vendors.find((v) => v.party_id === ARCHITECT);
+    expect(architect?.census_status).toBe('not checked');
+    expect(architect?.rea_status).toBe('not checked');
+    expect(architect?.checks.map((c) => c.type).sort()).toEqual([
+      'aeat_census',
+      'insolvency',
+      'rea',
+    ]);
+  });
+
   it('lists the grants published for the community and the sources that are still unverified', async () => {
     const sheet = await vendorFactSheet(client, CID);
     expect(sheet.community_grants).toHaveLength(1);
     expect(sheet.community_grants[0]?.amount_granted).toBe(30000);
-    expect(sheet.unverified_sources).toEqual(['company_profile']);
+    expect(sheet.unverified_sources).toEqual(['aeat_census', 'company_profile', 'insolvency']);
   });
 
   it('states in both languages that absence of an entry establishes nothing', async () => {
@@ -207,7 +337,9 @@ describe('vendorFactSheet', () => {
     const sheet = await vendorFactSheet(client, CID);
     const vendor = sheet.vendors.find((v) => v.party_id === VENDOR);
     expect(vendor?.checks.map((c) => c.type).sort()).toEqual([
+      'aeat_census',
       'company_profile',
+      'insolvency',
       'rea',
       'registro_mercantil_nota',
     ]);

@@ -1,0 +1,30 @@
+{
+  "_fixture_note": "Synthetic. An OpenMercantil `/api/v1/company/{slug}/events` answer, newest first as a provider might send it; the parser sorts oldest first. Key names are guesses.",
+  "count": 3,
+  "items": [
+    {
+      "fecha": "2023-07-11",
+      "tipo": "Cambio de domicilio social",
+      "texto": "Cambio de domicilio social.",
+      "seccion": "A",
+      "num_borme": "132",
+      "pagina": "30110"
+    },
+    {
+      "fecha": "2022-03-28",
+      "tipo": "Nombramientos",
+      "texto": "Apoderado: MOSTRA VIVES, LAIA.",
+      "seccion": "A",
+      "num_borme": "60",
+      "pagina": "14002"
+    },
+    {
+      "fecha": "2021-11-22",
+      "tipo": "Constitución",
+      "texto": "Constitución. Comienzo de operaciones: 08.11.21. Objeto social: obras de albañilería y reformas.",
+      "seccion": "A",
+      "num_borme": "224",
+      "pagina": "51234"
+    }
+  ]
+}

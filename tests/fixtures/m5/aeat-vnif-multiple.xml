@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <sal:VNifV2Sal xmlns:sal="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Sal.xsd">
+      <sal:Contribuyente>
+        <sal:Nif>B12345674</sal:Nif>
+        <sal:Nombre>OBRES EXEMPLE BARNA SL</sal:Nombre>
+        <sal:Resultado>NO IDENTIFICADO</sal:Resultado>
+      </sal:Contribuyente>
+      <sal:Contribuyente>
+        <sal:Nif>B12345674</sal:Nif>
+        <sal:Nombre>OBRES EXEMPLE BARNA 2000 SL</sal:Nombre>
+        <sal:Resultado>NO IDENTIFICADO-SIMILAR</sal:Resultado>
+      </sal:Contribuyente>
+      <sal:Contribuyente>
+        <sal:Nif>A12345674</sal:Nif>
+        <sal:Nombre>SERVEIS EXEMPLE DE PROVA SA</sal:Nombre>
+        <sal:Resultado>IDENTIFICADO-REVOCADO</sal:Resultado>
+      </sal:Contribuyente>
+    </sal:VNifV2Sal>
+  </soapenv:Body>
+</soapenv:Envelope>

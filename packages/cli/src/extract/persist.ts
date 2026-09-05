@@ -16,6 +16,7 @@ import {
 } from '@viladomat/core';
 import { createHash } from 'node:crypto';
 import { envOptional } from '../lib/env.ts';
+import { hmacNif } from '../vendors/links.ts';
 import {
   isCriticalPath,
   validateParsed,
@@ -256,6 +257,7 @@ export async function upsertParty(client: Queryable, input: UpsertPartyInput): P
   const display = str(input.displayName);
   if (!nif && !display) return null;
   const nameNorm = display ? normaliseCompanyName(display) || normaliseValue('text', display) : null;
+  const nifHmac = nifPseudonym(nif);
 
   const existing = nif
     ? await first<{ id: string }>(client, 'select id from public.parties where community_id = $1 and nif = $2 limit 1', [input.communityId, nif])
@@ -274,7 +276,8 @@ export async function upsertParty(client: Queryable, input: UpsertPartyInput): P
               nif_kind = coalesce(nif_kind, $6),
               entity_letter = coalesce(entity_letter, $7),
               address_norm = coalesce(address_norm, $8),
-              first_seen_document_id = coalesce(first_seen_document_id, $9)
+              first_seen_document_id = coalesce(first_seen_document_id, $9),
+              nif_hmac = coalesce(nif_hmac, $10)
         where id = $1`,
       [
         existing.id,
@@ -286,6 +289,7 @@ export async function upsertParty(client: Queryable, input: UpsertPartyInput): P
         nif ? (validateNif(nif).entityLetter ?? null) : null,
         input.address ? normaliseValue('text', input.address) : null,
         input.documentId,
+        nifHmac,
       ],
     );
     return String(existing.id);
@@ -295,8 +299,8 @@ export async function upsertParty(client: Queryable, input: UpsertPartyInput): P
   return firstId(
     client,
     `insert into public.parties (community_id, kind, display_name, legal_name_norm, nif, nif_valid, nif_kind, entity_letter,
-                                 address_norm, origin_class, first_seen_document_id)
-     values ($1, $2::public.party_kind, $3, $4, $5, $6, $7, $8, $9, $10::public.issuer_class, $11)
+                                 address_norm, origin_class, first_seen_document_id, nif_hmac)
+     values ($1, $2::public.party_kind, $3, $4, $5, $6, $7, $8, $9, $10::public.issuer_class, $11, $12)
      returning id`,
     [
       input.communityId,
@@ -310,8 +314,27 @@ export async function upsertParty(client: Queryable, input: UpsertPartyInput): P
       input.address ? normaliseValue('text', input.address) : null,
       input.originClass ?? 'unknown',
       input.documentId,
+      nifHmac,
     ],
   );
+}
+
+/**
+ * Keyed digest of a party identifier (`parties.nif_hmac`, 0013) with the same server secret as
+ * the IBAN digests; null when no key is configured or there is no identifier. The digest is what
+ * the related-party equality tests compare (`vendors/links.ts`); the identifier itself stays in
+ * `parties.nif` as business data of the counterparty.
+ */
+export function nifPseudonym(nif: string | null | undefined): string | null {
+  const n = normaliseNif(nif);
+  if (!n) return null;
+  const key = envOptional('IBAN_HMAC_KEY');
+  if (!key) return null;
+  try {
+    return hmacNif(n, key);
+  } catch {
+    return null;
+  }
 }
 
 /**

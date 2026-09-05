@@ -1,11 +1,24 @@
 [
   {
-    "_fixture_note": "Synthetic. Socrata-style row of the industrial-safety agents register; the dataset id is a placeholder in config.ts and the column names are to verify.",
-    "num_registre": "RASIC-EX-00042",
-    "rao_social": "ASCENSORS EXEMPLE, S.L.",
+    "_fixture_note": "Synthetic. Row shaped on the candidate columns of the RASIC dataset exxq-fubu (n_mero_de_rasic, nom_titular_actual, adre_a, poblaci_, codi_postal, prov_ncia, taken from a sibling dataset); the identifier column is unknown, so a plausible `nif` key is used. All of it is to verify (RASIC_COLUMNS_VERIFIED is false). Company and identifier are invented.",
+    "n_mero_de_rasic": "RASIC-EX-00042",
+    "nom_titular_actual": "ASCENSORS EXEMPLE, S.L.",
     "nif": "B58818501",
+    "adre_a": "CARRER DE MOSTRA, 100",
+    "poblaci_": "BARCELONA",
+    "codi_postal": "08011",
+    "prov_ncia": "BARCELONA",
     "activitats": ["Ascensors - instal.lacio", "Ascensors - manteniment"],
     "data_alta": "2015-04-01",
+    "situacio": "alta"
+  },
+  {
+    "_fixture_note": "A second row that only mentions the searched identifier inside free text, to show the client-side filter keeps values and not substrings.",
+    "n_mero_de_rasic": "RASIC-EX-00099",
+    "nom_titular_actual": "INSTAL·LACIONS MOSTRA, S.L.",
+    "nif": "B12345674",
+    "observacions": "Vegeu expedient B58818501-2 (referencia interna)",
+    "poblaci_": "BARCELONA",
     "situacio": "alta"
   }
 ]

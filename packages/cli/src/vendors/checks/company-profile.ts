@@ -2,18 +2,25 @@
  * `company_profile` — registry profile of a vendor entity: registered address, incorporation
  * date, share capital, CNAE activity, current officers and the timeline of gazette entries.
  *
- * Route: an OpenMercantil-style aggregator of the official gazette (`/api/v1`), searched by NIF
- * and, failing that, by name. **Every path and field name below is a guess** (see
- * `SOURCES.openmercantil.toVerify`): the parser therefore accepts several plausible spellings of
- * each field and lists what it could not read in `normalised.unread`, so a wrong guess surfaces
- * as a gap rather than as a wrong figure. When the route fails, the result carries the manual
- * fallback (LibreBORME or the BORME buscador) with the search terms to type.
+ * Route: OpenMercantil, an aggregator of the official gazette (`SOURCES.openmercantil`,
+ * `https://openmercantil.es/api/v1`), searched by NIF and, failing that, by name:
+ * `GET /search?q=…&limit=5` (answering `{ query, count, offset, items, _attributions }`), then
+ * `GET /company/{slug}` and, when the detail does not carry them, `/company/{slug}/officers` and
+ * `/company/{slug}/events`. The paths come from the provider's published OpenAPI as read by the
+ * research report; **the field names inside the objects are still to verify**, so the parser
+ * accepts several plausible spellings of each field and lists what it could not read in
+ * `normalised.unread`, and a wrong guess surfaces as a gap rather than as a wrong figure. An
+ * optional API key (`VX_OPENMERCANTIL_API_KEY`, header `X-API-Key`) raises the quota; without it
+ * the provider reports 200 requests per day and IP. The licence (CC BY 4.0) requires attribution:
+ * `_attributions` is kept with every row. When the route fails, the result carries the manual
+ * fallback (the provider's site or the BORME buscador) with the search terms to type.
  *
  * Officer names are natural-person data. They are written to `entity_officers` and stay there:
  * outside the reviewer screen they are rendered as a role and initials.
  */
 import { normaliseCompanyName, normaliseName, tokenSetSimilarity } from '@viladomat/core';
-import { SOURCES } from '../config.ts';
+import { envOptional } from '../../lib/env.ts';
+import { OPENMERCANTIL_API_KEY_VAR, SOURCES } from '../config.ts';
 import { asArray, asIsoDate, asNumber, asString, fetchJson, firstOf, qs } from '../http.ts';
 import {
   errorResult,
@@ -106,7 +113,8 @@ const OFFICERS_KEYS = [
   'appointments',
 ];
 const EVENTS_KEYS = ['events', 'acts', 'actos', 'borme', 'anuncios', 'timeline', 'historial'];
-const ID_KEYS = ['id', 'slug', 'company_id', 'uid', 'ref'];
+// The slug is what the detail path takes; a numeric id is the fallback.
+const ID_KEYS = ['slug', 'id', 'company_id', 'uid', 'ref'];
 const ROLE_KEYS = ['role', 'cargo', 'position', 'tipo_cargo'];
 const FROM_KEYS = ['from', 'date_from', 'fecha_nombramiento', 'fecha_inicio', 'desde', 'fecha'];
 const TO_KEYS = ['to', 'date_to', 'fecha_cese', 'fecha_fin', 'hasta'];
@@ -234,12 +242,41 @@ export function pickCandidate(
 
 const cfg = SOURCES.openmercantil;
 
+/** Officers from the `/company/{slug}/officers` answer (a bare list or a wrapped one). */
+export function parseOfficersList(payload: unknown): ProfileOfficer[] {
+  const list = Array.isArray(payload)
+    ? payload
+    : asArray(firstOf(payload, [...OFFICERS_KEYS, ...RESULT_KEYS]));
+  return list.map(parseOfficer).filter((o): o is ProfileOfficer => o !== null);
+}
+
+/** Events from the `/company/{slug}/events` answer, oldest first. */
+export function parseEventsList(payload: unknown): ProfileEvent[] {
+  const list = Array.isArray(payload)
+    ? payload
+    : asArray(firstOf(payload, [...EVENTS_KEYS, ...RESULT_KEYS]));
+  const events = list.map(parseEvent).filter((e): e is ProfileEvent => e !== null);
+  events.sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+  return events;
+}
+
+/** Attribution block of a search answer (CC BY 4.0 requires it to travel with the data). */
+export function attributionsOf(payload: unknown): unknown {
+  return firstOf(payload, ['_attributions', 'attributions', 'attribution']) ?? null;
+}
+
+/** Request headers: the optional API key, never logged. */
+export function apiHeaders(): Record<string, string> {
+  const key = envOptional(OPENMERCANTIL_API_KEY_VAR);
+  return key ? { 'X-API-Key': key } : {};
+}
+
 function manualFallback(subject: CheckSubject): { url: string; instruction: string } {
   const term = subject.nif ?? subject.name ?? subject.subjectKey;
   return {
-    url: cfg.fallbackUrl ?? 'https://libreborme.net/',
+    url: cfg.fallbackUrl ?? 'https://openmercantil.es/',
     instruction:
-      `Search "${term}" in LibreBORME or in the BORME buscador (boe.es/borme), open the Section A entries for the company ` +
+      `Search "${term}" on the provider's site or in the BORME buscador (boe.es/borme), open the Section A entries for the company ` +
       'and capture the page showing the incorporation entry, the current officers and the registered address. ' +
       'Upload it with `vx vendors evidence --check <id> --file <path>`.',
   };
@@ -253,12 +290,14 @@ export const companyProfile: VendorCheck = {
   source: cfg.id,
   async run(subject: CheckSubject, ctx: CheckContext): Promise<CheckResult> {
     const term = subject.nif ?? subject.name ?? null;
-    const searchUrl = `${cfg.baseUrl}/companies/search${qs({ q: term, nif: subject.nif ?? null, limit: 10 })}`;
-    const request = {
+    const searchUrl = `${cfg.baseUrl}/search${qs({ q: term, limit: 5 })}`;
+    const headers = apiHeaders();
+    const request: Record<string, unknown> = {
       term,
       nif: subject.nif ?? null,
       name: subject.name ?? null,
       endpoint: searchUrl,
+      api_key_used: Object.keys(headers).length > 0,
       source_verified: cfg.verified,
     };
     if (!term) {
@@ -268,6 +307,7 @@ export const companyProfile: VendorCheck = {
         normalised: {
           note: 'No name or identifier to search with.',
           fallback: manualFallback(subject),
+          source_verified: cfg.verified,
         },
         raw: null,
         source_url: cfg.baseUrl,
@@ -276,8 +316,13 @@ export const companyProfile: VendorCheck = {
       };
     }
     try {
-      const search = await fetchJson(ctx, searchUrl, { source: cfg.id, allowStatus: [404] });
+      const search = await fetchJson(ctx, searchUrl, {
+        source: cfg.id,
+        allowStatus: [404],
+        headers,
+      });
       const candidates = parseSearchResults(search.json);
+      const attributions = attributionsOf(search.json);
       const chosen = pickCandidate(candidates, subject);
       if (!chosen) {
         return {
@@ -286,6 +331,8 @@ export const companyProfile: VendorCheck = {
           normalised: {
             searched: term,
             candidates: candidates.length,
+            attributions,
+            source_verified: cfg.verified,
             note: 'No registry entry matched the identifier or the name. Absence of an entry is not exculpatory: the entity may be a sole trader, a civil partnership or registered under a different name.',
             fallback: manualFallback(subject),
           },
@@ -295,8 +342,10 @@ export const companyProfile: VendorCheck = {
           request,
         };
       }
-      const detailUrl = `${cfg.baseUrl}/companies/${encodeURIComponent(chosen.candidate.id ?? chosen.candidate.nif ?? '')}`;
-      const detail = await fetchJson(ctx, detailUrl, { source: cfg.id, allowStatus: [404] });
+      const slug = chosen.candidate.id ?? chosen.candidate.nif ?? '';
+      const detailUrl = `${cfg.baseUrl}/company/${encodeURIComponent(slug)}`;
+      request.detail_endpoint = detailUrl;
+      const detail = await fetchJson(ctx, detailUrl, { source: cfg.id, allowStatus: [404], headers });
       if (detail.status === 404 || detail.json === null) {
         return {
           type: 'company_profile',
@@ -304,16 +353,39 @@ export const companyProfile: VendorCheck = {
           normalised: {
             searched: term,
             matched_by: chosen.how,
+            attributions,
+            source_verified: cfg.verified,
             note: 'Search matched but the detail page was empty.',
             fallback: manualFallback(subject),
           },
           raw: detail.json ?? detail.text,
           source_url: detailUrl,
           cost_cents: 0,
-          request: { ...request, detail_endpoint: detailUrl },
+          request,
         };
       }
       const profile = parseCompanyProfile(detail.json);
+      const raw: Record<string, unknown> = { detail: detail.json, attributions };
+
+      // Officers and events live on their own paths; they are fetched only when the detail
+      // object did not carry them, so a provider that inlines them costs two requests, not four.
+      if (profile.officers.length === 0) {
+        const officersUrl = `${detailUrl}/officers`;
+        request.officers_endpoint = officersUrl;
+        const res = await fetchJson(ctx, officersUrl, { source: cfg.id, allowStatus: [404], headers });
+        raw.officers = res.json;
+        profile.officers = parseOfficersList(res.json);
+        if (profile.officers.length > 0) profile.unread = profile.unread.filter((u) => u !== 'officers');
+      }
+      if (profile.events.length === 0) {
+        const eventsUrl = `${detailUrl}/events`;
+        request.events_endpoint = eventsUrl;
+        const res = await fetchJson(ctx, eventsUrl, { source: cfg.id, allowStatus: [404], headers });
+        raw.events = res.json;
+        profile.events = parseEventsList(res.json);
+        if (profile.events.length > 0) profile.unread = profile.unread.filter((u) => u !== 'events');
+      }
+
       return {
         type: 'company_profile',
         status: 'ok',
@@ -321,13 +393,14 @@ export const companyProfile: VendorCheck = {
           ...profile,
           matched_by: chosen.how,
           match_score: Math.round(chosen.score * 1000) / 1000,
+          attributions,
           source_verified: cfg.verified,
           fallback: manualFallback(subject),
         },
-        raw: detail.json,
+        raw,
         source_url: detailUrl,
         cost_cents: 0,
-        request: { ...request, detail_endpoint: detailUrl },
+        request,
         ...(profile.unread.length > 0
           ? { note: `Fields not read from the response: ${profile.unread.join(', ')}.` }
           : {}),

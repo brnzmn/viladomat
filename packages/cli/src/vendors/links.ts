@@ -756,18 +756,42 @@ export function vendorLinkScore(links: readonly AggregatedLink[]): number {
 
 export interface WriteLinksResult {
   written: number;
+  /**
+   * Links with neither an office-holder role nor another party to point at (a company's age, a
+   * registry state): they have no target row and are reported by the fact sheet instead.
+   */
   skippedRoleless: number;
 }
 
+/** Party ids a link points at, read from the detail of the signals that recorded a coincidence. */
+export function linkTargets(link: Pick<AggregatedLink, 'partyId' | 'detail'>): string[] {
+  const ids = new Set<string>();
+  const add = (v: unknown): void => {
+    if (typeof v === 'string' && v && v !== link.partyId) ids.add(v);
+  };
+  const list = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
+  const d = link.detail ?? {};
+  for (const key of ['shared_with_party_ids', 'other_party_ids', 'to_party_ids']) {
+    for (const v of list(d[key])) add(v);
+  }
+  for (const key of ['other_party_id', 'to_party_id']) add(d[key]);
+  for (const f of list(d.fingerprints)) {
+    if (f && typeof f === 'object') {
+      for (const v of list((f as Record<string, unknown>).other_party_ids)) add(v);
+    }
+  }
+  return [...ids].sort();
+}
+
 /**
- * Write the role-bearing links to `public.party_links`.
+ * Write the links to `public.party_links`.
  *
- * `party_links.to_role` only accepts `president`, `president_family` and `administrator`, and the
- * table has no column for a second party, so coincidences that are **not** with an office-holder
- * (a shared address between two vendors, a shared account, the age of a company, an absent
- * registry entry) cannot be stored as a row without asserting a role that was not observed. They
- * are returned by the scorer, reported by rules B1, B2, B7, B9 and A10, and counted in
- * `vendorLinkScore`; see `docs/vendors.md` for the schema note.
+ * A link with an office-holder role (`to_role` in president, president_family, administrator) is
+ * upserted on the unique key (community, vendor, role, signal). A link without a role points at
+ * the other party it coincides with (`to_party_id`, 0013), one row per target party; no unique
+ * index covers a null role, so that upsert is done by hand (update, then insert). A role-less
+ * link with no target party at all is skipped and counted. `detail` carries the structured facts
+ * of the signal (digests are truncated by the data-room redaction, never printed in a pack).
  */
 export async function writePartyLinks(
   client: Queryable,
@@ -778,34 +802,86 @@ export async function writePartyLinks(
   let written = 0;
   let skippedRoleless = 0;
   for (const link of links) {
-    if (link.role === null) {
+    const detail = JSON.stringify(link.detail ?? {});
+    if (link.role !== null) {
+      await client.query(
+        `insert into public.party_links
+           (community_id, from_party_id, to_role, to_party_id, signal, points, rarity_weight, expected_collisions,
+            evidence_ids, tier, status, explanation, detail, engine_version)
+         values ($1,$2,$3,null,$4,$5,$6,$7,$8::uuid[],$9,'open',$10,$11::jsonb,$12)
+         on conflict (community_id, from_party_id, to_role, signal) do update set
+           points = excluded.points, rarity_weight = excluded.rarity_weight,
+           expected_collisions = excluded.expected_collisions, evidence_ids = excluded.evidence_ids,
+           tier = excluded.tier, explanation = excluded.explanation, detail = excluded.detail,
+           engine_version = excluded.engine_version`,
+        [
+          cid,
+          link.partyId,
+          link.role,
+          link.signal,
+          link.points,
+          link.rarityWeight,
+          link.expectedCollisions,
+          link.evidenceIds,
+          link.tier,
+          link.explanation,
+          detail,
+          engineVersion,
+        ],
+      );
+      written++;
+      continue;
+    }
+    const targets = linkTargets(link);
+    if (targets.length === 0) {
       skippedRoleless++;
       continue;
     }
-    await client.query(
-      `insert into public.party_links
-         (community_id, from_party_id, to_role, signal, points, rarity_weight, expected_collisions,
-          evidence_ids, tier, status, explanation, engine_version)
-       values ($1,$2,$3,$4,$5,$6,$7,$8::uuid[],$9,'open',$10,$11)
-       on conflict (community_id, from_party_id, to_role, signal) do update set
-         points = excluded.points, rarity_weight = excluded.rarity_weight,
-         expected_collisions = excluded.expected_collisions, evidence_ids = excluded.evidence_ids,
-         tier = excluded.tier, explanation = excluded.explanation, engine_version = excluded.engine_version`,
-      [
-        cid,
-        link.partyId,
-        link.role,
-        link.signal,
-        link.points,
-        link.rarityWeight,
-        link.expectedCollisions,
-        link.evidenceIds,
-        link.tier,
-        link.explanation,
-        engineVersion,
-      ],
-    );
-    written++;
+    for (const target of targets) {
+      const updated = await client.query(
+        `update public.party_links set
+           points = $5, rarity_weight = $6, expected_collisions = $7, evidence_ids = $8::uuid[],
+           tier = $9, explanation = $10, detail = $11::jsonb, engine_version = $12
+         where community_id = $1 and from_party_id = $2 and to_role is null and to_party_id = $3 and signal = $4`,
+        [
+          cid,
+          link.partyId,
+          target,
+          link.signal,
+          link.points,
+          link.rarityWeight,
+          link.expectedCollisions,
+          link.evidenceIds,
+          link.tier,
+          link.explanation,
+          detail,
+          engineVersion,
+        ],
+      );
+      if ((updated.rowCount ?? 0) === 0) {
+        await client.query(
+          `insert into public.party_links
+             (community_id, from_party_id, to_role, to_party_id, signal, points, rarity_weight, expected_collisions,
+              evidence_ids, tier, status, explanation, detail, engine_version)
+           values ($1,$2,null,$3,$4,$5,$6,$7,$8::uuid[],$9,'open',$10,$11::jsonb,$12)`,
+          [
+            cid,
+            link.partyId,
+            target,
+            link.signal,
+            link.points,
+            link.rarityWeight,
+            link.expectedCollisions,
+            link.evidenceIds,
+            link.tier,
+            link.explanation,
+            detail,
+            engineVersion,
+          ],
+        );
+      }
+      written++;
+    }
   }
   return { written, skippedRoleless };
 }

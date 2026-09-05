@@ -1,0 +1,7 @@
+{
+  "_fixture_note": "Synthetic. Shape of the error list the OVC callejero JSON service returns when the reference parameter is missing: the research report records that sending `RC` instead of `RefCat` is answered with code 17.",
+  "consulta_dnprcResult": {
+    "control": { "cudnp": 0, "cucons": 0, "cuerr": 1 },
+    "lerr": [{ "cod": "17", "des": "LA REFERENCIA CATASTRAL ES OBLIGATORIA" }]
+  }
+}

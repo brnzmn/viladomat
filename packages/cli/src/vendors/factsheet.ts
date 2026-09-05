@@ -5,7 +5,9 @@
  * public registers say about the companies the Community contracted with", and nothing else:
  * no scores, no tiers, no links, no severities, and no names of natural persons — officers are
  * rendered as a role and initials. What the register does not say is printed as "not located",
- * with the note that absence is not exculpatory.
+ * with the note that absence is not exculpatory. The register columns (REA, RASIC, the AEAT
+ * census, the Registro Público Concursal) share one closed vocabulary, {@link FactSheetStatus};
+ * the result strings a register answered with stay on the check rows and are not printed here.
  *
  * The related-party material (`party_links`) belongs to the reviewer screen and to the lawyer or
  * auditor annex, and is deliberately absent from this structure.
@@ -29,6 +31,15 @@ export interface FactSheetGrant {
   amount_paid: number | null;
 }
 
+/**
+ * The closed vocabulary of every register column. `registered` and `not located` state what the
+ * register answered on the date shown; `pending manual check` means a reviewer has been asked
+ * to open the page; `not checked` means the structure holds no answer (no check run, a failed
+ * call, nothing to look up, or a manual completion whose outcome is in the evidence file, not in
+ * the row). Absence is non-exculpatory in every case; the notes say so.
+ */
+export type FactSheetStatus = 'registered' | 'not located' | 'not checked' | 'pending manual check';
+
 export interface VendorFactSheetRow {
   party_id: string;
   display_name: string;
@@ -43,8 +54,20 @@ export interface VendorFactSheetRow {
   cnae: string | null;
   registered_address_known: boolean;
   officers: FactSheetOfficer[];
-  rea_status: 'registered' | 'not located' | 'not checked' | 'pending manual check';
-  rasic_status: 'registered' | 'not located' | 'not checked' | 'pending manual check';
+  rea_status: FactSheetStatus;
+  rasic_status: FactSheetStatus;
+  /**
+   * AEAT census (`aeat_census`, VNifV2): `registered` when the identifier and the name printed on
+   * the documents were identified as a pair; `not located` when the census answered anything else
+   * (not identified, de-registered, revoked). The result string itself stays on the check row.
+   */
+  census_status: FactSheetStatus;
+  /**
+   * Registro Público Concursal (`insolvency`): `registered` when an insolvency publication was
+   * located for the identifier, `not located` when the register answered none. The check is a
+   * manual route today, so the usual value is `pending manual check` or `not checked`.
+   */
+  insolvency_status: FactSheetStatus;
   grants: FactSheetGrant[];
   first_document_date: string | null;
   first_invoice_date: string | null;
@@ -81,16 +104,58 @@ const NOTE_EN =
   'registration may sit in another autonomous community or have lapsed after the works. Officers are ' +
   'identified by initials.';
 
-function statusFrom(row: Record<string, unknown> | undefined): VendorFactSheetRow['rea_status'] {
+function normalisedOf(row: Record<string, unknown>): Record<string, unknown> {
+  return (row.normalised as Record<string, unknown> | null) ?? {};
+}
+
+/** REA and RASIC: `normalised.registered`, or the row status when the check answered nothing. */
+function statusFrom(row: Record<string, unknown> | undefined): FactSheetStatus {
   if (!row) return 'not checked';
   const status = String(row.status ?? '');
   if (status === 'manual_pending') return 'pending manual check';
   if (status === 'not_found') return 'not located';
   if (status === 'ok') {
-    const n = (row.normalised as Record<string, unknown> | null) ?? {};
+    const n = normalisedOf(row);
     if (n.registered === false) return 'not located';
+    if (n.registered === true) return 'registered';
+    // A manual completion: the reviewer's evidence is on file, the outcome is not in the row.
+    if (n.evidence_uploaded === true) return 'not checked';
     return 'registered';
   }
+  return 'not checked';
+}
+
+/**
+ * AEAT census: only `normalised.census_match` of an `ok` row is an answer. `not_found` here means
+ * no identifier was transcribed (nothing was looked up), and an `ok` row without the flag is a
+ * manual completion, so both read `not checked`.
+ */
+export function censusStatusFrom(row: Record<string, unknown> | undefined): FactSheetStatus {
+  if (!row) return 'not checked';
+  const status = String(row.status ?? '');
+  if (status === 'manual_pending') return 'pending manual check';
+  if (status !== 'ok') return 'not checked';
+  const n = normalisedOf(row);
+  if (n.census_match === true) return 'registered';
+  if (n.census_match === false) return 'not located';
+  return 'not checked';
+}
+
+/**
+ * Registro Público Concursal: `registered` when a publication was located for the identifier
+ * (`normalised.registered`, the key the REA and RASIC checks use, so an automated module fits
+ * without touching this sheet), `not located` when the register answered none. A manual
+ * completion carries no structured outcome and reads `not checked`.
+ */
+export function insolvencyStatusFrom(row: Record<string, unknown> | undefined): FactSheetStatus {
+  if (!row) return 'not checked';
+  const status = String(row.status ?? '');
+  if (status === 'manual_pending') return 'pending manual check';
+  if (status === 'not_found') return 'not located';
+  if (status !== 'ok') return 'not checked';
+  const n = normalisedOf(row);
+  if (n.registered === true) return 'registered';
+  if (n.registered === false) return 'not located';
   return 'not checked';
 }
 
@@ -203,8 +268,10 @@ export async function vendorFactSheet(client: Queryable, cid: string): Promise<V
           date_from: o.dateFrom,
           date_to: o.dateTo,
         })),
-        rea_status: statusFrom(byKey.get(`rea|${id}`)),
+        rea_status: statusFrom(byKey.get(`rea|${id}`) ?? byKey.get(`rea_manual|${id}`)),
         rasic_status: statusFrom(byKey.get(`rasic|${id}`) ?? byKey.get(`rasic_manual|${id}`)),
+        census_status: censusStatusFrom(byKey.get(`aeat_census|${id}`)),
+        insolvency_status: insolvencyStatusFrom(byKey.get(`insolvency|${id}`)),
         grants: grantsFrom(byKey.get(`bdns_grants|${id}`)),
         first_document_date: (p.first_document as string | null) ?? null,
         first_invoice_date: (p.first_invoice as string | null) ?? null,

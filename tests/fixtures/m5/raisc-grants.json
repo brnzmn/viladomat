@@ -1,15 +1,19 @@
-{
-  "_fixture_note": "Synthetic. Socrata-style array from the Catalan grants dataset s9xt-n979; the dataset id and the column names are to verify.",
-  "rows": [
-    {
-      "identificador": "RAISC-2024-000123",
-      "beneficiari": "COMUNITAT DE PROPIETARIS EXEMPLE 25",
-      "nif": "H12345674",
-      "departament": "Departament de Territori",
-      "linia": "Rehabilitacio d'edificis d'us residencial",
-      "data_concessio": "2024-06-14",
-      "import_atorgat": "30000.00",
-      "import_pagat": "12000.00"
-    }
-  ]
-}
+[
+  {
+    "_fixture_note": "Synthetic. Socrata-style row of the Catalan grants dataset s9xt-n979 with the columns the research report established (codi_raisc, codi_bdns, any_de_la_convocat_ria, objecte_de_la_convocat_ria, cif_beneficiari, ra_social_del_beneficiari, data_concessi, import_subvenci_pr_stec_ajut, import_ajuda_equivalent, administraci_); the dataset was never opened live, so every column name is to verify. Beneficiary and amounts are invented.",
+    "clau": "2024-000123-1",
+    "entitat_oo_aa_o_departament": "Departament de Territori",
+    "codi_raisc": "RAISC-2024-000123",
+    "codi_bdns": "700456",
+    "any_de_la_convocat_ria": "2024",
+    "objecte_de_la_convocat_ria": "Rehabilitació d'edificis d'ús residencial",
+    "tipus_de_beneficiaris": "Comunitats de propietaris",
+    "cif_beneficiari": "H12345674",
+    "ra_social_del_beneficiari": "COMUNITAT DE PROPIETARIS EXEMPLE 25",
+    "codi_territorial": "08019",
+    "data_concessi": "2024-06-14T00:00:00.000",
+    "import_subvenci_pr_stec_ajut": "30000.00",
+    "import_ajuda_equivalent": "30000.00",
+    "administraci_": "Generalitat de Catalunya"
+  }
+]

@@ -1,27 +1,41 @@
 {
-  "_fixture_note": "Synthetic. Shape of a BDNS `concesiones/busqueda` response; the path and every parameter name are guesses (see SOURCES.bdns.toVerify). Amounts and references are invented.",
-  "page": 0,
-  "totalElements": 2,
+  "_fixture_note": "Synthetic. Shape of a BDNS `concesiones/busqueda` answer as the research report established it (wrapper content[] / totalElements / totalPages / size / number; Concesion fields id, idConvocatoria, numeroConvocatoria, convocatoria, nivel1..3, fechaConcesion, beneficiario 'NIF Razón social', instrumento, importe, ayudaEquivalente, urlBR). Amounts and references are invented; the beneficiary is a fictional community. Every field name is still to verify live (see SOURCES.bdns.toVerify).",
   "content": [
     {
-      "idConcesion": "9990001",
-      "beneficiario": "COMUNITAT DE PROPIETARIS EXEMPLE 25",
-      "nifBeneficiario": "H12345674",
-      "organo": "CONSORCI DE L'HABITATGE DE BARCELONA",
-      "convocatoria": "Ajuts a la rehabilitacio d'elements comuns 2023",
+      "id": 9990001,
+      "idConvocatoria": 770001,
+      "numeroConvocatoria": "700123",
+      "convocatoria": "Ajuts a la rehabilitació d'elements comuns 2023",
+      "nivel1": "LOCAL",
+      "nivel2": "BARCELONA",
+      "nivel3": "CONSORCI DE L'HABITATGE DE BARCELONA",
       "fechaConcesion": "2023-11-30",
-      "importe": "18500.00",
-      "importePagado": "0.00"
+      "idPersona": 555001,
+      "beneficiario": "H12345674 COMUNITAT DE PROPIETARIS EXEMPLE 25",
+      "instrumento": "SUBVENCIÓN Y ENTREGA DINERARIA SIN CONTRAPRESTACIÓN",
+      "importe": 18500.0,
+      "ayudaEquivalente": 18500.0,
+      "urlBR": null
     },
     {
-      "idConcesion": "9990002",
-      "beneficiario": "COMUNITAT DE PROPIETARIS EXEMPLE 25",
-      "nifBeneficiario": "H12345674",
-      "organo": "CONSORCI DE L'HABITATGE DE BARCELONA",
+      "id": 9990002,
+      "idConvocatoria": 770002,
+      "numeroConvocatoria": "700456",
       "convocatoria": "Ajuts a l'accessibilitat 2024",
+      "nivel1": "LOCAL",
+      "nivel2": "BARCELONA",
+      "nivel3": "CONSORCI DE L'HABITATGE DE BARCELONA",
       "fechaConcesion": "2024-06-14",
-      "importe": "30000.00",
-      "importePagado": "12000.00"
+      "idPersona": 555001,
+      "beneficiario": "H12345674 COMUNITAT DE PROPIETARIS EXEMPLE 25",
+      "instrumento": "SUBVENCIÓN Y ENTREGA DINERARIA SIN CONTRAPRESTACIÓN",
+      "importe": 30000.0,
+      "ayudaEquivalente": 30000.0,
+      "urlBR": "https://www.infosubvenciones.es/bdnstrans/GE/es/convocatoria/700456"
     }
-  ]
+  ],
+  "totalElements": 2,
+  "totalPages": 1,
+  "size": 50,
+  "number": 0
 }

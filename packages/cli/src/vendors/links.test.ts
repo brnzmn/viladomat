@@ -12,16 +12,20 @@ import {
   expectedCollisions,
   explanationFor,
   hmacNif,
+  linkTargets,
   pairWeight,
   rarityWeight,
   scoreVendorLinks,
   tierForPoints,
   vendorLinkScore,
+  writePartyLinks,
   UNKNOWN_FREQUENCY_WEIGHT,
+  type AggregatedLink,
   type LinkSignal,
   type ScoringContext,
   type VendorSnapshot,
 } from './links.ts';
+import type { Queryable } from './persist.ts';
 
 const VENDOR_ID = '11111111-1111-1111-1111-111111111111';
 const OTHER_VENDOR = '22222222-2222-2222-2222-222222222222';
@@ -456,5 +460,108 @@ describe('identifier digests', () => {
     expect(hmacNif('B12345674', key)).not.toBe(hmacNif('B12345674', other));
     expect(hmacNif('B12345674', key)).not.toContain('12345674');
     expect(() => hmacNif('B12345674', '')).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Persistence of the links (recording client; the real table is exercised in the integration test)
+// ---------------------------------------------------------------------------
+
+function aggregated(overrides: Partial<AggregatedLink> = {}): AggregatedLink {
+  return {
+    partyId: VENDOR_ID,
+    role: null,
+    signal: 'S7',
+    points: 90,
+    rarityWeight: null,
+    expectedCollisions: null,
+    tier: 'priority',
+    facts: ['an account digest of the vendor is also recorded for another party'],
+    detail: { basis: 'iban_reuse', shared_with_party_ids: [OTHER_VENDOR] },
+    source: { checkType: 'iban_validate', date: '2026-09-01' },
+    evidenceIds: [],
+    explanation: 'Possible link to verify: …',
+    ...overrides,
+  };
+}
+
+interface Call {
+  sql: string;
+  params: unknown[];
+}
+
+function recordingClient(updateHits = 0): { client: Queryable; calls: Call[] } {
+  const calls: Call[] = [];
+  const client = {
+    query: (sql: string, params?: unknown[]) => {
+      calls.push({ sql, params: params ?? [] });
+      const isUpdate = /^\s*update/i.test(sql);
+      return Promise.resolve({ rows: [], rowCount: isUpdate ? updateHits : 1 });
+    },
+  } as unknown as Queryable;
+  return { client, calls };
+}
+
+describe('linkTargets', () => {
+  it('reads the other parties out of the signal detail and never points a link at its own vendor', () => {
+    expect(linkTargets(aggregated({ detail: { shared_with_party_ids: [OTHER_VENDOR, VENDOR_ID] } }))).toEqual([
+      OTHER_VENDOR,
+    ]);
+    expect(
+      linkTargets(
+        aggregated({ detail: { fingerprints: [{ kind: 'phone', other_party_ids: [ADMIN_ID, OTHER_VENDOR] }] } }),
+      ),
+    ).toEqual([OTHER_VENDOR, ADMIN_ID].sort());
+    expect(linkTargets(aggregated({ detail: { incorporation_date: '2021-11-08' } }))).toEqual([]);
+  });
+});
+
+describe('writePartyLinks', () => {
+  it('upserts a role-bearing link on the unique key and stores its detail', async () => {
+    const { client, calls } = recordingClient();
+    const res = await writePartyLinks(client, 'cid', [
+      aggregated({ role: 'president', signal: 'S1', points: 100, detail: { basis: 'nif_hmac' } }),
+    ]);
+    expect(res).toEqual({ written: 1, skippedRoleless: 0 });
+    expect(calls).toHaveLength(1);
+    const call = calls[0] as Call;
+    expect(call.sql).toMatch(/on conflict \(community_id, from_party_id, to_role, signal\)/);
+    expect(call.sql).toMatch(/detail/);
+    expect(call.params[2]).toBe('president');
+    expect(call.params[3]).toBe('S1');
+    expect(JSON.parse(String(call.params[10]))).toEqual({ basis: 'nif_hmac' });
+  });
+
+  it('writes a role-less coincidence against each other party it points at (update, then insert)', async () => {
+    const { client, calls } = recordingClient(0);
+    const res = await writePartyLinks(client, 'cid', [aggregated()]);
+    expect(res).toEqual({ written: 1, skippedRoleless: 0 });
+    expect(calls).toHaveLength(2);
+    const update = calls[0] as Call;
+    const insert = calls[1] as Call;
+    expect(update.sql).toMatch(/^\s*update public\.party_links/);
+    expect(update.sql).toMatch(/to_role is null and to_party_id = \$3/);
+    expect(update.params[2]).toBe(OTHER_VENDOR);
+    expect(insert.sql).toMatch(/to_party_id/);
+    expect(insert.params[2]).toBe(OTHER_VENDOR);
+    expect(insert.params[3]).toBe('S7');
+  });
+
+  it('only updates when the role-less row already exists', async () => {
+    const { client, calls } = recordingClient(1);
+    const res = await writePartyLinks(client, 'cid', [aggregated()]);
+    expect(res.written).toBe(1);
+    expect(calls).toHaveLength(1);
+    expect((calls[0] as Call).sql).toMatch(/^\s*update/);
+  });
+
+  it('skips and counts a role-less link with nothing to point at', async () => {
+    const { client, calls } = recordingClient();
+    const res = await writePartyLinks(client, 'cid', [
+      aggregated({ signal: 'S8', detail: { incorporation_date: '2021-11-08', first_invoice_date: '2021-12-20' } }),
+      aggregated({ signal: 'S10', detail: { states: {}, leading: 'rea' } }),
+    ]);
+    expect(res).toEqual({ written: 0, skippedRoleless: 2 });
+    expect(calls).toHaveLength(0);
   });
 });

@@ -13,6 +13,7 @@ import {
   NIF_COMMUNITY,
 } from '@viladomat/core/extraction/__fixtures__/documents';
 import { loadEnv } from '../lib/env.ts';
+import { hmacNif } from '../vendors/links.ts';
 import { flattenParsed, type DocType } from './adapter.ts';
 import { persistExtraction, type PersistPage, type Queryable } from './persist.ts';
 
@@ -222,6 +223,7 @@ suite('factura', () => {
       expect(vendor?.kind).toBe('vendor');
       expect(vendor?.legal_name_norm).toBeTruthy();
       expect(vendor?.nif_valid).toBe(true);
+      expect(vendor?.nif_hmac).toBe(hmacNif(CIF_VENDOR, String(process.env.IBAN_HMAC_KEY)));
 
       const iban = (await rowsOf(s, 'select * from public.party_ibans where party_id = $1', [vendor?.id]))[0];
       expect(iban?.iban_last4).toBe(IBAN_VENDOR.slice(-4));

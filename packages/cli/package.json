@@ -18,6 +18,7 @@
     "@viladomat/core": "workspace:*",
     "commander": "^15.0.0",
     "exifr": "^7.1.3",
+    "fast-xml-parser": "^5.11.1",
     "heic-convert": "^2.1.0",
     "node-tesseract-ocr": "^2.2.1",
     "pdf-lib": "^1.17.1",

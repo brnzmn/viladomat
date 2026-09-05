@@ -38,9 +38,18 @@ export type CheckStatus = 'ok' | 'not_found' | 'error' | 'manual_pending';
  *
  * For `party` the subject key is the party's uuid, so a corrected identifier does not orphan the
  * earlier rows; for `surname` and `address` it is the normalised value, because those checks are
- * about reference data shared by several parties.
+ * about reference data shared by several parties; for `source` it is the id of the public source a
+ * probe verified.
  */
-export type SubjectType = 'party' | 'community' | 'unit' | 'works_package' | 'surname' | 'address';
+export type SubjectType =
+  | 'party'
+  | 'community'
+  | 'unit'
+  | 'works_package'
+  | 'surname'
+  | 'address'
+  /** A probe of a public source (`vendors/sources.ts`); the subject key is the source id. */
+  | 'source';
 
 /** The subject of a check: a vendor, the community itself, a unit or a works package. */
 export interface CheckSubject {
@@ -92,6 +101,14 @@ export interface CheckResult {
 export interface CheckContext {
   cid: string;
   fetch: FetchLike;
+  /**
+   * Transport that presents the operator's client certificate (mutual TLS), for the sources that
+   * only answer to an identified caller (AEAT VNifV2). Absent when no certificate is configured;
+   * a certificate-gated check then falls back to its manual route instead of calling out. Built
+   * by `vendors/transport/mtls.ts` from `VX_CLIENT_CERT_P12`; only ever set on the operator's
+   * machine, never in a hosted function.
+   */
+  certFetch?: FetchLike;
   /** Per-request timeout; defaults to {@link DEFAULT_TIMEOUT_MS}. */
   timeoutMs?: number;
   /** Wall clock, injectable so tests are deterministic. */
@@ -107,6 +124,22 @@ export interface CheckContext {
     subjectKey: string,
     maxAgeDays: number,
   ) => Promise<Record<string, unknown> | null>;
+  /**
+   * Whether the register (`public.registry_sources`) marks a source as verified by a probe from
+   * the operator's machine. Set by the check runner (`withSourceGate` in `vendors/sources.ts`);
+   * absent in a bare context, which the gated checks read as "not verified". Checks that refuse to
+   * call out until their source is verified (`rasic`, `rea`) ask it through
+   * {@link sourceVerifiedIn}.
+   */
+  sourceVerified?: (sourceId: string) => boolean;
+}
+
+/**
+ * Whether the runner has marked a source verified in the register. A context without the member
+ * — a test harness, a probe run — answers false, so a gated check never calls out by default.
+ */
+export function sourceVerifiedIn(ctx: CheckContext, sourceId: string): boolean {
+  return typeof ctx.sourceVerified === 'function' && ctx.sourceVerified(sourceId) === true;
 }
 
 /** One check module. `manual: true` means the reviewer fetches it and uploads the evidence. */

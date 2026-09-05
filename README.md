@@ -50,4 +50,9 @@ pnpm vx --help
 Personal data of owners and vendors is processed under a documented legitimate-interest
 assessment (`docs/legal/`). Originals never leave the EU-hosted storage except as page images
 sent to the extraction API under its data-processing agreement. Exports mask third parties.
+Public-registry lookups (the AEAT identity check of vendor NIFs, Cadastre, REA, RASIC, insolvency
+and grants registers) run only from the operator's machine through the `vx` CLI, use only
+identifiers already printed on ingested documents — never owners — and archive every response as
+an append-only `external_checks` row; the client certificate the AEAT check needs never leaves that
+machine (path and passphrase in the local `.env`, never in hosted functions or the repository).
 Do not commit any real document, bank data or `.env`. Seed files may carry community-level figures transcribed from minutes with page references, never personal data.

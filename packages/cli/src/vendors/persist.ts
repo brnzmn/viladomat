@@ -58,11 +58,14 @@ export async function persistCheck(
   // `fetched_at` is set from clock_timestamp(), not from the column default: `now()` is the
   // transaction timestamp, so two checks appended in one transaction would carry the same
   // instant and "the latest answer" would be ambiguous.
+  // `party_id` (0013) points at the party the check was run for, so the rows of one vendor can
+  // be listed without going through the subject key; null for community, surname and address
+  // subjects.
   const res = await client.query(
     `insert into public.external_checks
        (id, community_id, check_type, subject_type, subject_key, source_url, request, raw_response,
-        evidence_storage_path, normalised, status, cost_cents, checked_by, fetched_at)
-     values ($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,$9,$10::jsonb,$11,$12,$13, clock_timestamp())
+        evidence_storage_path, normalised, status, cost_cents, checked_by, party_id, fetched_at)
+     values ($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,$9,$10::jsonb,$11,$12,$13,$14::uuid, clock_timestamp())
      returning id, check_type, status, evidence_storage_path, fetched_at::text as fetched_at`,
     [
       id,
@@ -78,6 +81,7 @@ export async function persistCheck(
       result.status,
       result.cost_cents,
       opts.checkedBy ?? null,
+      subject.partyId ?? null,
     ],
   );
   const row = res.rows[0] as Record<string, unknown> | undefined;
@@ -176,7 +180,7 @@ export async function attachEvidence(
   opts: { checkedBy?: string | null } = {},
 ): Promise<PersistedCheck> {
   const pending = await client.query(
-    `select id, check_type, subject_type, subject_key, source_url, request, normalised, status, cost_cents
+    `select id, check_type, subject_type, subject_key, source_url, request, normalised, status, cost_cents, party_id
        from public.external_checks where id = $1 and community_id = $2`,
     [upload.checkId, cid],
   );
@@ -194,11 +198,13 @@ export async function attachEvidence(
     evidence_note: upload.note ?? null,
     answers_check_id: upload.checkId,
   };
+  // The completion row keeps the party of the row it answers, so the vendor's history stays
+  // reachable by party id on both rows.
   const res = await client.query(
     `insert into public.external_checks
        (community_id, check_type, subject_type, subject_key, source_url, request, raw_response,
-        evidence_storage_path, normalised, status, cost_cents, checked_by, fetched_at)
-     values ($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8,$9::jsonb,'ok',$10,$11, clock_timestamp())
+        evidence_storage_path, normalised, status, cost_cents, checked_by, party_id, fetched_at)
+     values ($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8,$9::jsonb,'ok',$10,$11,$12::uuid, clock_timestamp())
      returning id, check_type, status, evidence_storage_path, fetched_at::text as fetched_at`,
     [
       cid,
@@ -212,6 +218,7 @@ export async function attachEvidence(
       JSON.stringify(normalised),
       Number(row.cost_cents ?? 0),
       opts.checkedBy ?? null,
+      (row.party_id as string | null) ?? null,
     ],
   );
   const out = res.rows[0] as Record<string, unknown>;
