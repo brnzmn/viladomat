@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { validateNif } from '@viladomat/core/ids/nif';
 import { z } from 'zod';
 import { fail, ok, type ActionResult } from '@/lib/actions';
 import { asJson, logAccess } from '@/lib/audit';
@@ -90,6 +91,43 @@ async function finish(
   revalidatePath('/seed');
   revalidatePath('/');
   return ok(message);
+}
+
+// ---------------------------------------------------------------------------
+// community (the single row the session works on; identity and fiscal defaults)
+// ---------------------------------------------------------------------------
+const communitySchema = z.object({
+  name: str,
+  nif: nstr,
+  address: nstr,
+  catastro_rc: nstr,
+  fy_start_month: z.coerce.number().int().min(1).max(12),
+  ordinary_budget_default: nnum,
+  reason,
+});
+
+export async function saveCommunity(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  const r = await writer();
+  if ('result' in r) return r.result;
+  const { w } = r;
+  const parsed = communitySchema.safeParse(formObject(formData));
+  if (!parsed.success) return fail(issues(parsed.error));
+  const { reason: why, ...values } = parsed.data;
+
+  if (values.nif) {
+    const v = validateNif(values.nif);
+    if (!v.valid) return fail(`NIF "${values.nif}" is not valid (${v.reason ?? 'format'}).`);
+    if (v.kind !== 'CIF' || v.entityLetter !== 'H') {
+      return fail(`NIF "${v.normalised}" is not a community-of-owners identifier (those start with H).`);
+    }
+    values.nif = v.normalised;
+  }
+
+  const { data: before } = await w.supabase.from('communities').select('*').eq('id', w.cid).maybeSingle();
+  if (!before) return fail('Community not found.');
+  const { data: after, error } = await w.supabase.from('communities').update(values).eq('id', w.cid).select('*').single();
+  if (error) return fail(dbMessage(error));
+  return finish(w, 'edit', 'community', w.cid, asJson(before), asJson(after), why, 'Community details updated');
 }
 
 // ---------------------------------------------------------------------------
