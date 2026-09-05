@@ -11,6 +11,7 @@ import { BankAccountsTab } from './tabs/BankAccountsTab';
 import { RequestClockTab } from './tabs/RequestClockTab';
 import { ParametersTab } from './tabs/ParametersTab';
 import { CommunityRulesTab } from './tabs/CommunityRulesTab';
+import { CommunityTab } from './tabs/CommunityTab';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,13 +21,17 @@ function isTab(v: string | undefined): v is SeedTab {
 
 export default async function SeedPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const { tab: rawTab } = await searchParams;
-  const tab: SeedTab = isTab(rawTab) ? rawTab : 'units';
+  const tab: SeedTab = isTab(rawTab) ? rawTab : 'community';
   const { ctx, supabase } = await withCommunity();
   const cid = ctx.id;
   const canWrite = ctx.canWrite;
 
   let body: ReactNode;
   switch (tab) {
+    case 'community': {
+      body = <CommunityTab community={ctx.community} canWrite={canWrite} />;
+      break;
+    }
     case 'units': {
       const { data } = await supabase.from('units').select('*').eq('community_id', cid).order('label');
       body = <UnitsTab rows={data ?? []} canWrite={canWrite} />;

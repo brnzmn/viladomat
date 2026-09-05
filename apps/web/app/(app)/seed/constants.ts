@@ -1,6 +1,7 @@
 import type { Enums } from '@/lib/database.types';
 
 export const SEED_TABS = [
+  { key: 'community', label: 'Community' },
   { key: 'units', label: 'Units' },
   { key: 'meetings', label: 'Meetings' },
   { key: 'resolutions', label: 'Resolutions' },
