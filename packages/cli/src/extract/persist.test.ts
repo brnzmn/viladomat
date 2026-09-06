@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { hmacNif } from '../vendors/links.ts';
 import {
   approvedAmount,
   documentDate,
@@ -11,7 +12,10 @@ import {
   upfrontMaxPct,
   validatorFamily,
   validatorOkFor,
+  nifPseudonym,
+  upsertParty,
   valueKindOf,
+  type Queryable,
 } from './persist.ts';
 import type { ValidatorResult } from './adapter.ts';
 
@@ -133,5 +137,55 @@ describe('dates', () => {
     expect(documentDate('contrato_ascensor', { fecha_firma: '2024-09-10' })).toBe('2024-09-10');
     expect(documentDate('extracto_bancario', { periodo: { desde: '2024-05-01', hasta: '2024-05-31' } })).toBe('2024-05-31');
     expect(documentDate('liquidacion_anual', { periodo: { desde: null, hasta: null }, fecha_emision: null })).toBeNull();
+  });
+});
+
+describe('party identifier pseudonym', () => {
+  const KEY = Buffer.from('m5-unit-test-key-0000000000000000').toString('base64');
+  const saved = process.env.IBAN_HMAC_KEY;
+  beforeEach(() => {
+    process.env.IBAN_HMAC_KEY = KEY;
+  });
+  afterEach(() => {
+    if (saved === undefined) delete process.env.IBAN_HMAC_KEY;
+    else process.env.IBAN_HMAC_KEY = saved;
+  });
+
+  function recordingClient(existing: boolean): { client: Queryable; calls: Array<{ sql: string; params: unknown[] }> } {
+    const calls: Array<{ sql: string; params: unknown[] }> = [];
+    const client: Queryable = {
+      query: (sql: string, params?: unknown[]) => {
+        calls.push({ sql, params: params ?? [] });
+        if (/^\s*select/i.test(sql)) return Promise.resolve({ rows: existing ? [{ id: 'p-1' }] : [] });
+        return Promise.resolve({ rows: [{ id: 'p-1' }] });
+      },
+    };
+    return { client, calls };
+  }
+
+  const input = { communityId: 'c-1', documentId: 'd-1', kind: 'vendor', displayName: 'OBRES EXEMPLE BARNA, S.L.', nif: 'B12345674' };
+
+  it('writes parties.nif_hmac with the server key when a party is created', async () => {
+    const { client, calls } = recordingClient(false);
+    expect(await upsertParty(client, input)).toBe('p-1');
+    const insert = calls[1];
+    expect(insert?.sql).toMatch(/nif_hmac/);
+    expect(insert?.params[11]).toBe(hmacNif('B12345674', KEY));
+    expect(String(insert?.params[11])).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it('fills the digest in on an existing party without overwriting one already stored', async () => {
+    const { client, calls } = recordingClient(true);
+    expect(await upsertParty(client, input)).toBe('p-1');
+    const update = calls[1];
+    expect(update?.sql).toMatch(/nif_hmac = coalesce\(nif_hmac, \$10\)/);
+    expect(update?.params[9]).toBe(hmacNif('B12345674', KEY));
+  });
+
+  it('leaves the digest null without a key or without an identifier', () => {
+    expect(nifPseudonym(null)).toBeNull();
+    expect(nifPseudonym('')).toBeNull();
+    delete process.env.IBAN_HMAC_KEY;
+    expect(nifPseudonym('B12345674')).toBeNull();
   });
 });

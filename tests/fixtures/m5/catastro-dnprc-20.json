@@ -1,0 +1,39 @@
+{
+  "_fixture_note": "Synthetic. Shape of the OVC callejero JSON Consulta_DNPRC answer for a 20-character (unit) reference as recorded in the research report: bico.bi with idbi, dt, ldt and debi, plus the built elements in bico.lcons. The reference is invented and belongs to no real property; the street is fictional.",
+  "consulta_dnprcResult": {
+    "control": { "cudnp": 1, "cucons": 2, "cuerr": 0 },
+    "bico": {
+      "bi": {
+        "idbi": {
+          "cn": "UR",
+          "rc": { "pc1": "9999999", "pc2": "ZZ9999Z", "car": "0003", "cc1": "E", "cc2": "F" }
+        },
+        "dt": {
+          "loine": { "cp": "08", "cm": "900" },
+          "cmc": "900",
+          "np": "BARCELONA",
+          "nm": "BARCELONA",
+          "locs": {
+            "lous": {
+              "lourb": {
+                "dir": { "tv": "CL", "nv": "MOSTRA", "pnp": "25" },
+                "loint": { "es": "1", "pt": "PR", "pu": "01" },
+                "dp": "08015"
+              }
+            }
+          }
+        },
+        "ldt": "CL MOSTRA 25 Es:1 Pl:PR Pt:01 08015 BARCELONA (BARCELONA)",
+        "debi": { "luso": "Residencial", "sfc": "88", "cpt": "9,100000", "ant": "1928" }
+      },
+      "lcons": [
+        {
+          "lcd": "VIVIENDA",
+          "dt": { "lourb": { "loint": { "es": "1", "pt": "PR", "pu": "01" } } },
+          "dfcons": { "stl": "80" }
+        },
+        { "lcd": "ELEMENTOS COMUNES", "dfcons": { "stl": "8" } }
+      ]
+    }
+  }
+}

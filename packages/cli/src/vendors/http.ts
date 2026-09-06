@@ -2,11 +2,18 @@
  * Outbound HTTP for the vendor checks: one shared rate limiter per source and a hard timeout on
  * every request.
  *
- * The checks never call `fetch` directly — they call {@link fetchJson} with the source id, so a
- * limit is impossible to forget and a test can replace the transport wholesale.
+ * The checks never call `fetch` directly — they call {@link fetchJson} (JSON endpoints) or
+ * {@link fetchText} (SOAP envelopes, HTML forms) with the source id, so a limit is impossible to
+ * forget and a test can replace the transport wholesale. Neither function retries: a check that
+ * fails is recorded as `error` and re-run later.
  */
 import { parseAmountEs } from '@viladomat/core';
-import { DEFAULT_TIMEOUT_MS, type CheckContext, type HttpRequestInit } from './types.ts';
+import {
+  DEFAULT_TIMEOUT_MS,
+  type CheckContext,
+  type FetchLike,
+  type HttpRequestInit,
+} from './types.ts';
 import { SOURCES, type SourceId } from './config.ts';
 
 /** A minimum-interval limiter: `take()` resolves no sooner than 60s/perMinute after the last one. */
@@ -73,12 +80,20 @@ export class HttpError extends Error {
   }
 }
 
-export interface FetchJsonOptions extends HttpRequestInit {
+/** Options shared by {@link fetchJson} and {@link fetchText}. */
+export interface FetchOptionsBase extends HttpRequestInit {
   /** Source id, used for the rate limiter. */
   source: SourceId | string;
-  /** Accept a 404 as an answer instead of throwing (used for "not found" results). */
+  /** Accept these statuses as an answer instead of throwing (404 for "not found", 500 for a SOAP fault). */
   allowStatus?: readonly number[];
+  /**
+   * Transport to use instead of `ctx.fetch`. Certificate-gated checks pass `ctx.certFetch` here;
+   * the limiter and the timeout apply exactly as they do to the default transport.
+   */
+  fetch?: FetchLike;
 }
+
+export type FetchJsonOptions = FetchOptionsBase;
 
 export interface FetchJsonResult<T = unknown> {
   status: number;
@@ -87,6 +102,41 @@ export interface FetchJsonResult<T = unknown> {
   json: T | null;
   /** Raw body text, kept when parsing failed so the row still records what came back. */
   text: string;
+}
+
+export type FetchTextOptions = FetchOptionsBase;
+
+export interface FetchTextResult {
+  status: number;
+  url: string;
+  /** Body as received (SOAP envelope, HTML page); the caller parses it. */
+  text: string;
+}
+
+/**
+ * The preamble every outbound request shares: await the source's rate limiter, then run the
+ * request under the context timeout (10 s by default). The abort signal is handed to the
+ * transport; the timer is cleared however the request ends.
+ */
+async function guarded<T>(
+  ctx: CheckContext,
+  source: string,
+  run: (signal: AbortSignal) => Promise<T>,
+): Promise<T> {
+  const limit = ctx.rateLimit ?? ((s: string) => limiterFor(s).take());
+  await limit(source);
+
+  const timeoutMs = ctx.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(new Error(`timeout after ${timeoutMs} ms`)),
+    timeoutMs,
+  );
+  try {
+    return await run(controller.signal);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**
@@ -98,37 +148,45 @@ export async function fetchJson<T = unknown>(
   url: string,
   opts: FetchJsonOptions,
 ): Promise<FetchJsonResult<T>> {
-  const limit = ctx.rateLimit ?? ((source: string) => limiterFor(source).take());
-  await limit(opts.source);
+  const { status, text } = await fetchText(ctx, url, {
+    ...opts,
+    headers: { accept: 'application/json', ...(opts.headers ?? {}) },
+  });
+  let json: T | null = null;
+  if (text.trim()) {
+    try {
+      json = JSON.parse(text) as T;
+    } catch {
+      json = null;
+    }
+  }
+  return { status, url, json, text };
+}
 
-  const timeoutMs = ctx.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const controller = new AbortController();
-  const timer = setTimeout(
-    () => controller.abort(new Error(`timeout after ${timeoutMs} ms`)),
-    timeoutMs,
-  );
-  try {
-    const res = await ctx.fetch(url, {
+/**
+ * GET/POST an endpoint that answers with text (a SOAP envelope, an HTML result page) through
+ * `ctx.fetch` — or through `opts.fetch` when the source needs the certificate transport — after
+ * the source's rate limiter and under the context timeout. Throws {@link HttpError} on a status
+ * that is neither 2xx nor listed in `allowStatus`; never retries.
+ */
+export async function fetchText(
+  ctx: CheckContext,
+  url: string,
+  opts: FetchTextOptions,
+): Promise<FetchTextResult> {
+  const transport = opts.fetch ?? ctx.fetch;
+  return guarded(ctx, opts.source, async (signal) => {
+    const res = await transport(url, {
       method: opts.method ?? 'GET',
-      headers: { accept: 'application/json', ...(opts.headers ?? {}) },
+      ...(opts.headers ? { headers: opts.headers } : {}),
       ...(opts.body === undefined ? {} : { body: opts.body }),
-      signal: controller.signal,
+      signal,
     });
     const text = await res.text();
     const allowed = opts.allowStatus ?? [];
     if (!res.ok && !allowed.includes(res.status)) throw new HttpError(res.status, url, text);
-    let json: T | null = null;
-    if (text.trim()) {
-      try {
-        json = JSON.parse(text) as T;
-      } catch {
-        json = null;
-      }
-    }
-    return { status: res.status, url, json, text };
-  } finally {
-    clearTimeout(timer);
-  }
+    return { status: res.status, url, text };
+  });
 }
 
 /** Read a nested value by path, tolerating missing links. */

@@ -7,7 +7,8 @@ processor outside the EU), evaluation of identifiable natural persons (office-ho
 equality tests), financial data of all owners, and systematic cross-matching with public registries.
 [AEPD list of processing operations requiring a DPIA: to verify against the primary text.]
 
-Status: draft v1 · Owner: requesting owners · Date: 2026-09
+Status: draft v1.1 · Owner: requesting owners · Date: 2026-09 · Updated: 2026-09-05 (public-registry
+lookups; risks R9–R10)
 
 ## 1. Description of the processing
 
@@ -17,8 +18,8 @@ Status: draft v1 · Owner: requesting owners · Date: 2026-09
 | Scope | One community (about 15 units), fiscal years 2021–2026, 100–600 pages; 10–20 vendors, the administrator, office-holders, other owners as incidental data. |
 | Context | Owners holding ≥ 1/4 of quotas have requested an extraordinary meeting with the accounts and the works documentation on the agenda; the requesting owners prepare that meeting and, if the assembly so decides, an independent review. |
 | Purposes | See `lia.md` §2. |
-| Assets | Supabase EU project (Postgres, private Storage buckets), Vercel UI in an EU region, operator laptop running the `vx` worker, Anthropic API, optional Google Drive intake. |
-| Data flows | Source device → laptop (hash, EXIF) → Storage (immutable originals) → renders and OCR on the laptop → page images to the Anthropic API (base64 inline; batch) → JSON back → Postgres → reports → recipients per the sharing policy. |
+| Assets | Supabase EU project (Postgres, private Storage buckets), Vercel UI in an EU region, operator laptop running the `vx` worker (also the only place the client certificate for the AEAT identity check exists), Anthropic API, optional Google Drive intake. |
+| Data flows | Source device → laptop (hash, EXIF) → Storage (immutable originals) → renders and OCR on the laptop → page images to the Anthropic API (base64 inline; batch) → JSON back → Postgres → reports → recipients per the sharing policy. Registry lookups from the laptop only: identifier already on the document → AEAT (mutual TLS with the client certificate), a public register or the BORME aggregator → response archived as an append-only `external_checks` row. |
 
 ## 2. Necessity and proportionality
 
@@ -28,7 +29,8 @@ Status: draft v1 · Owner: requesting owners · Date: 2026-09
   e-mail fields; family members of the president as surnames only; restricted schema for reference
   identifiers and payer→unit keys.
 - Accuracy: two independent readers or a person for every money/date/NIF/IBAN field; validators;
-  revision log; right of reply so that the counterparty can correct facts before circulation.
+  revision log; right of reply so that the counterparty can correct facts before circulation. A NIF
+  and a name are sent to a register only after that agreement and the check-digit validation.
 - Transparency: art. 13/14 notice to every unit within the first week of ingestion.
 - Processors: DPAs with Supabase, Vercel and Anthropic (SCCs; 30-day deletion; no training); archived
   copies required before the first batch.
@@ -48,23 +50,28 @@ Likelihood: L low, M medium, H high. Severity: 1 minimal, 2 limited, 3 significa
 | R6 | Unauthorised access or breach | credentials, laptop loss | L | 3 | MFA, RLS, private buckets, signed URLs ≤ 1 h, encrypted laptop disk, encrypted weekly export to a second EU bucket, no public endpoints | L / 2 |
 | R7 | Reputational harm to a counterparty from premature circulation | owners sharing drafts | M | 4 | `sent_for_explanation` state and ≥ 10-day window before any pack inclusion; confidentiality banner; junta version without scores, severities or related-party material; legal review before circulation | L / 3 |
 | R8 | Pressure on a data subject through direct contact by individual owners | owner contacting vendors directly | L | 2 | vendor requests routed through the administrator or legal counsel only | L / 1 |
+| R9 | Mis-identification of a vendor through a homonym or a transcription error in an AEAT or registry lookup: a NIF or name read wrongly from a page, a trade name instead of the legal name, or a homonymous entity returns "not identified" or another entity's record | OCR/LLM transcription of NIF and name; trade names; homonymous company names; registry lag after a name change; unverified source | M | 3 | NIF and name accepted by two independent readers or a person, and the check digit validated, before any lookup; "NO IDENTIFICADO" and "not located" are recorded as discrepancies to verify with their innocent explanations (transcription, trade name, recent name change, source not yet verified) and the resolving document, never as a conclusion; `source_verified` printed with every result; absence stated as non-exculpatory; right of reply | L / 2 |
+| R10 | Misuse or leakage of the operator's client certificate: lookups made in the holder's name outside the stated purpose, or the certificate file and passphrase reaching a repository, a hosted function or a third party | PKCS#12 file and passphrase on the laptop; accidental commit or upload; laptop loss | L | 3 | local-only storage (path and passphrase in the git-ignored `.env`; `.env.example` carries the variable names only); no hosted use — lookups run only in the `vx` CLI on the encrypted laptop; revocation through the issuing authority as soon as compromise is suspected; every lookup written as an append-only `external_checks` row with the identity used, the identifier and the time, so use of the certificate is auditable; later switch to the community's representative certificate, scoped to the community's own duties | L / 2 |
 
 ## 4. Measures adopted (summary)
 
 Technical: EU hosting; immutable hashed originals; restricted schema behind RPCs; HMAC and encryption
-of IBANs; redaction stage; audit log; MFA; append-only evidence tables; weekly encrypted export.
+of IBANs; redaction stage; audit log; MFA; append-only evidence tables; weekly encrypted export;
+client certificate on the operator's machine only; every registry lookup an append-only
+`external_checks` row; per-source rate limits.
 
 Organisational: LIA; owner notice; retention and deletion procedure; sharing policy and audience split;
 right-of-reply procedure; neutrality policy with CI check; legal review gate before circulation;
-processor DPAs archived.
+processor DPAs archived; registry lookups limited to identifiers already on ingested documents and
+never to owners; result-only storage for natural persons; source register with probe-before-use.
 
 ## 5. Residual risk and conclusion
 
 Residual risks are low for all items except R7 (severity remains limited-to-significant if the
 right-of-reply and sharing rules were broken). No residual high risk remains; prior consultation of
 the supervisory authority under art. 36 is not required. The assessment is revisited if the assembly
-commissions a review, if a data subject objects, if a processor is added, or if pre-LLM redaction is
-enabled.
+commissions a review, if a data subject objects, if a processor or a registry source is added, if the
+community's representative certificate replaces the operator's, or if pre-LLM redaction is enabled.
 
 ## 6. Consultation
 

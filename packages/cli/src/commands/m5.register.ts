@@ -74,4 +74,46 @@ export function register(program: Command): void {
       const { vendorsFactsheetCommand } = await import('./vendors.ts');
       await vendorsFactsheetCommand(opts);
     });
+
+  vendors
+    .command('catastro')
+    .description(
+      'Compare the latest Cadastre unit list with the unit table; with --apply, fill units.catastro_rc20 and surface_m2 where one unit matches one Cadastre unit (quota_pct is never written)',
+    )
+    .option('--apply', 'write the matched columns; without it the comparison is printed only')
+    .option('--dry-run', 'print what --apply would write and write nothing')
+    .option('--force', 'overwrite a catastro_rc20 or surface_m2 already present')
+    .option('--community <uuid>', 'community id (defaults to the only community)')
+    .action(
+      async (opts: { apply?: boolean; dryRun?: boolean; force?: boolean; community?: string }) => {
+        const { vendorsCatastroCommand } = await import('./vendors.ts');
+        await vendorsCatastroCommand(opts);
+      },
+    );
+
+  const sources = vendors
+    .command('sources')
+    .description(
+      'Register of the public sources (public.registry_sources): verify them from this machine with one probe each, or print their status',
+    );
+
+  sources
+    .command('probe')
+    .description(
+      'Run one known-good lookup per automatable source (catastro, bdns, raisc, rasic, rea, openmercantil, aeat_vnif) with data already on file; a parsed answer marks the source verified and opens the gated checks (rasic, rea)',
+    )
+    .option('--source <id>', 'probe one source only')
+    .option('--community <uuid>', 'community id (defaults to the only community)')
+    .action(async (opts: { source?: string; community?: string }) => {
+      const { vendorsSourcesProbeCommand } = await import('./vendors.ts');
+      await vendorsSourcesProbeCommand(opts);
+    });
+
+  sources
+    .command('status')
+    .description('Print the register: id, access, verified_at, probe check id, notes')
+    .action(async () => {
+      const { vendorsSourcesStatusCommand } = await import('./vendors.ts');
+      await vendorsSourcesStatusCommand();
+    });
 }

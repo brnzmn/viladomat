@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CHECK_PARTY_NIF_KIND,
   emptyRedactionContext,
+  isNaturalPersonCheckRow,
   isNaturalPersonCounterparty,
   looksLikeBusiness,
   maskIban,
@@ -9,9 +11,11 @@ import {
   PRESIDENCY_UNIT,
   redactBankRow,
   redactCounterpartyName,
+  redactExternalCheckRow,
   redactIbansInText,
   redactRecord,
   redactText,
+  stripPersonNames,
   unitDisplay,
   type RedactionContext,
 } from './redact.ts';
@@ -140,5 +144,125 @@ describe('data-room records', () => {
       descripcion: 'transferencia ES** **** 1332',
       empty: null,
     });
+  });
+});
+
+describe('registry lookups made for a natural person', () => {
+  // A sole trader's lookups as the checks write them: the name as printed on the invoice sits in
+  // the request of several checks, in the search terms of a manual route and, for a legal person
+  // only, in the census result. The placeholder stands for a person's name; no real name is used.
+  const NAME = 'SOLE TRADER NAME PLACEHOLDER';
+  const censusRow = {
+    id: 'c-1',
+    party_id: 'p-1',
+    check_type: 'aeat_census',
+    status: 'ok',
+    request: JSON.stringify({ nif: '12345678Z', name_sent: NAME, natural_person: true, endpoint: 'https://example.test/vnif' }),
+    normalised: JSON.stringify({
+      census_match: true,
+      result: 'IDENTIFICADO',
+      nif: '12345678Z',
+      name_sent: NAME,
+      name_registered: null,
+      natural_person: true,
+      source_verified: false,
+      manual: { url: 'https://example.test/G321', query: '12345678Z' },
+    }),
+    [CHECK_PARTY_NIF_KIND]: 'DNI',
+  };
+
+  it('recognises the row by the party identifier kind or by the check’s own flag', () => {
+    expect(isNaturalPersonCheckRow(censusRow)).toBe(true);
+    expect(isNaturalPersonCheckRow({ ...censusRow, [CHECK_PARTY_NIF_KIND]: null })).toBe(true);
+    expect(
+      isNaturalPersonCheckRow({
+        request: JSON.stringify({ nif: 'B12345674', name: 'OBRES EXEMPLE SL' }),
+        normalised: JSON.stringify({ registered: true }),
+        [CHECK_PARTY_NIF_KIND]: 'CIF',
+      }),
+    ).toBe(false);
+    expect(isNaturalPersonCheckRow({ request: null, normalised: null, [CHECK_PARTY_NIF_KIND]: 'NIE' })).toBe(true);
+    expect(isNaturalPersonCheckRow({ request: null, normalised: null })).toBe(false);
+  });
+
+  it('drops the names at every depth of the request and the result and keeps the outcome', () => {
+    const out = redactExternalCheckRow(censusRow);
+    expect(CHECK_PARTY_NIF_KIND in out).toBe(false);
+    expect(JSON.stringify(out)).not.toContain('PLACEHOLDER');
+    expect(JSON.parse(String(out.request))).toEqual({
+      nif: '12345678Z',
+      natural_person: true,
+      endpoint: 'https://example.test/vnif',
+    });
+    expect(JSON.parse(String(out.normalised))).toEqual({
+      census_match: true,
+      result: 'IDENTIFICADO',
+      nif: '12345678Z',
+      natural_person: true,
+      source_verified: false,
+      manual: { url: 'https://example.test/G321' },
+    });
+    // The other shapes the checks write: a search term equal to the name, nested search terms,
+    // entries and grant rows naming the beneficiary, manual search terms of "identifier · name".
+    const stripped = stripPersonNames({
+      term: NAME,
+      name: NAME,
+      nif: '12345678Z',
+      searched: { nif: '12345678Z', name: NAME },
+      entries: [{ registration_number: '09/08/0004567', name: NAME, nif: null }],
+      grants: [{ reference: 'r1', beneficiary: `***5678** ${NAME}`, amount: 100 }],
+      query: `12345678Z · ${NAME}`,
+      evidence_required: ['the result page with the search terms and the date'],
+    });
+    expect(JSON.stringify(stripped)).not.toContain('PLACEHOLDER');
+    expect(stripped).toEqual({
+      nif: '12345678Z',
+      searched: { nif: '12345678Z' },
+      entries: [{ registration_number: '09/08/0004567', nif: null }],
+      grants: [{ reference: 'r1', amount: 100 }],
+      evidence_required: ['the result page with the search terms and the date'],
+    });
+  });
+
+  it('applies to a row flagged only by the party identifier kind, whatever the check wrote', () => {
+    const out = redactExternalCheckRow({
+      check_type: 'company_profile',
+      request: JSON.stringify({ term: NAME, nif: null, name: NAME, endpoint: 'https://example.test/search' }),
+      normalised: JSON.stringify({ note: 'No profile matched.', searched: { name: NAME } }),
+      [CHECK_PARTY_NIF_KIND]: 'nie',
+    });
+    expect(JSON.stringify(out)).not.toContain('PLACEHOLDER');
+    expect(JSON.parse(String(out.request))).toEqual({ nif: null, endpoint: 'https://example.test/search' });
+    expect(JSON.parse(String(out.normalised))).toEqual({ note: 'No profile matched.', searched: {} });
+  });
+
+  it('leaves a legal person’s row as read, apart from the helper column', () => {
+    const row = {
+      check_type: 'aeat_census',
+      request: JSON.stringify({ nif: 'B12345674', name_sent: 'OBRES EXEMPLE BARNA SL', natural_person: false }),
+      normalised: JSON.stringify({ census_match: true, name_registered: 'OBRES EXEMPLE BARNA SL', natural_person: false }),
+      [CHECK_PARTY_NIF_KIND]: 'CIF',
+    };
+    const out = redactExternalCheckRow(row);
+    expect(out.request).toBe(row.request);
+    expect(out.normalised).toBe(row.normalised);
+    expect(CHECK_PARTY_NIF_KIND in out).toBe(false);
+  });
+
+  it('tolerates parsed payloads, null payloads and text that is not JSON', () => {
+    const parsed = redactExternalCheckRow({
+      request: { nif: '12345678Z', name: NAME, natural_person: true },
+      normalised: null,
+      [CHECK_PARTY_NIF_KIND]: 'DNI',
+    });
+    expect(parsed.request).toEqual({ nif: '12345678Z', natural_person: true });
+    expect(parsed.normalised).toBeNull();
+    const unreadable = redactExternalCheckRow({
+      request: `not json ${NAME}`,
+      normalised: '{}',
+      [CHECK_PARTY_NIF_KIND]: 'DNI',
+    });
+    expect(String(unreadable.request)).not.toContain('PLACEHOLDER');
+    expect(JSON.parse(String(unreadable.request))).toHaveProperty('redacted');
   });
 });

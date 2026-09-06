@@ -1,0 +1,26 @@
+{
+  "_fixture_note": "Synthetic. An OpenMercantil `/api/v1/company/{slug}/officers` answer; names are invented, key names are guesses.",
+  "count": 2,
+  "items": [
+    {
+      "nombre": "EXEMPLE ROCA, JOSEP MARIA",
+      "cargo": "Administrador único",
+      "fecha_nombramiento": "2021-11-08",
+      "seccion": "A",
+      "borme_fecha": "2021-11-22",
+      "num_borme": "224",
+      "pagina": "51234",
+      "anuncio": "512345"
+    },
+    {
+      "nombre": "MOSTRA VIVES, LAIA",
+      "cargo": "Apoderada",
+      "fecha_nombramiento": "2022-03-14",
+      "seccion": "A",
+      "borme_fecha": "2022-03-28",
+      "num_borme": "60",
+      "pagina": "14002",
+      "anuncio": "140021"
+    }
+  ]
+}

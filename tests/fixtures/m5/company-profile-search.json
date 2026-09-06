@@ -1,19 +1,27 @@
 {
-  "_fixture_note": "Synthetic. Shape of an OpenMercantil-style company search response; every key name is a guess and is marked to verify in packages/cli/src/vendors/config.ts. No real company appears here.",
+  "_fixture_note": "Synthetic. Shape of an OpenMercantil `/api/v1/search?q=` answer as the research report established it ({ query, count, offset, items, _attributions }); the field names inside items are still to verify (see SOURCES.openmercantil.toVerify). No real company appears here.",
   "query": "B12345674",
-  "total": 2,
-  "results": [
+  "count": 2,
+  "offset": 0,
+  "items": [
     {
-      "id": "obres-exemple-barna-sl",
+      "slug": "obres-exemple-barna-sl",
       "name": "OBRES EXEMPLE BARNA, S.L.",
       "nif": "B12345674",
       "address": "CARRER DE MOSTRA 100, 08011 BARCELONA"
     },
     {
-      "id": "exemple-serveis-generals-sl",
+      "slug": "exemple-serveis-generals-sl",
       "name": "EXEMPLE SERVEIS GENERALS, S.L.",
       "nif": "B58818501",
       "address": "CARRER DE MOSTRA 100, 08011 BARCELONA"
+    }
+  ],
+  "_attributions": [
+    {
+      "source": "BORME",
+      "licence": "CC BY 4.0",
+      "text": "Datos del BORME estructurados por OpenMercantil (CC BY 4.0) — fuente: https://openmercantil.es/ (fixture wording, to verify)"
     }
   ]
 }

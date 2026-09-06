@@ -2,9 +2,9 @@
  * M5 rules: what the public registers and the vendor documents say once the checks have run.
  *
  * B1 company age and form · B2 address coincidence · B3 surname coincidence · B7 registry
- * registration (REA/RASIC) · B8 vendor concentration · B9 implied invoicing volume ·
- * A10 comparison-quote authenticity · G2 tax filings · G5 lift compliance · G6 health and safety
- * on site · G7 technical building inspection.
+ * registration (REA/RASIC) · B8 vendor concentration · B9 implied invoicing volume · B10 census
+ * identification of the identifier and name (AEAT) · A10 comparison-quote authenticity · G2 tax
+ * filings · G5 lift compliance · G6 health and safety on site · G7 technical building inspection.
  *
  * Neutrality, which matters more here than anywhere else in the system:
  *
@@ -768,6 +768,172 @@ export const B9_impliedVolume: Rule = async ({ cid, client }) => {
 };
 
 // ---------------------------------------------------------------------------
+// B10 — identification of the identifier and name in the tax census (aeat_census)
+// ---------------------------------------------------------------------------
+
+/**
+ * Parties whose identifier may be put to the census: the counterparties on ingested documents.
+ * Owners and the presidency act as members of the community and are never looked up; the
+ * check runner filters them out and this list keeps the rule from ever reading such a row.
+ */
+const CENSUS_KINDS: ReadonlySet<string> = new Set([
+  'vendor',
+  'administrator',
+  'architect',
+  'insurer',
+]);
+
+/** Results of the AEAT service that identify the identifier but qualify its state. */
+const CENSUS_DEREGISTERED = 'IDENTIFICADO-BAJA';
+const CENSUS_REVOKED = 'IDENTIFICADO-REVOCADO';
+
+/**
+ * The latest `aeat_census` row of each vendor party (VNifV2, `checks/aeat-census.ts`) whose
+ * status is `ok` and whose `normalised.census_match` is false: the identifier and the name
+ * printed on the invoices were not identified as a pair in the tax census, or the identifier is
+ * identified but de-registered or revoked. Severity 3, or 2 for a de-registration, which is
+ * compatible with every invoice on file when it post-dates them.
+ *
+ * Only automated results fire: a manual completion carries the reviewer's evidence and no
+ * structured outcome, so it never sets `census_match`. Nothing returned about a natural person
+ * is printed: the summary names neither the party nor the identifier, and the registered name is
+ * carried in `computed` for legal persons only.
+ */
+export const B10_censusIdentity: Rule = async ({ cid, client, today }) => {
+  const hits: RuleHit[] = [];
+  const res = await client.query(
+    `select p.id, p.kind::text as kind, p.nif_kind,
+            coalesce(inv.invoice_total, 0) as invoice_total,
+            inv.first_invoice::text as first_invoice,
+            inv.last_invoice::text as last_invoice,
+            cen.status as census_status, cen.normalised as census,
+            cen.fetched_at::date::text as census_on,
+            (cen.raw_response is not null) as census_archived,
+            (cen.request ? 'answers_check_id') as census_manual
+       from public.parties p
+       left join lateral (
+         select min(v.fecha_expedicion) as first_invoice, max(v.fecha_expedicion) as last_invoice,
+                coalesce(sum(v.total), 0) as invoice_total
+           from public.invoices v where v.vendor_party_id = p.id and v.community_id = $1
+       ) inv on true
+       left join lateral (
+         select c.status, c.normalised, c.fetched_at, c.raw_response, c.request
+           from public.external_checks c
+          where c.community_id = p.community_id and c.check_type = 'aeat_census'
+            and c.subject_key = p.id::text
+          order by c.fetched_at desc limit 1
+       ) cen on true
+      where p.community_id = $1 and p.kind in ('vendor', 'administrator', 'architect', 'insurer')
+      order by p.display_name`,
+    [cid],
+  );
+
+  for (const r of res.rows as Array<Record<string, unknown>>) {
+    // The query restricts the kinds already; the guard keeps the rule explicit should that list
+    // ever widen: no owner or president identifier is ever read here.
+    if (!CENSUS_KINDS.has(String(r.kind ?? ''))) continue;
+    // The latest row decides: a manual item still pending, or a failed call, is not a finding.
+    if (String(r.census_status ?? '') !== 'ok') continue;
+    const census = (r.census as Record<string, unknown> | null) ?? {};
+    if (census.census_match !== false) continue;
+
+    const partyId = String(r.id);
+    const result =
+      census.result === null || census.result === undefined ? null : String(census.result);
+    const resultLabel = result ?? 'not read';
+    const deregistered = result === CENSUS_DEREGISTERED;
+    const revoked = result === CENSUS_REVOKED;
+    const nifKind = String(r.nif_kind ?? '');
+    const natural = census.natural_person === true || nifKind === 'DNI' || nifKind === 'NIE';
+    const sourceVerified = census.source_verified === true;
+    const checkedOn = iso(r.census_on);
+    const total = money(r.invoice_total);
+    const severity: 2 | 3 = deregistered ? 2 : 3;
+
+    const summaryEs = deregistered
+      ? 'El identificador impreso en las facturas figura en el censo de la Agencia Tributaria como dado de baja ' +
+        `(resultado ${resultLabel}). Verificar si la baja es posterior a la última factura.`
+      : revoked
+        ? 'El identificador impreso en las facturas figura en el censo de la Agencia Tributaria con el número revocado ' +
+          `(resultado ${resultLabel}). Verificar.`
+        : 'El identificador impreso en las facturas no ha sido identificado por la Agencia Tributaria con el nombre facturado ' +
+          `(resultado ${resultLabel}). Verificar.`;
+    const summaryEn = deregistered
+      ? 'The identifier printed on the invoices is recorded in the Agencia Tributaria census as de-registered ' +
+        `(result ${resultLabel}). Verify whether the de-registration post-dates the last invoice.`
+      : revoked
+        ? 'The identifier printed on the invoices is recorded in the Agencia Tributaria census as revoked ' +
+          `(result ${resultLabel}). Verify.`
+        : 'The identifier printed on the invoices was not identified by the Agencia Tributaria under the invoiced name ' +
+          `(result ${resultLabel}). Verify.`;
+
+    const innocentExplanations = [
+      'The name or the identifier may have been transcribed wrongly from the document; re-read both on the original page before treating either as incorrect.',
+      'A trade name is often printed on invoices instead of the registered name, and the census matches on the registered name.',
+      'The company may have changed its name recently; the census answers with the current registered name.',
+    ];
+    if (natural) {
+      innocentExplanations.push(
+        'The identifier belongs to a natural person, whose census entry is matched on the complete name (given name and both surnames); a name printed incomplete or in another order is not identified.',
+      );
+    }
+    if (deregistered) {
+      innocentExplanations.push(
+        'A de-registration dated after the last invoice is compatible with every invoice on file having been issued while the entity was registered.',
+      );
+    }
+    if (!sourceVerified) {
+      innocentExplanations.push(
+        'The source endpoint is not yet verified from the operator’s machine; a negative result may be an artefact of the request rather than of the census.',
+      );
+    }
+
+    hits.push({
+      ruleCode: 'B10',
+      severity,
+      eventKey: `party:${partyId}:aeat_identity`,
+      fingerprint: fp('B10', partyId, 'aeat_identity', result ?? ''),
+      entityType: 'party',
+      entityId: partyId,
+      amountAtStake: total,
+      actDateFirst: iso(r.first_invoice),
+      actDateLast: checkedOn ?? today,
+      computed: {
+        result,
+        census_match: false,
+        checked_on: checkedOn,
+        natural_person: natural,
+        // A natural person's echoed name is never carried; a legal person's registered name is.
+        name_registered:
+          natural || census.name_registered === undefined ? null : (census.name_registered ?? null),
+        source_verified: sourceVerified,
+        first_invoice_date: iso(r.first_invoice),
+        last_invoice_date: iso(r.last_invoice),
+      },
+      summaryEs,
+      summaryEn,
+      innocentExplanations,
+      nextCheck:
+        'Ask the vendor, through the administrator, for its certificado de situación censal or a copy of its modelo 036, and compare the registered name and dates with what the invoices print.',
+      resolvingDocument:
+        'Certificado de situación censal de la AEAT; copia del modelo 036/037; nota informativa del Registro Mercantil',
+      independence: checkIndependence({
+        archived: r.census_archived,
+        manual_evidence: r.census_manual,
+      }),
+      extractionQuality: RECORD_QUALITY,
+      evidence: [
+        {
+          label: 'aeat_census_check',
+          computed: { party_id: partyId, checked_on: checkedOn, result },
+        },
+      ],
+    });
+  }
+  return hits;
+};
+
+// ---------------------------------------------------------------------------
 // A10 — authenticity of the comparison quotes
 // ---------------------------------------------------------------------------
 
@@ -1214,6 +1380,7 @@ export const M5_RULES: Record<string, Rule> = {
   B7: B7_registryRegistration,
   B8: B8_vendorConcentration,
   B9: B9_impliedVolume,
+  B10: B10_censusIdentity,
   A10: A10_quoteAuthenticity,
   G2: G2_taxFilings,
   G5: G5_liftCompliance,

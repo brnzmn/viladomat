@@ -312,21 +312,36 @@ suite('M5 vendor module against Postgres', () => {
     expect(await loadPartyLinks(client, seeded.cid)).toHaveLength(stored.length);
   });
 
-  it('keeps the coincidences that have no office-holder role out of party_links', async () => {
+  it('stores the role-less coincidences against the other party and drops those with nothing to point at', async () => {
     const inputs = await loadLinkInputs(client, seeded.cid, TODAY);
     const links = aggregateLinks(
       inputs.vendors.flatMap((v) => scoreVendorLinks(v, inputs.context)),
     );
     const roleless = links.filter((l) => l.role === null);
-    // Shared account digest between the two vendors, shared address with the administrator,
-    // the company's age against its first invoice, and the absent REA entry.
+    // Shared account digest between the two vendors, the company's age against its first
+    // invoice, and the absent REA entry.
     expect(roleless.map((l) => l.signal).sort()).toEqual(
       expect.arrayContaining(['S10', 'S7', 'S8']),
     );
-    const stored = await loadPartyLinks(client, seeded.cid);
-    for (const row of stored) {
-      expect(['president', 'president_family', 'administrator']).toContain(String(row.to_role));
-    }
+    await writePartyLinks(client, seeded.cid, links);
+    const res = await client.query(
+      `select from_party_id, to_role, to_party_id, signal, detail from public.party_links where community_id = $1`,
+      [seeded.cid],
+    );
+    const rows = res.rows as Array<Record<string, unknown>>;
+    // Every row points somewhere: at an office-holder role or at another party (0013 constraint).
+    for (const row of rows) expect(row.to_role !== null || row.to_party_id !== null).toBe(true);
+    // The shared account digest points at the other vendor and keeps the structured detail.
+    const shared = rows.find(
+      (r) => r.from_party_id === seeded.vendorId && r.signal === 'S7' && r.to_role === null,
+    );
+    expect(shared?.to_party_id).toBe(seeded.otherVendorId);
+    // One S7 row aggregates every shared-contact basis of the pair; the detail names the parties.
+    const detail = shared?.detail as Record<string, unknown>;
+    expect(['iban_reuse', 'phone', 'email_mailbox', 'email_domain']).toContain(String(detail.basis));
+    expect(detail.shared_with_party_ids).toContain(seeded.otherVendorId);
+    // Company age and registry state have no counterparty: no row, the fact sheet reports them.
+    expect(rows.filter((r) => r.to_role === null && ['S8', 'S10'].includes(String(r.signal)))).toHaveLength(0);
   });
 
   it('builds a fact sheet with no score, no link and no natural-person name', async () => {

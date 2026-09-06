@@ -1,0 +1,16 @@
+{
+  "_fixture_note": "Synthetic. An OpenMercantil `/api/v1/company/{slug}` answer that carries no officers and no events inline, so the check has to read /officers and /events. Key names are guesses (see SOURCES.openmercantil.toVerify).",
+  "company": {
+    "slug": "obres-exemple-barna-sl",
+    "name": "OBRES EXEMPLE BARNA, S.L.",
+    "nif": "B12345674",
+    "domicilio_social": "CARRER DE MOSTRA 100, 08011 BARCELONA",
+    "codigo_postal": "08011",
+    "municipio": "BARCELONA",
+    "fecha_constitucion": "2021-11-08",
+    "capital_social": "3.000,00",
+    "cnae": "4399",
+    "actividad": "Otras actividades de construcción especializada n.c.o.p.",
+    "situacion": "activa"
+  }
+}

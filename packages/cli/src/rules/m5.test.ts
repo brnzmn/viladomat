@@ -17,6 +17,7 @@ import {
   B7_registryRegistration,
   B8_vendorConcentration,
   B9_impliedVolume,
+  B10_censusIdentity,
   G2_taxFilings,
   G5_liftCompliance,
   G6_healthAndSafety,
@@ -513,6 +514,191 @@ describe('B9 — implied invoicing volume', () => {
   });
 });
 
+describe('B10 — census identification of the identifier and name', () => {
+  const row = (over: Record<string, unknown> = {}): Record<string, unknown> => ({
+    id: VENDOR,
+    kind: 'vendor',
+    nif_kind: 'CIF',
+    invoice_total: '45000.00',
+    first_invoice: '2022-01-10',
+    last_invoice: '2023-06-30',
+    census_status: 'ok',
+    census: {
+      census_match: false,
+      result: 'NO IDENTIFICADO',
+      nif: 'B12345674',
+      name_sent: 'OBRES EXEMPLE BARNA SL',
+      name_registered: null,
+      natural_person: false,
+      source_verified: true,
+    },
+    census_on: '2026-09-01',
+    census_archived: true,
+    census_manual: false,
+    ...over,
+  });
+  const run = (rows: Rows): Promise<RuleHit[]> =>
+    B10_censusIdentity(ctxWith([{ match: "check_type = 'aeat_census'", rows }]));
+
+  it('fires at severity 3 on NO IDENTIFICADO from an archived response, naming nobody', async () => {
+    const hits = await run([row()]);
+    expect(hits).toHaveLength(1);
+    const hit = hits[0] as RuleHit;
+    expect(hit.severity).toBe(3);
+    expect(hit.eventKey).toBe(`party:${VENDOR}:aeat_identity`);
+    expect(hit.summaryEn).toContain('was not identified by the Agencia Tributaria');
+    expect(hit.summaryEn).toContain('result NO IDENTIFICADO');
+    expect(hit.summaryEs).toContain('no ha sido identificado');
+    expect(`${hit.summaryEs} ${hit.summaryEn}`).not.toMatch(/EXEMPLE|B12345674/);
+    expect(hit.independence).toBe(1);
+    expect(hit.amountAtStake).toBe(45000);
+    expect(hit.actDateFirst).toBe('2022-01-10');
+    expect(hit.actDateLast).toBe('2026-09-01');
+    expect(hit.computed.result).toBe('NO IDENTIFICADO');
+    expect(hit.computed.checked_on).toBe('2026-09-01');
+    expect(hit.innocentExplanations.join(' ')).toMatch(/trade name/);
+    expect(hit.innocentExplanations.join(' ')).not.toMatch(/not yet verified/);
+    expect(hit.nextCheck).toMatch(/certificado de situación censal|modelo 036/);
+    expect(hit.resolvingDocument).toMatch(/modelo 036/);
+    expectWellFormed(hits);
+  });
+
+  it('drops to severity 2 on IDENTIFICADO-BAJA and asks about the date of the de-registration', async () => {
+    const hits = await run([
+      row({ census: { census_match: false, result: 'IDENTIFICADO-BAJA', source_verified: true } }),
+    ]);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]?.severity).toBe(2);
+    expect(hits[0]?.summaryEn).toContain('de-registered');
+    expect(hits[0]?.summaryEn).toContain('post-dates the last invoice');
+    expect(hits[0]?.innocentExplanations.join(' ')).toMatch(
+      /de-registration dated after the last invoice/,
+    );
+    expect(hits[0]?.computed.last_invoice_date).toBe('2023-06-30');
+  });
+
+  it('keeps severity 3 on IDENTIFICADO-REVOCADO', async () => {
+    const hits = await run([
+      row({
+        census: { census_match: false, result: 'IDENTIFICADO-REVOCADO', source_verified: true },
+      }),
+    ]);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]?.severity).toBe(3);
+    expect(hits[0]?.summaryEn).toContain('as revoked');
+  });
+
+  it('stays silent when the pair was identified, when the item is still pending by hand, when the call failed, and without any row', async () => {
+    const identified = await run([
+      row({ census: { census_match: true, result: 'IDENTIFICADO', source_verified: true } }),
+    ]);
+    expect(identified).toHaveLength(0);
+
+    const pending = await run([
+      row({
+        census_status: 'manual_pending',
+        census: {
+          manual: true,
+          url: 'https://sede.agenciatributaria.gob.es/Sede/tramitacion/G321.shtml',
+        },
+      }),
+    ]);
+    expect(pending).toHaveLength(0);
+
+    const failed = await run([
+      row({
+        census_status: 'error',
+        census: { error: 'timeout after 10000 ms', source_verified: false },
+      }),
+    ]);
+    expect(failed).toHaveLength(0);
+
+    const none = await run([
+      row({
+        census_status: null,
+        census: null,
+        census_on: null,
+        census_archived: null,
+        census_manual: null,
+      }),
+    ]);
+    expect(none).toHaveLength(0);
+  });
+
+  it('does not fire on a manual completion, which carries evidence but no structured outcome', async () => {
+    const hits = await run([
+      row({
+        census: { manual: true, evidence_uploaded: true, answers_check_id: 'c-pending' },
+        census_archived: true,
+        census_manual: true,
+      }),
+    ]);
+    expect(hits).toHaveLength(0);
+  });
+
+  it('still fires on an unverified source, with the extra innocent explanation', async () => {
+    const hits = await run([
+      row({ census: { census_match: false, result: 'NO IDENTIFICADO', source_verified: false } }),
+    ]);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]?.severity).toBe(3);
+    expect(hits[0]?.computed.source_verified).toBe(false);
+    expect(hits[0]?.innocentExplanations.join(' ')).toMatch(/not yet verified from the operator/);
+  });
+
+  it('adds the natural-person explanation and carries no name for a natural person', async () => {
+    const hits = await run([
+      row({
+        nif_kind: 'DNI',
+        census: {
+          census_match: false,
+          result: 'NO IDENTIFICADO',
+          natural_person: true,
+          // Defensive: even if a name reached the row, the rule never carries it onwards.
+          name_registered: 'NOM EXEMPLE',
+          source_verified: true,
+        },
+      }),
+    ]);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]?.computed.natural_person).toBe(true);
+    expect(hits[0]?.computed.name_registered).toBeNull();
+    expect(JSON.stringify(hits[0])).not.toContain('NOM EXEMPLE');
+    expect(hits[0]?.innocentExplanations.join(' ')).toMatch(/belongs to a natural person/);
+  });
+
+  it('carries the registered name of a legal person and omits the natural-person explanation', async () => {
+    const hits = await run([
+      row({
+        census: {
+          census_match: false,
+          result: 'IDENTIFICADO-BAJA',
+          natural_person: false,
+          name_registered: 'OBRES EXEMPLE BARNA SOCIEDAD LIMITADA',
+          source_verified: true,
+        },
+      }),
+    ]);
+    expect(hits[0]?.computed.name_registered).toBe('OBRES EXEMPLE BARNA SOCIEDAD LIMITADA');
+    expect(hits[0]?.innocentExplanations.join(' ')).not.toMatch(/belongs to a natural person/);
+  });
+
+  it('scores an unarchived response or a manual capture at 0.7', async () => {
+    const unarchived = await run([row({ census_archived: false })]);
+    expect(unarchived[0]?.independence).toBe(0.7);
+    const manual = await run([row({ census_manual: true })]);
+    expect(manual[0]?.independence).toBe(0.7);
+  });
+
+  it('never fires for an owner or the presidency, whatever the row says', async () => {
+    const hits = await run([
+      row({ kind: 'owner_role' }),
+      row({ id: OTHER, kind: 'president_role' }),
+    ]);
+    expect(hits).toHaveLength(0);
+  });
+});
+
 describe('A10 — comparison-quote authenticity', () => {
   const quoteRows = (over: Array<Record<string, unknown>> = []): Canned[] => [
     {
@@ -811,6 +997,7 @@ describe('registry and module wiring', () => {
     expect(Object.keys(M5_RULES).sort()).toEqual([
       'A10',
       'B1',
+      'B10',
       'B2',
       'B3',
       'B7',

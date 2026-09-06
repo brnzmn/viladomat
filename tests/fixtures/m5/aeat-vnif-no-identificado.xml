@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+  <env:Body>
+    <VNifV2Sal xmlns="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Sal.xsd">
+      <Contribuyente>
+        <Nif>A12345674</Nif>
+        <Nombre>SERVEIS EXEMPLE DE PROVA SA</Nombre>
+        <Resultado>NO IDENTIFICADO</Resultado>
+      </Contribuyente>
+    </VNifV2Sal>
+  </env:Body>
+</env:Envelope>

@@ -15,15 +15,26 @@ import path from 'node:path';
 import type pg from 'pg';
 import type { Lang } from './i18n.ts';
 import { applyGates, loadArchivedLegalSources, loadGateFindings, type GateStats } from './gates.ts';
-import { loadRedactionContext, redactBankRow, redactRecord, type RedactionContext } from './redact.ts';
+import {
+  CHECK_PARTY_NIF_KIND,
+  loadRedactionContext,
+  redactBankRow,
+  redactExternalCheckRow,
+  redactRecord,
+  type RedactionContext,
+} from './redact.ts';
 import { sha256 } from './sections.ts';
 
 export interface DataRoomTableSpec {
   /** file base name, also the ledger name in the manifest */
   name: string;
   sql: string;
-  /** `bank` applies the bank-row rules, `record` the generic column rules, `none` exports as read */
-  redaction: 'bank' | 'record' | 'none';
+  /**
+   * `bank` applies the bank-row rules, `record` the generic column rules, `external_check` the
+   * registry-lookup rules (a natural person's names dropped) and then the column rules, `none`
+   * exports as read
+   */
+  redaction: 'bank' | 'record' | 'external_check' | 'none';
   /** also write a JSON copy, for ledgers whose jsonb columns do not fit a CSV cell */
   json?: boolean;
 }
@@ -162,6 +173,32 @@ export const DATA_ROOM_TABLES: readonly DataRoomTableSpec[] = [
     redaction: 'none',
     sql: `select id, title, url, storage_path, sha256, archived_at, excerpt from public.legal_sources order by id`,
   },
+  // Registry lookups: the provenance of every figure a pack takes from a public source (what was
+  // asked, where, when, with which outcome). The archived response stays in the row or in
+  // Storage; officer names are dropped from the normalised payload, which travels as text so the
+  // record redaction applies to it. The party's kind of identifier is read along so a lookup made
+  // for a natural person is reduced to its outcome (`redactExternalCheckRow`): the names inside
+  // its request and its result never leave the database, whatever the check wrote.
+  {
+    name: 'external_checks',
+    redaction: 'external_check',
+    sql: `select c.id, c.party_id, c.check_type, c.subject_type, c.subject_key, c.status, c.source_url,
+                 c.request::text as request, (coalesce(c.normalised, '{}'::jsonb) - 'officers' - 'rows')::text as normalised,
+                 c.evidence_storage_path, c.cost_cents, c.fetched_at,
+                 p.nif_kind::text as ${CHECK_PARTY_NIF_KIND}
+            from public.external_checks c
+            left join public.parties p on p.id = c.party_id
+           where c.community_id = $1 order by c.fetched_at, c.id`,
+    json: true,
+  },
+  // The register of public sources and their verification state, so a reader can see which
+  // sources had been probed when the lookups above were made.
+  {
+    name: 'registry_sources',
+    redaction: 'none',
+    sql: `select id, name, base_url, access, licence_note, verified_at, verified_by, probe_check_id, notes
+            from public.registry_sources order by id`,
+  },
 ];
 
 /** The note that travels with the scores, so they are never read as a verdict. */
@@ -230,7 +267,11 @@ export interface DataRoomBundle {
 
 const REDACTION_NOTE =
   'Natural-person counterparties are replaced by a placeholder; IBANs keep four digits; pseudonymous HMACs are truncated; ' +
-  'units are named by label, and by role where the presidency holds them. Vendor names are kept: they are business data.';
+  'units are named by label, and by role where the presidency holds them. Vendor names are kept: they are business data. ' +
+  'A registry lookup made for a natural person keeps its outcome only: the names inside its request and its result are dropped.';
+
+/** Columns read for the redactors and dropped from the export. */
+const HELPER_COLUMNS: ReadonlySet<string> = new Set(['counterparty_kind', CHECK_PARTY_NIF_KIND]);
 
 /** Build the whole bundle in memory: every ledger, hashed, plus the manifest. */
 export async function buildDataRoom(client: pg.PoolClient, cid: string, today: string, lang: Lang): Promise<DataRoomBundle> {
@@ -250,6 +291,8 @@ export async function buildDataRoom(client: pg.PoolClient, cid: string, today: s
         delete out.counterparty_kind;
         return out;
       });
+    } else if (spec.redaction === 'external_check') {
+      rows = raw.map((r) => redactRecord(redactExternalCheckRow(r), ctx));
     } else if (spec.redaction === 'record') {
       rows = raw.map((r) => redactRecord(r, ctx));
     } else {
@@ -257,7 +300,7 @@ export async function buildDataRoom(client: pg.PoolClient, cid: string, today: s
     }
     // the redactors may rename `unit_id` to `unit_label` and drop helper columns
     const outColumns = columns
-      .filter((c) => c !== 'counterparty_kind')
+      .filter((c) => !HELPER_COLUMNS.has(c))
       .map((c) => (c === 'unit_id' && spec.redaction !== 'none' ? 'unit_label' : c));
     const csv = toCsv(outColumns, rows);
     const csvBuf = Buffer.from(csv, 'utf8');

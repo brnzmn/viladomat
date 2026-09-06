@@ -38,3 +38,7 @@ Thumbs.db
 # test artefacts
 playwright-report/
 test-results/
+
+# client certificates for registry lookups (operator machine only)
+*.p12
+*.pfx

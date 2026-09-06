@@ -1,0 +1,86 @@
+{
+  "_fixture_note": "Synthetic. Shape of the OVC callejero JSON Consulta_DNPRC answer for a 14-character (parcel) reference as recorded in the research report: root consulta_dnprcResult, one lrcdnp.rcdnp entry per unit, Spanish decimals in debi.cpt, control counts. The references are invented and belong to no real property; the street is fictional.",
+  "consulta_dnprcResult": {
+    "control": { "cudnp": 4, "cucons": 0, "cuerr": 0 },
+    "lrcdnp": {
+      "rcdnp": [
+        {
+          "rc": { "pc1": "9999999", "pc2": "ZZ9999Z", "car": "0001", "cc1": "A", "cc2": "B" },
+          "dt": {
+            "loine": { "cp": "08", "cm": "900" },
+            "cmc": "900",
+            "np": "BARCELONA",
+            "nm": "BARCELONA",
+            "locs": {
+              "lous": {
+                "lourb": {
+                  "dir": { "tv": "CL", "nv": "MOSTRA", "pnp": "25" },
+                  "loint": { "es": "1", "pt": "BJ", "pu": "01" },
+                  "dp": "08015"
+                }
+              }
+            }
+          },
+          "debi": { "luso": "Comercial", "sfc": "120", "cpt": "12,400000", "ant": "1928" }
+        },
+        {
+          "rc": { "pc1": "9999999", "pc2": "ZZ9999Z", "car": "0002", "cc1": "C", "cc2": "D" },
+          "dt": {
+            "loine": { "cp": "08", "cm": "900" },
+            "cmc": "900",
+            "np": "BARCELONA",
+            "nm": "BARCELONA",
+            "locs": {
+              "lous": {
+                "lourb": {
+                  "dir": { "tv": "CL", "nv": "MOSTRA", "pnp": "25" },
+                  "loint": { "es": "1", "pt": "EN", "pu": "01" },
+                  "dp": "08015"
+                }
+              }
+            }
+          },
+          "debi": { "luso": "Residencial", "sfc": "70", "cpt": "7,320000", "ant": "1928" }
+        },
+        {
+          "rc": { "pc1": "9999999", "pc2": "ZZ9999Z", "car": "0003", "cc1": "E", "cc2": "F" },
+          "dt": {
+            "loine": { "cp": "08", "cm": "900" },
+            "cmc": "900",
+            "np": "BARCELONA",
+            "nm": "BARCELONA",
+            "locs": {
+              "lous": {
+                "lourb": {
+                  "dir": { "tv": "CL", "nv": "MOSTRA", "pnp": "25" },
+                  "loint": { "es": "1", "pt": "PR", "pu": "01" },
+                  "dp": "08015"
+                }
+              }
+            }
+          },
+          "debi": { "luso": "Residencial", "sfc": "88", "cpt": "9,100000", "ant": "1928" }
+        },
+        {
+          "rc": { "pc1": "9999999", "pc2": "ZZ9999Z", "car": "0004", "cc1": "G", "cc2": "H" },
+          "dt": {
+            "loine": { "cp": "08", "cm": "900" },
+            "cmc": "900",
+            "np": "BARCELONA",
+            "nm": "BARCELONA",
+            "locs": {
+              "lous": {
+                "lourb": {
+                  "dir": { "tv": "CL", "nv": "MOSTRA", "pnp": "25" },
+                  "loint": { "es": "1", "pt": "01", "pu": "02" },
+                  "dp": "08015"
+                }
+              }
+            }
+          },
+          "debi": { "luso": "Residencial", "sfc": "76", "cpt": "7,850000", "ant": "1928" }
+        }
+      ]
+    }
+  }
+}

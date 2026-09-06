@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>REA - Resultado de la consulta (fixture)</title>
+  <style>.tabla td { padding: 2px; }</style>
+</head>
+<body>
+<!-- Synthetic fixture: a result page for a registered company, shaped on the research report
+     (table id tabla-consulta; number AA/PP/SSSSSSS; validity dates). Company and identifier are invented. -->
+<h1>Consulta p&uacute;blica de empresas acreditadas</h1>
+<p>Resultado de la b&uacute;squeda para CIF B12345674.</p>
+<table id="tabla-consulta" class="tabla">
+  <thead>
+    <tr>
+      <th>N&ordm; REA</th>
+      <th>Raz&oacute;n social</th>
+      <th>NIF/CIF</th>
+      <th>Comunidad Aut&oacute;noma</th>
+      <th>Fecha de inscripci&oacute;n</th>
+      <th>Fecha de vencimiento</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>09/08/0004567</td>
+      <td>OBRES EXEMPLE BARNA, S.L.</td>
+      <td>B12345674</td>
+      <td>Catalu&ntilde;a</td>
+      <td>12/05/2022</td>
+      <td>12/05/2025</td>
+      <td>Inscrita</td>
+    </tr>
+  </tbody>
+</table>
+<script>document.getElementById('tabla-consulta').className += ' cargada';</script>
+</body>
+</html>

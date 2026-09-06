@@ -8,7 +8,9 @@
  *  - other owners' units are printed by unit label only, never by holder;
  *  - an IBAN anywhere in the text keeps its last four digits;
  *  - the units held by the presidency role are labelled by role, so a reader learns which rows
- *    concern the office without learning who holds it.
+ *    concern the office without learning who holds it;
+ *  - a registry lookup made for a natural person (a sole trader) keeps its outcome only: the
+ *    names inside its request and its result are dropped before the row leaves the database.
  *
  * The same functions run over pack text, evidence rows and data-room CSV cells, so one rule
  * governs every surface.
@@ -211,6 +213,128 @@ export function redactRecord(row: Record<string, unknown>, ctx: RedactionContext
       continue;
     }
     out[k] = typeof v === 'string' ? redactText(v, ctx) : v;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Registry lookups (external_checks) for natural persons
+// ---------------------------------------------------------------------------
+
+/** Columns of an exported `external_checks` row that carry a JSON payload (as text or parsed). */
+const CHECK_PAYLOAD_COLUMNS = ['request', 'normalised'] as const;
+
+/**
+ * Keys, at any depth of a lookup's request or result, whose value is a name: the name sent to a
+ * source (`name_sent`) and the name a source returned (`name`, `name_registered`, `beneficiary`).
+ * Their values also feed the equality rule of {@link stripPersonNames}, so a search `term` equal
+ * to the name goes with them. Errs towards redacting: a key of a company's own name inside a
+ * natural person's row is dropped too.
+ */
+const PERSON_NAME_KEYS: ReadonlySet<string> = new Set([
+  'name',
+  'name_sent',
+  'name_registered',
+  'beneficiary',
+]);
+
+/**
+ * Keys dropped as well, whose value may carry the name without being one: the search terms typed
+ * for a manual route (`query`, "identifier · name"). Not used for the equality rule, since a
+ * `query` of an identifier alone would otherwise take the identifier fields with it.
+ */
+const PERSON_TEXT_KEYS: ReadonlySet<string> = new Set([...PERSON_NAME_KEYS, 'query']);
+
+/** `parties.nif_kind` values of a natural person: DNI, NIE and the K/L/M identifiers. */
+const NATURAL_PERSON_NIF_KINDS: ReadonlySet<string> = new Set(['DNI', 'NIE', 'SPECIAL']);
+
+/** The helper column the data-room query adds so the party's kind of identifier is known. */
+export const CHECK_PARTY_NIF_KIND = 'party_nif_kind';
+
+function parsePayload(v: unknown): { value: unknown; wasText: boolean } | null {
+  if (v == null) return null;
+  if (typeof v !== 'string') return { value: v, wasText: false };
+  try {
+    return { value: JSON.parse(v) as unknown, wasText: true };
+  } catch {
+    // Not JSON: the text itself could carry the name, so nothing of it is kept.
+    return { value: { redacted: 'unreadable payload of a natural-person lookup' }, wasText: true };
+  }
+}
+
+/**
+ * Whether an exported `external_checks` row is a lookup made for a natural person: the party's
+ * identifier is a person's (`party_nif_kind`), or the check itself flagged the subject
+ * (`natural_person: true` in its request or result).
+ */
+export function isNaturalPersonCheckRow(row: Record<string, unknown>): boolean {
+  const kind = row[CHECK_PARTY_NIF_KIND];
+  if (typeof kind === 'string' && NATURAL_PERSON_NIF_KINDS.has(kind.toUpperCase())) return true;
+  for (const col of CHECK_PAYLOAD_COLUMNS) {
+    const parsed = parsePayload(row[col]);
+    const value = parsed?.value;
+    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+      if ((value as Record<string, unknown>).natural_person === true) return true;
+    }
+  }
+  return false;
+}
+
+function collectNames(value: unknown, into: Set<string>): void {
+  if (value === null || typeof value !== 'object') return;
+  if (Array.isArray(value)) {
+    for (const item of value) collectNames(item, into);
+    return;
+  }
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    if (PERSON_NAME_KEYS.has(k) && typeof v === 'string' && v.trim()) into.add(norm(v));
+    collectNames(v, into);
+  }
+}
+
+function withoutNames(value: unknown, names: ReadonlySet<string>): unknown {
+  if (value === null || typeof value !== 'object') {
+    // A value equal to a dropped name under any other key (a search `term`) goes with it.
+    return typeof value === 'string' && names.has(norm(value)) ? undefined : value;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => withoutNames(item, names)).filter((item) => item !== undefined);
+  }
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    if (PERSON_TEXT_KEYS.has(k)) continue;
+    const kept = withoutNames(v, names);
+    if (kept !== undefined) out[k] = kept;
+  }
+  return out;
+}
+
+/**
+ * Drop every name from a natural person's lookup payload: the name and search-term keys above at
+ * any depth, and any other string equal to one of the names they carried. Pure; exported for
+ * tests.
+ */
+export function stripPersonNames(payload: unknown): unknown {
+  const names = new Set<string>();
+  collectNames(payload, names);
+  return withoutNames(payload, names);
+}
+
+/**
+ * An exported `external_checks` row: the helper column removed and, for a lookup made for a
+ * natural person, the request and the result reduced to what is not a name. A legal person's row
+ * is returned as read (a vendor's name is business data). Applied before {@link redactRecord}.
+ */
+export function redactExternalCheckRow(row: Record<string, unknown>): Record<string, unknown> {
+  const natural = isNaturalPersonCheckRow(row);
+  const out: Record<string, unknown> = { ...row };
+  delete out[CHECK_PARTY_NIF_KIND];
+  if (!natural) return out;
+  for (const col of CHECK_PAYLOAD_COLUMNS) {
+    const parsed = parsePayload(row[col]);
+    if (!parsed) continue;
+    const stripped = stripPersonNames(parsed.value);
+    out[col] = parsed.wasText ? JSON.stringify(stripped) : stripped;
   }
   return out;
 }

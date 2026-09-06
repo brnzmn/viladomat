@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>REA - Consulta pública de empresas (fixture)</title>
+</head>
+<body>
+<!-- Synthetic fixture: the lookup form as the check expects it (field names from the research report,
+     hidden fields invented). No real data. -->
+<h1>Consulta p&uacute;blica de empresas acreditadas</h1>
+<form id="consultaForm" method="post" action="/rea/pub/consulta.htm">
+  <input type="hidden" name="idioma" value="es"/>
+  <input type='hidden' name='_token' value='fixture-token-0001'>
+  <label for="tipoIdentificacion">Tipo de identificaci&oacute;n</label>
+  <select id="tipoIdentificacion" name="tipoIdentificacion">
+    <option value="1">NIF</option>
+    <option value="2">NIE</option>
+    <option value="3">CIF</option>
+    <option value="6">PASAPORTE</option>
+  </select>
+  <label for="numIdentificacion">N&uacute;mero</label>
+  <input type="text" id="numIdentificacion" name="numIdentificacion" value=""/>
+  <input type="submit" name="submitButton_mostrar" value="Mostrar"/>
+</form>
+</body>
+</html>
